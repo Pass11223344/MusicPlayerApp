@@ -19,7 +19,6 @@
 ![k](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/3d9e90cd-fccf-4b49-a30b-6528728084e6)
 ![l](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/a3181181-3c1b-44bd-90c3-087aa67a927e)
 ![m](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/066581be-65c8-4041-9c0a-10d5eb89f7f4)
-![m](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/7b72a425-6b78-40dd-9022-814882aa5d2e)
 ![n](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/db3ae9c5-c5a7-408f-b118-e3b00fb55af9)
 ![o](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/e2ac554b-cf2c-46a4-82dc-5a0acff4142d)
 ![p](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/33d81df6-fff0-444a-bb18-675431a86a54)
