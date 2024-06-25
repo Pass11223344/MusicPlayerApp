@@ -1,7 +1,7 @@
 本项目是一个Android与flutter的混合开发项目
 实现了作为音乐播放器的各个基本功能
-后端使用NeteaseCloudMusicApi作为后端平台进行Api调用
-此项目采用混合开发技术其中原生页为首页，播放页，播放列表页，为保证流畅度所以音乐播放和服务都采用原生开发其余基本上都是flutter页面利用通道来进行两端通信。
+后端使用NeteaseCloudMusicApi作为后端平台进行Api调用，
+此项目采用混合开发技术，其中原生页为首页，播放页，播放列表页，为保证流畅度所以音乐播放和服务都采用原生开发其余基本上都是flutter页面，利用通道来进行两端通信。
 flutterEngine采用FlutterEngineGroup；采用的flutter状态管理框架是Getx
 
 项目功能展示：
