@@ -2,6 +2,9 @@
 实现了作为音乐播放器的各个基本功能
 后端使用NeteaseCloudMusicApi作为后端平台进行Api调用
 项目功能展示：
+
+
+
 ![a](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/87f2dfa3-f77d-4338-80dd-06efdb375a0b)
 ![b](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/41e21eb6-d908-406a-9c34-148c9c643ac7)
 ![c (2)](https://github.com/Pass11223344/MusicPlayerApp/assets/138595065/9a875bae-e8af-448d-9706-92e549f9f0c7)
