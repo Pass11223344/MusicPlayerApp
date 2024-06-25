@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/group_one"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/sidebar_item_setting"
+            android:icon="@drawable/baseline_settings_24"
+
+            android:title="设置" />
+        <item
+            android:id="@+id/sidebar_item_blacklist"
+            android:icon="@drawable/baseline_do_disturb_alt_24"
+            android:title="音乐黑名单" />
+        <item
+            android:id="@+id/sidebar_item_share"
+            android:icon="@drawable/baseline_share_24"
+            android:title="分享软件" />
+        <item
+            android:id="@+id/sidebar_item_about"
+            android:icon="@drawable/baseline_error_outline_24"
+            android:title="分享软件" />
+        <item
+            android:id="@+id/sidebar_item_out"
+            android:icon="@drawable/baseline_power_settings_new_24"
+            android:title="分享软件" />
+
+    </group>
+</menu>

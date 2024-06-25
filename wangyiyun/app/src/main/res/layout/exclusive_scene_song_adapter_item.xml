@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RE_exclusive_root"
+    android:layout_width="wrap_content"
+    android:layout_height="200dp"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/RE_group"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+
+
+            <ImageView
+
+                android:id="@+id/IV_exclusive_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                />
+
+            <LinearLayout
+                android:padding="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:layout_alignRight="@+id/IV_exclusive_img"
+                android:layout_alignTop="@+id/IV_exclusive_img"
+                android:orientation="horizontal">
+                <ImageView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:src="@android:drawable/stat_sys_headset"
+
+                    />
+
+                <TextView
+                    android:id="@+id/TV_exclusive_playCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="3dp"
+                    android:textStyle="bold"
+                    android:background="@color/transparent"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/IV_exclusive_img"
+                android:layout_alignBottom="@+id/IV_exclusive_img"
+                android:background="@color/transparent"
+                android:padding="4dp"
+                android:src="@android:drawable/ic_media_play" />
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/TV_exclusive_title"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_below="@+id/IV_exclusive_img"
+            android:layout_weight="1.2"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:paddingTop="10dp"
+            android:textSize="14sp"
+
+
+            />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
