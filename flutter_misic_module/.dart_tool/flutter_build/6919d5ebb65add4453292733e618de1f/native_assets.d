@@ -1,0 +1,1 @@
+ E:\\FlutterObject\\flutter_misic_module\\.dart_tool\\flutter_build\\6919d5ebb65add4453292733e618de1f\\native_assets.yaml: 
