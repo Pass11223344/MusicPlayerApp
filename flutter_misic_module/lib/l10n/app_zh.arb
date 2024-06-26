@@ -1,0 +1,8 @@
+{
+  "@@locale": "zh",
+  "helloWorld": "你好，世界！",
+  "welcomeMessage": "欢迎来到我们的应用",
+  "continueButton": "继续",
+  "settings": "设置",
+  "logout": "退出登录"
+}

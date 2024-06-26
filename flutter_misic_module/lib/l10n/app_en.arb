@@ -1,0 +1,12 @@
+{
+  "@@locale": "en",
+  "appVersion": "Version: {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helloWorld": "helloWorld"
+}
