@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".activity.LoginPage">
+
+    <LinearLayout
+        android:paddingTop="60dp"
+        android:background="@drawable/home_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="-80dp"
+
+            android:background="@color/transparent"
+            android:src="@drawable/baseline_account_circle_24" />
+
+        <EditText
+
+            android:id="@+id/ed_account"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/color_style"
+            android:drawableLeft="@drawable/baseline_phone_iphone_24"
+            android:gravity="center"
+            android:hint="账号"
+            android:drawablePadding="-20dp"
+            android:padding="10dp"
+            android:selectAllOnFocus="true"
+            android:inputType="phone"
+            android:textColorHint="@color/light_gray" />
+
+        <EditText
+
+            android:id="@+id/ed_password"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/color_style"
+            android:drawableLeft="@drawable/baseline_admin_panel_settings_24"
+            android:hint="请输入密码"
+            android:inputType="textPassword"
+            android:drawablePadding="-20dp"
+            android:padding="10dp"
+            android:selectAllOnFocus="true"
+            android:textAlignment="center"
+            android:textColorHint="@color/light_gray" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_margin="55dp"
+            android:background="@drawable/gradient_color"
+            android:text="登录" />
+    </LinearLayout>
+
+
+
+</LinearLayout>
