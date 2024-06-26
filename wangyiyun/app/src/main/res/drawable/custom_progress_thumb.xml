@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- custom_progress_thumb.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <size
-        android:width="16dp"
-        android:height="16dp" />
-    <solid android:color="#FFFFFF" /> <!-- 设置进度点的颜色 -->
-</shape>
