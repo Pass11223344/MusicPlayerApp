@@ -172,7 +172,7 @@ getPage() {
       return  searchPage();
     default:
 
-      return  MyApps();
+      return  myPage();
   }
 }
 

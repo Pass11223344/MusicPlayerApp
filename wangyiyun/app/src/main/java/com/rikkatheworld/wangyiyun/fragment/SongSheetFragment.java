@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -46,6 +47,7 @@ public class SongSheetFragment extends Fragment {
     private App app;
     private RecyclerView song_sheet;
     private List<songSheet> list;
+    private  ProgressBar progressBar;
 
     public SongSheetFragment(HomeFragment.NavigationToSecond secondPage) {
        this.secondPage = secondPage;
@@ -71,10 +73,12 @@ public class SongSheetFragment extends Fragment {
         NetworkUtils.makeRequest(NetworkInfo.URL + "/top/playlist/highquality", songSheetHandler,SONG_SHEET , true, getContext());
         song_sheet = getView().findViewById(R.id.recycler_song_sheet);
         song_sheet.setLayoutManager(new GridLayoutManager(getContext(),3));
+        progressBar = getView().findViewById(R.id.progressBar);
         ImageView btn_back = getView().findViewById(R.id.song_sheet_back);
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
                 requireActivity().onBackPressed();
             }
         });
@@ -100,6 +104,7 @@ public class SongSheetFragment extends Fragment {
                             Log.d("TAG---------", "dispatchMessage: "+list.get(0).getName());
                             GridItemAdapter adapter = new GridItemAdapter(getContext(),secondPage);
                             adapter.setData(list);
+                            progressBar.setVisibility(View.GONE);
                             song_sheet.setAdapter(adapter);
 
                             //                        else if(json==null){

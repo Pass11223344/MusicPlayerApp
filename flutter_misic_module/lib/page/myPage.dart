@@ -55,7 +55,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
     _scrollController = ScrollController(keepScrollOffset: false);
     _myPageController = myPageController();
     _tabController.addListener(_onTabChanged);
-
+    getTabData();
 
 
   }
@@ -246,57 +246,63 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                               ],
                             ),
                           ),
-                          bottom: PreferredSize(
+                          bottom:
+
+                          PreferredSize(
                             preferredSize: const Size.fromHeight(56),
-                            child: Container(
-                              height: 90,
-                              decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(16),topLeft: Radius.circular(16)),
-                                  color: Colors.white
-                              ),
-                              child:Column(
-                                children: [
-                                  SizedBox(
-                                    height: 50,
-                                    child: TabBar(
-                                      controller: _tabController,
-                                      indicatorPadding: EdgeInsets.zero,
-                                      dividerHeight:0 ,
-                                      indicatorColor: Colors.red,
-                                      labelColor: Colors.black,
-                                      unselectedLabelColor: Color(0xff77767c),
-                                      tabs: const[
-                                        Text("音乐" ,style: TextStyle(fontSize: 20,)),
-                                        Text("视频",style: TextStyle(fontSize: 20)),
-                                        Text("动态",style: TextStyle(fontSize: 20)),
-                                      ],
-                                    ),
-                                  ),
-                                Obx((){
-                                  return
-                                    SizedBox(height: _myPageController.selectedIndex==0?40:0,child:
-                               _myPageController.selectedIndex==0 ?
-                                    Container(
-                                      color: Colors.white,
+                            child:
+                            Obx((){
+                              return Container(
+                                height:  90,
+                                decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(topRight: Radius.circular(16),topLeft: Radius.circular(16)),
+                                    color: Colors.white
+                                ),
+                                child:Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 50,
                                       child: TabBar(
-                                          isScrollable: false,
-                                          dividerHeight:double.nan ,
-                                          labelColor: Colors.black,
-                                          unselectedLabelColor: Color(0xff77767c),
-                                          labelStyle: TextStyle(fontSize: 16 ),
-                                          padding: EdgeInsets.only(right: 200),
-                                          controller:  _tabControllerWithMusicTab,
-                                          indicator: BoxDecoration(),
-                                          tabs: [
-                                            Tab(text:"近期"),
-                                            Tab(text: "创建")
-                                          ]),) : SizedBox(height: 0,)
+                                        controller: _tabController,
+                                        indicatorPadding: EdgeInsets.zero,
+                                        dividerHeight:0 ,
+                                        indicatorColor: Colors.red,
+                                        labelColor: Colors.black,
+                                        unselectedLabelColor: Color(0xff77767c),
+                                        tabs: const[
+                                          Text("音乐" ,style: TextStyle(fontSize: 20,)),
+                                          Text("视频",style: TextStyle(fontSize: 20)),
+                                          Text("动态",style: TextStyle(fontSize: 20)),
+                                        ],
+                                      ),
+                                    ),
+                                    Visibility(
+                                        visible: _myPageController.selectedIndex==0,
+                                        child:  Container(
+                                          height: 40,
+                                          color: Colors.white,
+                                          child: TabBar(
+                                              isScrollable: false,
+                                              dividerHeight:double.nan ,
+                                              labelColor: Colors.black,
+                                              unselectedLabelColor: Color(0xff77767c),
+                                              labelStyle: TextStyle(fontSize: 16 ),
+                                              padding: EdgeInsets.only(right: 200),
+                                              controller:  _tabControllerWithMusicTab,
+                                              indicator: BoxDecoration(),
+                                              tabs: [
+                                                Tab(text:"近期"),
+                                                Tab(text: "创建")
+                                              ]),))
 
 
-                                  );})
 
-                                ],
-                              ),),
+
+
+                                  ],
+                                ),);
+                            })
+                           ,
 
                           ),
                         )
