@@ -1,6 +1,6 @@
 
 
-part 'notificationListBean.g.dart';
+part 'NotificationListBean.g.dart';
 //receiveUserId = toUser为自己
 //sendUserUserId = fromUser为对方
 class notificationListBean{

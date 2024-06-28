@@ -1,5 +1,5 @@
 
-import 'package:flutter_misic_module/bean/relayBean.dart';
+import 'package:flutter_misic_module/bean/RelayBean.dart';
 import 'package:get/get.dart';
 
 import '../bean/SongSheetList.dart';

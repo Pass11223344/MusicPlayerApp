@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:get/get.dart';
 
-import '../bean/msgBean.dart';
+import '../bean/MsgBean.dart';
 
 class chatPageController extends GetxController{
   RxList<msgBean> _msgList = <msgBean>[].obs;

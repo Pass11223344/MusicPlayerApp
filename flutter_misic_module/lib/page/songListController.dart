@@ -3,7 +3,7 @@ import 'package:get/get_rx/get_rx.dart';
 
 import '../bean/AlbumListBean.dart';
 import '../bean/SongSheetList.dart';
-import '../bean/songListBean.dart';
+import '../bean/SongListBean.dart';
 
 class songListController extends GetxController{
   RxList<songListBean> _songList = <songListBean>[].obs;

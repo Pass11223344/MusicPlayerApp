@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'AlbumListBean.dart';
 import 'CommentInfoBean.dart';
-part 'relayBean.g.dart';
+part 'RelayBean.g.dart';
 @JsonSerializable()
 class relayBean{
   int size ;
@@ -26,11 +26,15 @@ class Events {
   User user;
   Message? message;
   Message? get() => message;
-  set(Message? msg) => message = msg;
+ Events set(Message? msg) {
+  message = msg;
+  return this;
+  }
   Events(this.info, this.id, this.showTime, this.json, this.ipLocation,
       this.user);
   factory Events.fromJson(Map<String,dynamic> json)=>_$EventsFromJson(json);
   Map<String,dynamic> toJson() => _$EventsToJson(this);
+
 }
 @JsonSerializable()
 class Info {

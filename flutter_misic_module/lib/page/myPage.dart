@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_misic_module/bean/relayBean.dart';
+import 'package:flutter_misic_module/bean/RelayBean.dart';
 import 'package:get/get.dart';
 
 
 
 import '../NetWork/DioRequest.dart';
 import '../bean/SongSheetList.dart';
-import '../bean/userInfoBean.dart';
+import '../bean/UserInfoBean.dart';
 import '../main.dart';
 import 'msgListPage.dart';
 import 'myPageController.dart';
@@ -55,7 +55,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
     _scrollController = ScrollController(keepScrollOffset: false);
     _myPageController = myPageController();
     _tabController.addListener(_onTabChanged);
-    getTabData();
+
 
 
   }
@@ -325,8 +325,8 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                       controller: _tabController,
                       children: [
                         _secondaryTabWithMusicTab(_tabControllerWithMusicTab,mediaQuery),
-                        _secondaryTabWithPodcastTab(_tabControllerWithPodcastTab,mediaQuery),
-                        Center(child: Text('Tab 3 Content')),
+                        _secondaryTabWithPodcastTab(mediaQuery),
+                    _pageThreeTabView()
                       ],
                     ) ,
                   ),
@@ -379,7 +379,6 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                               return
                               InkWell(
                                 onTap: (){
-                                  print("object11111111111111111111111111111");
                                  channel.invokeMethod("addPage",
                                      {"sheetId":sheetList[index].id});
                                   Navigator.pushNamed(context, "main/songListPage",arguments: {"type":"to_my_page_song_list",
@@ -488,51 +487,47 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
               }),
         ]);
   }
-  _secondaryTabWithPodcastTab(TabController controller,MediaQueryData mediaQuery){
-    return TabBarView(
-        controller: controller,
-        children: [
-          Builder(builder: (context){
-            return  CustomScrollView(
-              key: PageStorageKey<String>("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}"),
-              slivers: <Widget>[
-                SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
-                SliverFixedExtentList(
-                  //  key: PageStorageKey<String>("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}"),
-                    delegate:
-                SliverChildBuilderDelegate(
-                    childCount: 12,
-                        (context,index){
-                      return  Padding(padding: EdgeInsets.only(left: 10,right: 10,bottom: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 80,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                  image:DecorationImage(image: AssetImage("images/img.png"),fit: BoxFit.cover) ,
-                                  borderRadius: BorderRadius.circular(8)
-                              ),
-                            ),
-                            Padding(padding: EdgeInsets.only(left: 10),child:  Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}",style:  TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),maxLines: 1,overflow: TextOverflow.ellipsis,),
-                                Text("副标题",style: TextStyle(fontSize: 12,color: Colors.grey),maxLines: 1,overflow: TextOverflow.ellipsis),
-
-                              ],),)
-
-                          ],
+  _secondaryTabWithPodcastTab(MediaQueryData mediaQuery){
+    return CustomScrollView(
+      key: PageStorageKey<String>("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}"),
+      slivers: <Widget>[
+        SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+        SliverFixedExtentList(
+          //  key: PageStorageKey<String>("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}"),
+            delegate:
+            SliverChildBuilderDelegate(
+                childCount: 12,
+                    (context,index){
+                  return  Padding(padding: EdgeInsets.only(left: 10,right: 10,bottom: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          height: 80,
+                          width: 80,
+                          decoration: BoxDecoration(
+                              image:DecorationImage(image: AssetImage("images/img.png"),fit: BoxFit.cover) ,
+                              borderRadius: BorderRadius.circular(8)
+                          ),
                         ),
-                      );
-                    })
-                    , itemExtent: 100)
-              ],
-            );
-          }),
+                        Padding(padding: EdgeInsets.only(left: 10),child:  Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("listKey${_tabController.index}-${_tabControllerWithPodcastTab.index}",style:  TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.bold),maxLines: 1,overflow: TextOverflow.ellipsis,),
+                            Text("副标题",style: TextStyle(fontSize: 12,color: Colors.grey),maxLines: 1,overflow: TextOverflow.ellipsis),
 
+                          ],),)
 
-        ]);
+                      ],
+                    ),
+                  );
+                })
+            , itemExtent: 100)
+      ],
+    );
+  }
+  _pageThreeTabView() {
+    getTabData();
+return Container();
   }
 
   getTabData() async {
@@ -575,6 +570,8 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
 
 
    }
+
+
 
 
 

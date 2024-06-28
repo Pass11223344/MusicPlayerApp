@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'songListBean.dart';
+part of 'SongListBean.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

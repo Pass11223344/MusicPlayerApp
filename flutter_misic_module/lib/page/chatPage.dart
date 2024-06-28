@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_misic_module/bean/msgBean.dart';
+import 'package:flutter_misic_module/bean/MsgBean.dart';
 import 'package:flutter_misic_module/page/chatPageController.dart';
 import 'package:flutter_misic_module/page/msgListPage.dart';
 import 'package:get/get.dart';

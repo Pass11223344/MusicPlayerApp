@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'relayBean.dart';
+part of 'RelayBean.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -55,7 +55,7 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
 
 CommentThread _$CommentThreadFromJson(Map<String, dynamic> json) =>
     CommentThread(
-      json['resourceTitle'] as String,
+      json['resourceTitle'] ==null?"分享单曲":  json['resourceTitle'] as String,
     );
 
 Map<String, dynamic> _$CommentThreadToJson(CommentThread instance) =>

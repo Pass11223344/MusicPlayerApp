@@ -3,7 +3,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'msgBean.g.dart';
+part 'MsgBean.g.dart';
 
 @JsonSerializable()
 class msgBean {

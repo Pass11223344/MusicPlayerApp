@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 
 
 
-import '../bean/notificationListBean.dart';
+import '../bean/NotificationListBean.dart';
 import '../main.dart';
 import 'myPageController.dart';
 

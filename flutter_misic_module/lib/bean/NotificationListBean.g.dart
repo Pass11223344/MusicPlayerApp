@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'notificationListBean.dart';
+part of 'NotificationListBean.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator

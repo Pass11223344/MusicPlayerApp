@@ -1,7 +1,7 @@
 
 
 
-part 'songListBean.g.dart';
+part 'SongListBean.g.dart';
 
 class songListBean {
   String name;

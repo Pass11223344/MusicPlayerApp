@@ -16,7 +16,7 @@ import 'package:get/get.dart';
 
 import '../NetWork/DioRequest.dart';
 import '../bean/SongSheetList.dart';
-import '../bean/songListBean.dart';
+import '../bean/SongListBean.dart';
 import '../main.dart';
 
 import '../util/Utils.dart';

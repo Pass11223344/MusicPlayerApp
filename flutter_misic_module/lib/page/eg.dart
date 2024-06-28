@@ -1,7 +1,11 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-//import 'package:flutter_app/pullandpush.dart';
-//import "package:pull_to_refresh/pull_to_refresh.dart";
+
+import '../bean/RelayBean.dart';
+import '../main.dart';
+
 
 
 
@@ -19,12 +23,13 @@ class MyAppState extends State<MyApps> with TickerProviderStateMixin {
   late TabController tc1;
   Duration _kScrollDuration = Duration(milliseconds: 100);
   Curve _kScrollCurve = Curves.fastOutSlowIn;
+   relayBean? _relayBeans ;
   @override
   void initState() {
     for (int i = 0; i < 20; i++) {
       listData.add(new ListItem("我是测试标题$i", Icons.cake));
     }
-
+    getTabData();
     tc = new TabController(length: 2, vsync: this);
     tc.addListener(() {
       //var offset=sc.offset+1000;
@@ -39,7 +44,21 @@ class MyAppState extends State<MyApps> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
   }
+  getTabData() async {
+    //relay;
+    var   executeGet = await dioRequest.executeGet(url: "/user/event",params: {"uid":287870880});
+    var relayBeans = relayBean.fromJson(executeGet);
+    relayBeans.events.forEach((event) {
+      var message = Message.fromJson(jsonDecode(event.json));
+      event.set(message);
+    });
+    print("object11111122211111${relayBeans.events[0].message?.msg}");
+    _relayBeans = relayBeans;
 
+setState((){});
+
+
+  }
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;

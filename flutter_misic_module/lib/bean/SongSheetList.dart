@@ -1,5 +1,5 @@
 
-import 'package:flutter_misic_module/bean/userInfoBean.dart';
+import 'package:flutter_misic_module/bean/UserInfoBean.dart';
 
 
 part 'SongSheetList.g.dart';
