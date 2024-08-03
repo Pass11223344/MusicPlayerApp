@@ -4,11 +4,11 @@ import java.util.List;
 
 public class ConcentrationBean {
     String creativeId,titleDesc,songName,picUrl;
-    int songId;
+    long songId;
     String ModuleTitle;
     List<Data.Creatives.Resources.ResourceExtInfo.SongData.Artists> artists;
 
-    public ConcentrationBean(String creativeId, String titleDesc, String songName, String picUrl, int songId, List<Data.Creatives.Resources.ResourceExtInfo.SongData.Artists> artists,String ModuleTitle) {
+    public ConcentrationBean(String creativeId, String titleDesc, String songName, String picUrl, long songId, List<Data.Creatives.Resources.ResourceExtInfo.SongData.Artists> artists,String ModuleTitle) {
         this.creativeId = creativeId;
         this.titleDesc = titleDesc;
         this.songName = songName;
@@ -66,11 +66,11 @@ public class ConcentrationBean {
         this.picUrl = picUrl;
     }
 
-    public int getSongId() {
+    public long getSongId() {
         return songId;
     }
 
-    public void setSongId(int songId) {
+    public void setSongId(long songId) {
         this.songId = songId;
     }
 
@@ -97,7 +97,7 @@ public class ConcentrationBean {
                     public SongData  songData;
                     public class SongData{
                       public String  name;
-                      public int id;
+                      public long id;
                       public List<Artists> artists;
                       public Album  album;
                       public class Artists{

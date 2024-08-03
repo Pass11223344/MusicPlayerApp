@@ -826,6 +826,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             isUpData = 1;
             Drawable drawable = play_module.getDrawable();
             int drawable_hashCode = drawable.getConstantState().hashCode();
+            Log.d("TAG----------------ss", "onClick: "+(app.touchType == EXCLUSIVE_MUSIC));
+
             if (app.touchType == EXCLUSIVE_MUSIC) {
 
 
@@ -898,7 +900,9 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
             switchSong = true;
             if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
-                playerPageAdapter.setData(playerInfo.getListBeans());}
+                playerPageAdapter.setData(playerInfo.getListBeans());
+                songListAdapter.upData(playerInfo.getListBeans());
+            }
             if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==getCurrentPagerIdx())return;
             next_song.setClickable(false);
 
@@ -1060,33 +1064,33 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     @Override
     public void onPageSelected(int position) {
-        Log.d("TAG11111111111122333", "onPageSelected: ");
+        Log.d("TAG11111111111122333", "onPageSelected: "+playerInfo.getListBeans().size());
         isScroll = true;
         if (instance.serviceBinder!=null) {
             instance.serviceBinder.playOrPause(STATE_PLAY);
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
         }
-        if (CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
+        if (app.touchType == EXCLUSIVE_MUSIC) {
             if (playerInfo.getListBeans().size()-1==position) {
                 homeFragment.loadOk = false;
                 isUpData = 1;
                 homeFragment.loadMp3("radio");
-                return;
-            }
-            if ( isUpData == 1){
+               // return;
+            } else   if ( isUpData == 1){
+                Log.d("TAG-------------->", "onPageSelected: ");
                 isUpData = 2;
                 playerPageAdapter.setData(playerInfo.getListBeans());
-                return;
+                songListAdapter.upData(playerInfo.getListBeans());
+              //  return;
             }
-
            // player_viewPage.setCurrentItem(position1+1);
         }
             if(!isOnClick&&!switchSong){
-                if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
+                if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){
+                    isUpData = 2;
                     playerPageAdapter.setData(playerInfo.getListBeans());
                 return;
                 }
-
                 if (CURRENT_PLAY_MODE!=RANDOM_PLAY_MODE) {
                     if (inTO){
                         inTO = false;
@@ -1164,7 +1168,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 return playerInfo.getSongId()==num;});
 
             player_heart.setImageDrawable((likeOrNot||isIn?getDrawable(R.drawable.baseline_favorite):getDrawable(R.drawable.baseline_not_favorite)));
-
             likeOrNot1 = likeOrNot || isIn;
             if (instance.serviceBinder!=null){
                 loadNetWork("lyric",null,0);

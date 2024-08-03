@@ -90,10 +90,12 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.Holder
 
     }
     public void upData(List<ListBean> list){
+        Log.d("TAG-------zoul走了", "upData: ");
         if (listBeans!=null) {
             listBeans.clear();
         }
         this.listBeans.addAll(list);
+
     notifyDataSetChanged();
 
     }

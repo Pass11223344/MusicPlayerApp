@@ -165,9 +165,6 @@ public void setData(List<ListBean> list){
     }
     this.list.addAll(list);
 notifyDataSetChanged();
-
-
-
 }
 
     @Override

@@ -174,6 +174,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     Set<Integer> generated = new HashSet<>();
     SecureRandom secureRandom = new SecureRandom();
     private int number;
+    private int currentNumber;
     private View load_page;
     private RelativeLayout home_root;
 
@@ -458,11 +459,15 @@ public void hideFragment(){
     public   void loadMp3(String type){
         switch (type){
             case  "radio":
-                while(generated.size() < N) {
                     // 生成-180到180之间的随机数
                     number = secureRandom.nextInt(363) - 181;
+                    if (number!=currentNumber) {
+                        currentNumber = number;
+                    }else number -=1;
                     generated.add(number);
-                }
+
+                Log.d("TAG---aaaaaa", "loadMp3: "+number);
+
                 NetworkUtils.makeRequest(NetworkInfo.URL +"/aidj/content/rcmd?longitude="+number+"&latitude="+(number-1),homeHandler,SONGS,true,getContext());
                 break;
             //   case ""
@@ -657,8 +662,6 @@ public void hideFragment(){
                                 Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: "+ar);
                                 Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
                                 List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(ar,token);
-
-
                                 listBean.setSingerInfo(SingerInfo);
                                 listBean.setSongName(exclusiveMusicBean.getValue().songData.name);
                                 listBean.setSongId(exclusiveMusicBean.getValue().songData.id);
@@ -670,7 +673,11 @@ public void hideFragment(){
                         }
                         if (playerInfo.getListBeans()!=null) {
                            playerInfo.addListBeans(list);
-                            ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
+                            activityMainBinding.setPlayerInfo(playerInfo);
+                            for (ListBean listBean : list) {
+                                Log.d("TAG--------过来的数据为", "dispatchMessage: "+listBean.getSongName());
+                            }
+                           // ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
                         }else {
                             playerInfo.setListBeans(list);
                             setImg.setImg(list.get(0).getImgUrl());
@@ -683,10 +690,12 @@ public void hideFragment(){
                             playerInfo.setSingerName(name);
                             playerInfo.setSongId(list.get(0).getSongId());
                             activityMainBinding.setPlayerInfo(playerInfo);
-                            activityMainBinding.setPlayerInfo(playerInfo);
+
                             ((MainActivity) getContext())
-                                    .play(String.valueOf(playerInfo.getListBeans().get(playerInfo.getListBeans().size()-2).getSongId()),null);
-                            setList.setListInfo(playerInfo.getListBeans());}
+                                    .play(String.valueOf(playerInfo.getListBeans().get(0).getSongId()),null);
+                            setList.setListInfo(playerInfo.getListBeans());
+
+                        }
 
 
                       //  setCurrentPageItem.setCurrentItem(0);

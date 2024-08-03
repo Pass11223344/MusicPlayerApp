@@ -315,7 +315,7 @@ public class Home_GsonUtil {
                             JSONObject subTitle = (JSONObject) uiElement.get("subTitle");
                             String ModuleTitle = (String) subTitle.get("title");
                             String titleDesc="", songName="", imageUrl="", singer = "",creativeId="";
-                            int songId = 0,singerId=0;
+                            long songId = 0,singerId=0;
                          //   HomeFragment.UpDateText(ModuleTitle, "concentration_title");
                             List<ConcentrationBean>list= new ArrayList<>();
                             ConcentrationBean.Data info = gson.fromJson(String.valueOf(jsonObject), ConcentrationBean.Data.class);

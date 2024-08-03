@@ -183,16 +183,11 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
         playOrPause(STATE_STOP);
         if (mp != null&&mp.isPlaying()) {
-//            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==mViewChange.currentIndex()){
-//                Log.d("TAG--------", "onPrepared:最后一首 ");
-//                isUpData = 1;
-//                mViewChange.loadUrl();
-//            }
+
             duration = mp.getDuration();
             String duration = Utils.getTime(this.duration);
             playerInfo.setDuration(duration);
             activityMainBinding.setPlayerInfo(playerInfo);
-
             starTime();
             currentPosition = () -> {
                 if ( mViewChange != null) {
@@ -225,9 +220,6 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
                         }
                     }
             ,800);
-
-
-
 
 
     }
