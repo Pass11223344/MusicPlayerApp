@@ -78,12 +78,11 @@
             app:behavior_hideable = "true"
             app:behavior_peekHeight="0dp"
             app:layout_behavior="@string/bottom_sheet_behavior">
+
             <include
                 android:id="@+id/include_player"
                 layout="@layout/layout_player"
-                app:playerInfo = "@{playerInfo}"
-                />
-
+                app:playerInfo="@{playerInfo}" />
         </FrameLayout>
 
 

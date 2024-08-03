@@ -828,7 +828,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             int drawable_hashCode = drawable.getConstantState().hashCode();
             if (app.touchType == EXCLUSIVE_MUSIC) {
 
-                Log.d("TAG----------------ss", "onClick: "+(getDrawable(ExclusiveMusicMode[0]).getConstantState().hashCode())+"---------"+drawable.hashCode());
 
                 if (CURRENT_PLAY_MODE ==   UNLIMITED_PLAYBACK_MODE) {
                     CURRENT_PLAY_MODE =   SINGLE_PLAY_MODE;
