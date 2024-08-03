@@ -8,7 +8,7 @@ part of 'SongSheetList.dart';
 
 SongSheetList _$SongSheetListFromJson(Map<String, dynamic> json) =>
     SongSheetList(
-        json['creator'] ==null?userInfoBean("","","",0,0,0,0,0,0,0,0) : userInfoBean.fromJson(json['creator'] as Map<String, dynamic>),
+        json['creator'] ==null?UserInfoBean("","","",0,0,0,0,0,0,0,0) : UserInfoBean.fromJson(json['creator'] as Map<String, dynamic>),
       (json['trackCount'] as num).toInt(),
       (json['playCount'] as num).toInt(),
       (json['id'] as num).toInt(),
@@ -24,8 +24,9 @@ SongSheetList _$SongSheetListFromJson(Map<String, dynamic> json) =>
           json['backgroundCoverUrl'] == null ? "" : json['backgroundCoverUrl'] as String,
           json['detailPageTitle'] == null?"" :json['detailPageTitle'] as String,
           json['sharedUsers'] == null ? [] :(json['sharedUsers'] as List<dynamic>)
-              .map((e) => SharedUsers.fromJson(e as Map<String, dynamic>))
+              .map((e) => UserInfoBean.fromJson(e as Map<String, dynamic>))
               .toList(),
+        json['subscribed']==null?false:  json['subscribed'] as bool
     );
 
 Map<String, dynamic> _$SongSheetListToJson(SongSheetList instance) =>

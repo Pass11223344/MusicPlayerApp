@@ -107,6 +107,7 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
         isOnClick = true;
         if (!app.touchType.equals(TouchType.CONCENTRATION)) {
             app.touchType = TouchType.CONCENTRATION;
+            ((MainActivity)context).setCurrentMode("");
             if (concentrationBeanList==null) {
                 concentrationBeanList = new ArrayList<>();
             }
@@ -129,6 +130,7 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
         }
         if (playerInfo.getSongId()!= bean.getSongId()) {
 
+
             ((MainActivity)context).play(String.valueOf(bean.getSongId()), urlBeans -> {
                 if (urlBeans!=null) {
                     int index = 0;
@@ -140,11 +142,11 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
                             int currentPage = position;
 
                             if ( num<=10) {
-                                index =  num* 500+currentPage;
+                                index =  num* 488+currentPage;
                             }else if( num<=100){
-                                index =  num* 50+currentPage;
+                                index =  num* 48+currentPage;
                             }else if( num<=1000){
-                                index = num* 5+currentPage;
+                                index = num* 6+currentPage;
                             }else {
                                 index = currentPage;
                             }
@@ -155,7 +157,7 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
                     if(CURRENT_PLAY_MODE == RANDOM_PLAY_MODE){
                         isUpData=2;
 
-                        ((MainActivity)context).upData(position);
+                        ((MainActivity)context).upData(bean.getSongId());
                     }else setCurrentPageItem.setCurrentItem(index);
                 }
             });

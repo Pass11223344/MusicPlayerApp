@@ -137,13 +137,12 @@ public class RecommendableMusicItemAdapter extends RecyclerView.Adapter<Recommen
             if(bean.getSongId()!=playerInfo.getSongId()){
                 if (!app.touchType.equals(TouchType.RECOMMENDABLE_MUSIC)){
                     app.touchType = TouchType.RECOMMENDABLE_MUSIC;
+                    ((MainActivity)context).setCurrentMode("");
                     RecommendableMusicListBeans = new ArrayList<>();
                     list.forEach(innerList -> {
                         innerList.forEach(recommendableMusicsBean -> {
-
                             ListBean listBean = new ListBean();
                             listBean.setImgUrl(recommendableMusicsBean.getImageUrl());
-
                             String json = app.gson.toJson(recommendableMusicsBean.getArtists());
                             Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
                             List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(json,token);
@@ -180,13 +179,13 @@ public class RecommendableMusicItemAdapter extends RecyclerView.Adapter<Recommen
                                              }
                                          }
                                          if ( num<=10) {
-                                             index =  num* 500+currentPage;
+                                             index =  num* 499+currentPage;
                                          }else if( num<=100){
-                                             index =  num* 50+currentPage;
+                                             index =  num* 49+currentPage;
                                          }else if( num<=1000){
-                                             index = num* 5+currentPage;
-                                         }else {
-                                             index = currentPage;
+                                             index = num* 4+currentPage;
+                                         }else if(num<=50000){
+                                             index = num+currentPage;
                                          }
 
                                      }

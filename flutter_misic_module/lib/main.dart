@@ -1,26 +1,34 @@
 import 'dart:async';
-
-
+import 'package:flutter_misic_module/page/VideoPage.dart';
+import 'package:flutter_misic_module/page/eg.dart';
+import 'package:flutter_misic_module/page/rankingListPage.dart';
+import 'package:flutter_misic_module/util/Utils.dart';
+import 'package:image_picker_android/image_picker_android.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_misic_module/NetWork/DioRequest.dart';
 import 'package:flutter_misic_module/page/WebPage.dart';
-import 'package:flutter_misic_module/page/chatPage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_misic_module/page/commentPage.dart';
 import 'package:flutter_misic_module/page/fpaged.dart';
+import 'package:flutter_misic_module/page/ggggg.dart';
 import 'package:flutter_misic_module/page/msgListPage.dart';
+import 'package:flutter_misic_module/page/musicCloudDiskPage.dart';
 import 'package:flutter_misic_module/page/myPage.dart';
 import 'package:flutter_misic_module/page/myPageController.dart';
+import 'package:flutter_misic_module/page/purchasedPage.dart';
+import 'package:flutter_misic_module/page/recentlyPlayed.dart';
 import 'package:flutter_misic_module/page/searchPage.dart';
 import 'package:flutter_misic_module/page/songListPage.dart';
+import 'package:flutter_misic_module/page/traceCommentPage.dart';
 import 'package:flutter_misic_module/route/route.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:get/get.dart';
 
-import 'page/eg.dart';
 
 @pragma('vm:entry-point')
 void msgMain() {
@@ -35,6 +43,8 @@ void msgMain() {
 @pragma("vm:entry-point")
  MyPage() {
   _initializeGlobalController();
+  Get.lazyPut(() => myPageController());
+
   runZonedGuarded(()=>runApp( MyApp(pageTitle: "to_myPage")), (error,stack){
     print("Error caught：$error");
     print("Stack trace：$stack");});
@@ -66,15 +76,27 @@ void SearchPage() {
 }
  final MethodChannel channel = MethodChannel("from_flutter");
 final DioRequest dioRequest = DioRequest();
+ final  ImagePicker picker = ImagePicker();
 //final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void _initializeGlobalController() {
+  final ImagePickerPlatform imagePickerImplementation =
+      ImagePickerPlatform.instance;
+  if (imagePickerImplementation is ImagePickerAndroid) {
+    imagePickerImplementation.useAndroidPhotoPicker = true;
+  }
   if (!Get.isRegistered<PageControllers>()) {
     Get.lazyPut(() => PageControllers());
+
   }
 }
 
 
 void main() {
+  final ImagePickerPlatform imagePickerImplementation =
+      ImagePickerPlatform.instance;
+  if (imagePickerImplementation is ImagePickerAndroid) {
+    imagePickerImplementation.useAndroidPhotoPicker = true;
+  }
   _initializeGlobalController();
   runZonedGuarded(() {
 
@@ -97,18 +119,18 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-var datas ;
-final PageControllers pageController = Get.find();
-@override
-  void didUpdateWidget(covariant MyApp oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
 
-  }
+var datas ;
+final GlobalKey<songListPageState> _childKey = GlobalKey<songListPageState>();
+
+final PageControllers pageController = Get.find<PageControllers>();
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     receiveDataFromAndroid();
     //与 Flutter 应用的生命周期状态交互的通道。
     //
@@ -133,21 +155,18 @@ final PageControllers pageController = Get.find();
 
 
     return  GetMaterialApp(
-
           localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             debugShowCheckedModeBanner: false,
             onGenerateRoute: onGenerateRoute,
             theme: ThemeData(primarySwatch: Colors.deepOrange),
-            home:    getPage()
+            home:   getPage()
 
         );
 
   }
 
 getPage() {
-
-
   switch(widget.pageTitle){
     case "to_msgPage":
       return const msgListPage();
@@ -164,33 +183,50 @@ getPage() {
         case "to_sing_and_albums":
         case"to_recommend_song":
         case "to_sheet":
-         return  songListPage(data: datas);
+         return  songListPage(data: datas,key: _childKey);
         case "to_albums":
           return WebPage(url: datas['id']);
       }
     case "to_search":
       return  searchPage();
     default:
-
-      return  MyApps();
+      var params = {
+        "avatarUrl":"http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
+        "name":"aaa"  ,
+        "show_time&place":"oooo",
+        "msg":"e.message!.msg",
+        "img":"http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
+        "title":"title",
+        "creatorName":"creatorName",
+        "id":"A_EV_2_29945262900_287870880",
+        "commentCount":2,
+        "likedCount":4
+      };
+    //  return  MyApps();
+     // _initializeGlobalController();
+     return  rankingListPage();
+      //return  Player_page();
+   //  return  purchasedPage();
+    //  return  ss();
+    //return  PopupRoutePage();
+      //return  traceCommentPage(params: params);
   }
 }
 
   void receiveDataFromAndroid() {
 channel.setMethodCallHandler((call) async {
-
+  print("object1111111111111111111122222222222222${call.method}");
       switch(call.method){
         case "pressPage":
-
+          _childKey.currentState?.isPop();
           if( pageController.pageIsOk){
-
             channel.invokeMethod("loadComplete",true);
-
           }else{
             channel.invokeMethod("loadComplete",false);
             songListPageState.cancelRequest();
+            pageController.pageIsOk = false;
           }
-          pageController.pageIsOk = false;
+
           break;
         case "to_other_page":
 
@@ -200,7 +236,28 @@ channel.setMethodCallHandler((call) async {
               datas = data;
             });
             pageController.cookie = datas['token'];
-            print("object1111111111111111111122222222222222${pageController.cookie}");
+            pageController.userId = datas['userId'];
+            print("object1111111111111111111122222222222222fffff${pageController.userId}");
+          }
+          break;
+        case "RequestResults":
+          var info = call.arguments;
+          if(info['isSuccess']){
+
+            switch(info['action']){
+              case"saveImg":
+                pageController.path ??= info['path'];
+                Utils.downloadImage(info['info'],pageController.path).then((flag){
+                  print("object-------xxxxx-----${info['action']}---------${info['info']}");
+
+                  _childKey.currentState?.show(flag);
+
+
+                });
+                break;
+
+                break;
+            }
           }
           break;
 
@@ -219,19 +276,29 @@ channel.setMethodCallHandler((call) async {
 
 
 
-class PageTitleProvider extends InheritedWidget {
-  final String pageTitle;
+class MyInheritedWidget  extends InheritedWidget {
+  final BuildContext context;
 
-  PageTitleProvider({required this.pageTitle, required Widget child}) : super(child: child);
+  MyInheritedWidget ({required this.context, required Widget child}) : super(child: child);
 
-  static PageTitleProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<PageTitleProvider>();
+  static MyInheritedWidget ? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<MyInheritedWidget >();
   }
 
   @override
-  bool updateShouldNotify(PageTitleProvider oldWidget) {
+  bool updateShouldNotify(MyInheritedWidget  oldWidget) {
 
-    return pageTitle != oldWidget.pageTitle;
+    return context != oldWidget.context;
   }
 
+}
+class MyPageBindings extends Bindings {
+  @override
+  void dependencies() {
+    // lazyPut用法示例
+    Get.lazyPut(() => PageControllers());
+    Get.lazyPut(() => myPageController());
+    // Get.lazyPut(() => CounterController());
+    // Get.lazyPut(() => CounterController());
+  }
 }

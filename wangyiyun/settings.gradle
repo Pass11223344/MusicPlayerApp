@@ -16,8 +16,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "musicAPP"
 include ':app'
+
+rootProject.name = "musicAPP"
 setBinding(new Binding([gradle: this]))
 evaluate(new File(
         settingsDir.parentFile,

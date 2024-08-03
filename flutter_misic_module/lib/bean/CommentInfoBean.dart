@@ -7,7 +7,10 @@ class CommentInfoBean{
   List<Comments> comments;
   int totalCount,sortType;
   String cursor;
-  CommentInfoBean(this.comments, this.totalCount, this.sortType, this.cursor);
+  int? count;
+  bool hasMore;
+
+  CommentInfoBean(this.comments, this.totalCount, this.sortType, this.cursor,this.hasMore);
   factory CommentInfoBean.fromJson(Map<String,dynamic> json) => _$CommentInfoBeanFromJson(json);
   Map<String,dynamic> toJson() =>_$CommentInfoBeanToJson(this);
 }
@@ -19,6 +22,7 @@ class Comments {
   String timeStr,content;
   bool liked;
   IpLocation ipLocation;
+  int time;
 
   Comments(
       this.user,
@@ -30,7 +34,8 @@ class Comments {
       this.timeStr,
       this.content,
       this.liked,
-      this.ipLocation);
+      this.ipLocation,
+      this.time);
 
   factory Comments.fromJson(Map<String,dynamic> json)=>_$CommentsFromJson(json);
   Map<String,dynamic> toJson() => _$CommentsToJson(this);
@@ -40,8 +45,9 @@ class BeReplied {
 User user;
 String content;
 int beRepliedCommentId;
+IpLocation ipLocation;
 
-BeReplied(this.user, this.content, this.beRepliedCommentId);
+BeReplied(this.user, this.content, this.beRepliedCommentId,this.ipLocation);
 factory BeReplied.fromJson(Map<String,dynamic> json) => _$BeRepliedFromJson(json);
 Map<String,dynamic> toJson() => _$BeRepliedToJson(this);
 }

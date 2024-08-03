@@ -48,7 +48,7 @@ public class LrcView extends View {
 
     private static final int textSize = 42;
     private static final int rowSpacing = 110;
-    private boolean isTouched = false,Tips = false,isFirstShow = true;
+    private boolean isTouched = false,Tips = true,isFirstShow = true;
     private IPlayerControl serviceBinder;
     private float[] mRowSpacing;
     private float lastDistance = 0,distanceAll =0;
@@ -106,6 +106,7 @@ public class LrcView extends View {
 
             return true;
         }else {
+            Tips = false;
             return false;
         }
 
@@ -210,7 +211,10 @@ return 0;
                     gPaint.setFlags(Paint.UNDERLINE_TEXT_FLAG);
                     canvas.drawText("暂无歌词",width>>1,height>>1,gPaint);
 
-                }else {canvas.drawText("歌词加载中......",width>>1,height>>1,gPaint);}
+                }else {
+                    canvas.drawText("歌词加载中......",width>>1,height>>1,gPaint);
+
+                }
 
                 return;
             }
@@ -338,6 +342,7 @@ return 0;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        if (list==null)  return super.dispatchTouchEvent(event);
         if (list.size()!=0) {
             switch (event.getAction()){
                 case MotionEvent.ACTION_DOWN:

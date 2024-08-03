@@ -9,6 +9,8 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SEARCH;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.getLrcString;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.setCurrentPageItem;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.setImg;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.setList;
 
 import android.annotation.SuppressLint;
@@ -140,7 +142,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     private SpeciallyProducedAdapter speciallyProducedAdapter;
     private ExclusiveSceneSongListAdapter exclusiveSceneSongListAdapter;
     private int px;
-    private RelativeLayout re_home;
+    private LinearLayout re_home;
     private ImageView img_menu;
 
     private static HomeFragment.dataFromAdapter FromAdapter;
@@ -172,6 +174,8 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     Set<Integer> generated = new HashSet<>();
     SecureRandom secureRandom = new SecureRandom();
     private int number;
+    private View load_page;
+    private RelativeLayout home_root;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -227,6 +231,8 @@ public void hideFragment(){
         bannerAdapter = new BannerAdapter(getContext(),secondPage);
         banner_beanList = new ArrayList<>();
         re_home = getView().findViewById(R.id.re_home);
+        load_page = getView().findViewById(R.id.load_page);
+        home_root = getView().findViewById(R.id.home_root);
         layout = getView().findViewById(R.id.lin_tab);
         lin_point = getView().findViewById(R.id.Lin_point);
         singLessAlbum = getView().findViewById(R.id.Vp_Disc);
@@ -384,11 +390,20 @@ public void hideFragment(){
           ((MainActivity) getContext()).setRecommendSheetId("-1");
           secondPage.toSecond(TO_RECOMMEND_SONG, "-1");
       }else if(id==R.id.lin_radio){
+          if (app.touchType== TouchType.EXCLUSIVE_MUSIC)return;
           app.touchType = TouchType.EXCLUSIVE_MUSIC;
+          ((MainActivity)getActivity()).setCurrentMode("ExclusiveMusicMode");
+          //if (playerInfo!=null) {
+              if (playerInfo.getListBeans()!=null)  playerInfo.getListBeans().clear();
+         // }
+
+
+          activityMainBinding.setPlayerInfo(playerInfo);
         loadMp3("radio");
       }else if(id==R.id.lin_songSheet){
-         ( (MainActivity)  getContext()).hideView();
+         ( (MainActivity) getContext()).hideView();
          ( (MainActivity)getContext()).setBackColor();
+          ((MainActivity) getContext()).setRecommendSheetId("10086");
           // 获取FragmentManager
           FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
           // 开始事务
@@ -440,7 +455,7 @@ public void hideFragment(){
       }
     }
 
-    public  void loadMp3(String type){
+    public   void loadMp3(String type){
         switch (type){
             case  "radio":
                 while(generated.size() < N) {
@@ -620,18 +635,29 @@ public void hideFragment(){
                 case SONGS:
                     if (msg.obj!=null){
                         String obj =  msg.obj.toString();
+                        String  result = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(obj);
+                            JSONObject data = (JSONObject) jsonObject.get("data");
+                              result = String.valueOf(data.get("aiDjResources"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
                         if (exclusiveMusic==null) {
                             exclusiveMusic = new ArrayList<>();
                         }
                         List<ListBean> list = new ArrayList<>();
 
-                        for (ExclusiveMusicBean exclusiveMusicBean : app.gson.fromJson(obj, ExclusiveMusicBean[].class)) {
+                        for (ExclusiveMusicBean exclusiveMusicBean : app.gson.fromJson(result, ExclusiveMusicBean[].class)) {
                             if (exclusiveMusicBean.getType().equals("song")) {
                              //exclusiveMusic.add(exclusiveMusicBean);
                                 ListBean listBean =  new ListBean();
-                                String ar = String.valueOf(exclusiveMusicBean.getValue().songData.artists);
+                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: "+exclusiveMusicBean.getValue().songData.artists.size());
+                                String ar = app.gson.toJson(exclusiveMusicBean.getValue().songData.artists);
+                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: "+ar);
                                 Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
                                 List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(ar,token);
+
 
                                 listBean.setSingerInfo(SingerInfo);
                                 listBean.setSongName(exclusiveMusicBean.getValue().songData.name);
@@ -644,11 +670,26 @@ public void hideFragment(){
                         }
                         if (playerInfo.getListBeans()!=null) {
                            playerInfo.addListBeans(list);
-                        }else  playerInfo.setListBeans(list);
-                       activityMainBinding.setPlayerInfo(playerInfo);
-                    setList.setListInfo(playerInfo.getListBeans());
-                    ((MainActivity) getContext())
-                            .play(String.valueOf(playerInfo.getListBeans().get(playerInfo.getListBeans().size()-2).getSongId()),null);
+                            ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
+                        }else {
+                            playerInfo.setListBeans(list);
+                            setImg.setImg(list.get(0).getImgUrl());
+                            String name = Utils.getString(list.get(0));
+                            playerInfo.setSongName(list.get(0).getSongName());
+                            playerInfo.setImgUrl(list.get(0).getImgUrl());
+                            playerInfo.setCurrentPosition("00:00");
+                            // player_seekBar.setProgress(0);
+                            playerInfo.setPlayOrPause(true);
+                            playerInfo.setSingerName(name);
+                            playerInfo.setSongId(list.get(0).getSongId());
+                            activityMainBinding.setPlayerInfo(playerInfo);
+                            activityMainBinding.setPlayerInfo(playerInfo);
+                            ((MainActivity) getContext())
+                                    .play(String.valueOf(playerInfo.getListBeans().get(playerInfo.getListBeans().size()-2).getSongId()),null);
+                            setList.setListInfo(playerInfo.getListBeans());}
+
+
+                      //  setCurrentPageItem.setCurrentItem(0);
                     }
                     break;
 
@@ -774,14 +815,8 @@ public void hideFragment(){
                 singlesAndAlbumsAdapter.setData(singLe_albumsList);
                 singLessAlbum.setAdapter(singlesAndAlbumsAdapter);
                 singlesAndAlbumsAdapter.notifyDataSetChanged();
-
-
-
-
                 digitalAlbumsAdapter.setData(singLe_albumsList);
                 svDish.setAdapter(digitalAlbumsAdapter);
-
-
                 recommendableMusicAdapter.setData(recommendableMusics);
                 UpDateText(recommendableMusics.get(0).get(0).getModuleTitle(),"module_title");
                 //recommendableMusicAdapter.setUrlData(urlBeans);
@@ -818,6 +853,8 @@ public void hideFragment(){
                 asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
 
             }
+            load_page.setVisibility(View.GONE);
+            home_root.setVisibility(View.VISIBLE);
             
         }
 

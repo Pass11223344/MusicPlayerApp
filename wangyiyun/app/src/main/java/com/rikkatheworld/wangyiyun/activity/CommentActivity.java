@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -21,6 +23,8 @@ import java.util.Map;
 
 import io.flutter.embedding.android.FlutterFragment;
 import io.flutter.embedding.engine.FlutterEngineCache;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
 public class CommentActivity extends AppCompatActivity implements EngineBindings.EngineBindingsDelegate {
@@ -46,29 +50,13 @@ public class CommentActivity extends AppCompatActivity implements EngineBindings
 
         Bundle extras = getIntent().getExtras();
         Map<String ,Object> map = new HashMap<>();
-
-        String num = "";
-        switch ((CommentType) extras.get("commentType")){
-            case T_SONG://0
-               num = "0";
-                break;
-            case T_SHEET://2
-                num = "2";
-                break;
-            case T_ALBUM://3
-                num = "3";
-                break;
-            case T_DYNAMIC://6
-                num = "6";
-                break;
-        }
-
         map.put("songName",extras.getString("songName"));
-        map.put("commentType",num);
-        map.put("commentUrl","/comment/new");
-        map.put("songId",extras.getLong("songId"));
+        map.put("commentType",0);
+       // map.put("commentUrl","/comment/new");
+        map.put("Id",extras.getLong("Id"));
         map.put("singerName",extras.getString("singerName"));
         map.put("imgUrl",extras.getString("imgUrl"));
+            map.put("userId",extras.getString("userId"));
         FlutterEngineCache.getInstance().put(COMMENT_ENGINE_ID,commentBindings.engine);
         FlutterFragment commentFragment = FlutterFragment.withCachedEngine(COMMENT_ENGINE_ID)
                 .build();
@@ -91,4 +79,32 @@ public class CommentActivity extends AppCompatActivity implements EngineBindings
     public void onNext() {
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+        commentBindings.channel.invokeMethod("canPop", "", new MethodChannel.Result() {
+            @Override
+            public void success(@Nullable Object result) {
+                boolean canPop = (boolean) result;
+                if(canPop){
+                    Log.d("TAG-------", "successdddddd: "+canPop);
+                    CommentActivity.super.onBackPressed();
+                }
+            }
+
+            @Override
+            public void error(@NonNull String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+
+            }
+
+            @Override
+            public void notImplemented() {
+
+            }
+        });
+
+        return;
+    }
+
 }

@@ -1,11 +1,11 @@
-class searchHotListBean {
+class SearchHotListBean {
   String searchWord;
   String iconUrl;
 
-  searchHotListBean(this.searchWord, this.iconUrl);
-  factory searchHotListBean.fromJson(Map<String ,dynamic> json) => searchHotListBean(
+  SearchHotListBean(this.searchWord, this.iconUrl);
+  factory SearchHotListBean.fromJson(Map<String ,dynamic> json) => SearchHotListBean(
       json['searchWord']as String, json['iconUrl']==null?"":json['iconUrl'] as String);
-  Map<String,dynamic> toJson(searchHotListBean bean) =>{
+  Map<String,dynamic> toJson(SearchHotListBean bean) =>{
     "searchWord": bean.searchWord,
     "iconUrl":bean.iconUrl
   };

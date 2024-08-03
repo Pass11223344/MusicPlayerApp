@@ -1,6 +1,7 @@
 package com.rikkatheworld.wangyiyun.adapter.home;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.rikkatheworld.wangyiyun.bean.Home.SinglesAndAlbumsBean;
 import com.rikkatheworld.wangyiyun.fragment.HomeFragment;
+import com.rikkatheworld.wangyiyun.util.Utils;
 
 import java.util.List;
 //单曲与专辑（新歌新碟）
@@ -48,12 +50,12 @@ public class SinglesAndAlbumsAdapter extends PagerAdapter{
         List<SinglesAndAlbumsBean> item = list.get(position);
         RecyclerView recyclerView = new RecyclerView(context);
         recyclerView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
         GridLayoutManager layoutManager = new GridLayoutManager(context,1);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         height=container.getHeight();
-        SingAndAlbumsItemAdapter singAndAlbumsItemAdapter = new SingAndAlbumsItemAdapter(context,item,height,secondPage);
+
+        SingAndAlbumsItemAdapter singAndAlbumsItemAdapter = new SingAndAlbumsItemAdapter(context,item,secondPage);
         singAndAlbumsItemAdapter.setData(list);
         recyclerView.setAdapter(singAndAlbumsItemAdapter);
        container.addView(recyclerView);

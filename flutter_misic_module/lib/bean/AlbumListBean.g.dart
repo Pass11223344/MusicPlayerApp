@@ -21,7 +21,7 @@ Map<String, dynamic> _$AlbumListBeanToJson(AlbumListBean instance) =>
     };
 
 Album _$AlbumFromJson(Map<String, dynamic> json) => Album(
-      json['picUrl'] as String,
+    json['picUrl']==null?"":  json['picUrl'] as String,
       json['blurPicUrl'] as String,
       json['description'] as String,
       json['name'] as String,
@@ -76,10 +76,10 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
     };
 
 Songs _$SongsFromJson(Map<String, dynamic> json) => Songs(
-      (json['ar'] as List<dynamic>)
+  json['ar']==null?[]:   (json['ar'] as List<dynamic>)
           .map((e) => AR.fromJson(e as Map<String, dynamic>))
           .toList(),
-      Al.fromJson(json['al'] as Map<String, dynamic>),
+    json['al']==null?Al("", ""):   Al.fromJson(json['al'] as Map<String, dynamic>),
       json['name'] as String,
       (json['id'] as num).toInt(),
     );

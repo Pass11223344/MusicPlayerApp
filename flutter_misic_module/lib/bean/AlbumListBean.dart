@@ -1,5 +1,5 @@
 
-import 'dart:convert';
+
 
 import 'package:json_annotation/json_annotation.dart';
 
@@ -7,6 +7,7 @@ part 'AlbumListBean.g.dart';
 
 @JsonSerializable()
 class AlbumListBean {
+  int? playTime;
   List<Songs> songs;
   Album album;
   AlbumListBean(this.songs, this.album);

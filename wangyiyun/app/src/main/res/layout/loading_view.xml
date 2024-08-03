@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/load_view"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/home_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:background="@android:color/transparent"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp">
+
+            <ImageView
+
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:background="@android:color/transparent"
+                android:src="@drawable/menu" />
+
+            <EditText
+
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="3.5"
+                android:background="@drawable/color_style"
+                android:drawableLeft="@drawable/search"
+                android:focusable="false"
+                android:hint="搜索"
+                android:textColorHint="@color/grey" />
+
+            <ImageView
+
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="14dp"
+                android:layout_weight="0.5"
+                android:background="@android:color/transparent"
+                android:src="@drawable/scan" />
+
+            <ImageView
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="14dp"
+                android:layout_weight="0.5"
+                android:background="@android:color/transparent"
+                android:src="@drawable/hear" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/splicing_color">
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="120dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="20dp"
+                        android:background="@drawable/redius_background">
+
+                    </View>
+
+
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:background="@color/white"
+                    android:paddingTop="10dp">
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:src="@drawable/tuijian" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="每日推荐"
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/shouyinji" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="私人漫游"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:src="@drawable/baseline_queue_music_24" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="歌单"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/baseline_insert_chart_outlined_24" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="排行榜"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:paddingTop="25dp">
+
+                    <LinearLayout
+                        android:id="@+id/lin_recommendati"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="推荐歌单"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/back" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="210dp"
+                        android:layout_below="@+id/lin_recommendati"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center|left|top"
+                        android:layout_marginLeft="10dp"
+
+                        android:orientation="horizontal"
+                        >
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:gravity="center"
+
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="135dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="125dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="135dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="125dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+
+                            android:gravity="left"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="135dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="130dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:alpha="0.3"
+                    android:background="@color/grey" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:background="@color/white"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="25dp">
+
+                    <LinearLayout
+                        android:id="@+id/lin_di"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="新歌新碟"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/back" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_below="@+id/lin_di"
+                        android:layout_marginTop="16dp"
+
+                        android:paddingLeft="12dp">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_width="match_parent"
+
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <View
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:background="@drawable/redius_background" />
+
+                                <LinearLayout
+                                    android:layout_weight="1"
+                                    android:paddingLeft="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+
+                                    android:orientation="vertical">
+                                    <View
+                                        android:layout_marginBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                    <View
+                                        android:paddingBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="35dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="left"
+                                    android:layout_marginLeft="10dp"
+
+                                    android:background="@drawable/left_radius" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:paddingTop="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <View
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:background="@drawable/redius_background" />
+
+                                <LinearLayout
+                                    android:layout_weight="1"
+                                    android:paddingLeft="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+
+                                    android:orientation="vertical">
+                                    <View
+                                        android:layout_marginBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                    <View
+                                        android:paddingBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="35dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="left"
+                                    android:layout_marginLeft="10dp"
+
+                                    android:background="@drawable/left_radius" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:paddingTop="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <View
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    android:background="@drawable/redius_background" />
+
+                                <LinearLayout
+                                    android:layout_weight="1"
+                                    android:paddingLeft="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+
+                                    android:orientation="vertical">
+                                    <View
+                                        android:layout_marginBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                    <View
+                                        android:paddingBottom="8dp"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="20dp"
+                                        android:background="#1F000000"/>
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="35dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="left"
+                                    android:layout_marginLeft="10dp"
+
+                                    android:background="@drawable/left_radius" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:background="@color/white"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="25dp">
+
+                    <LinearLayout
+                        android:id="@+id/lin_dis"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="数字专辑"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/back" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+
+                        android:layout_width="match_parent"
+                        android:layout_height="210dp"
+                        android:layout_below="@+id/lin_dis"                android:layout_marginTop="10dp"
+                        android:gravity="center|left|top"
+                        android:layout_marginLeft="10dp"
+
+                        android:orientation="horizontal"
+                        >
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:gravity="center"
+
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="150dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="130dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="150dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="130dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="left"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="100dp"
+                                android:layout_height="125dp"
+                                android:background="@drawable/redius_background" />
+
+                            <View
+                                android:layout_width="130dp"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="#1F000000" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+                <TextView
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:text="到底了~~"
+                    android:paddingTop="10dp"
+                    android:gravity="top|center"
+
+                    android:textSize="14sp"
+                    android:textColor="@color/grey"
+                    android:alpha="0.9"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</RelativeLayout>

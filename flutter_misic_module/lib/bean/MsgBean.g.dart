@@ -6,7 +6,7 @@ part of 'MsgBean.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-msgBean _$msgBeanFromJson(Map<String, dynamic> json) => msgBean(
+MsgBean _$MsgBeanFromJson(Map<String, dynamic> json) => MsgBean(
       FromUser.fromJson(json['fromUser'] as Map<String, dynamic>),
       ToUser.fromJson(json['toUser'] as Map<String, dynamic>),
       json['msg'] as String,
@@ -14,7 +14,7 @@ msgBean _$msgBeanFromJson(Map<String, dynamic> json) => msgBean(
       (json['time'] as num).toInt(),
     );
 
-Map<String, dynamic> _$msgBeanToJson(msgBean instance) => <String, dynamic>{
+Map<String, dynamic> _$MsgBeanToJson(MsgBean instance) => <String, dynamic>{
       'fromUser': instance.fromUser,
       'toUser': instance.toUser,
       'msg': instance.msg,

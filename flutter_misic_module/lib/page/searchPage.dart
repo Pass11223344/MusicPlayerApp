@@ -34,18 +34,19 @@ class searchPageState extends State<searchPage> with TickerProviderStateMixin{
  bool  isLongPress = false;
  bool isResultOk = false;
  bool isNetOk = true;
+ bool isOpenSheet = false;
 
  final String HistoryList = "HistoryList";
 
- late List<searchHotListBean> searchHotList;
+ late List<SearchHotListBean> searchHotList;
   var pageController = Get.find<PageControllers>();
  var currentIndex;
 var recommendTab = 0;
 var foldTab =  -1;
 bool jump_page = false;
-  late MediaQueryData mediaQuery ;
-  late double warp_widh ;
-  late double warp_height ;
+  late MediaQueryData mediaQuery = MediaQueryData() ;
+  late double warp_widh   = 0.0;
+  late double warp_height =0.0 ;
   var songOffset = 0;
   var songSheetOffset = 0;
   var albumOffset = 0;
@@ -58,7 +59,7 @@ bool jump_page = false;
 var _inputValue;
   final FocusNode _focusNode = FocusNode();
 //单曲
-  List<songListBean>? songList;
+  List<SongListBean>? songList;
  int songCount = 0;
   //歌单
   List<SongSheetList>? songSheetList;
@@ -82,7 +83,8 @@ var _inputValue;
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
+
+
 
     _tabController = TabController(length: 3, vsync: this);
     _textEditingController = TextEditingController();
@@ -141,6 +143,8 @@ var _inputValue;
       }
     });
  receiveDataFromAndroid();
+    super.initState();
+
   }
   @override
   void dispose() {
@@ -153,14 +157,13 @@ var _inputValue;
   void didUpdateWidget(covariant searchPage oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
-    print("object1111111111111111111111111111111");
+
   }
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    mediaQuery = MediaQuery.of(context);
-    warp_widh = mediaQuery.size.width-20;
-    warp_height =  mediaQuery.size.height;
+
+
     return
       pageIsOk?   GestureDetector(
         onTap: isLongPress?(){
@@ -229,10 +232,9 @@ var _inputValue;
                               border: Border.all(color: Colors.black12,width: 1),
                               borderRadius: BorderRadius.circular(25)),
                           child:  TextField(
-
-                            textInputAction: TextInputAction.done,
                             focusNode: _focusNode,
                             controller:_textEditingController,
+                            textInputAction: TextInputAction.search,
                             maxLines: 1,
                             decoration: const InputDecoration(
                                 hintText: "搜索歌曲",
@@ -296,7 +298,10 @@ var _inputValue;
                                         children: [
                                           const Text("搜索历史",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
 
-                                          IconButton( icon: Icon(Icons.delete_outline_outlined,size: 20,color: Colors.grey), onPressed: _showAlertDialog)
+                                          IconButton( icon: Icon(Icons.delete_outline_outlined,size: 20,color: Colors.grey), onPressed: (){
+                                            isOpenSheet = true;
+                                                          _showAlertDialog();
+                                                        })
                                         ],),
                                       Container(
                                         alignment: Alignment.centerLeft,
@@ -422,7 +427,7 @@ var _inputValue;
                                 },
                                 leading: Text("${index+1}",style: TextStyle(color: index+1<=3?Colors.red:Colors.grey,fontWeight:index+1<=3?FontWeight.bold:FontWeight.normal ),),
                                 title: Text(searchHotList[index].searchWord,overflow: TextOverflow.ellipsis,),
-                                trailing: searchHotList[index].iconUrl==""?null:getImg(url: searchHotList[index].iconUrl,size: 10,)
+                                trailing: searchHotList[index].iconUrl==""?null:getCircularImg(url: searchHotList[index].iconUrl,size: 10,)
                               );
                             })
                     ),
@@ -722,12 +727,14 @@ var _inputValue;
        if(!foldFlag){
          history_list.remove("");
          for(int i=0;i< history_list.length;i++){
+            if(i!=0){
+              if( len+width>warp_widh){
+                foldTab = i-1;
+                history_list.insert(i-1, "");
+                break;
+              }
+            }
 
-           if( len+width>warp_widh){
-             foldTab = i-1;
-             history_list.insert(i-1, "");
-             break;
-           }
            len += (roughlyWidth(history_list[i])+20) ;
          }
        }
@@ -772,7 +779,7 @@ var _inputValue;
     switch(type){
       case 1:
 
-        songList = (data['songs'] as List<dynamic>).map((json)=>songListBean.fromJson(json)).toList();
+        songList = (data['songs'] as List<dynamic>).map((json)=>SongListBean.fromJson(json)).toList();
          songCount = data['songCount'];
         break;
       case 10:
@@ -805,7 +812,7 @@ print("object$value----------$type-------$offset");
     switch(type){
       case 1:
 
-        songList?.addAll((data['songs'] as List<dynamic>).map((json)=>songListBean.fromJson(json)).toList());
+        songList?.addAll((data['songs'] as List<dynamic>).map((json)=>SongListBean.fromJson(json)).toList());
        // songCount = data['songCount'];
         break;
       case 10:
@@ -849,7 +856,10 @@ print("object$value----------$type-------$offset");
     double len=0.0;
     var data =  await dioRequest.executeGet(url: "/search/hot/detail");
  setState(() {
-   searchHotList = (data as List<dynamic>).map((json)=>searchHotListBean.fromJson(json)).toList();
+   mediaQuery =  MediaQuery.of(context);
+   warp_widh = mediaQuery.size.width-20;
+   warp_height =  mediaQuery.size.height;
+   searchHotList = (data as List<dynamic>).map((json)=>SearchHotListBean.fromJson(json)).toList();
 
    searchHotList.asMap().forEach((index, value){
      len += (roughlyWidth(value.searchWord))+8 ;
@@ -857,7 +867,7 @@ print("object$value----------$type-------$offset");
        recommendTab+=1;
 
      }
-print("object1111111111111111222222222222$recommendTab");
+
    });
    pageIsOk = true;
  });
@@ -940,7 +950,7 @@ print("object1111111111111111222222222222$recommendTab");
       title: Text(songSheetList![index].name,maxLines: 1,),
       titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
           overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
-      subtitle:Text("${songSheetList![index].trackCount}首,${songSheetList![index].creator.nickname},播放${Utils.formatNumber(songSheetList![index].playCount)}次",maxLines: 1,) ,
+      subtitle:Text("${songSheetList![index].trackCount}首,${songSheetList![index].creator.nickname},播放${Utils.formatNumber(songSheetList![index].playCount,'')}次",maxLines: 1,) ,
       subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
           overflow: TextOverflow.ellipsis),
       onTap: ()async{
@@ -950,6 +960,7 @@ print("object1111111111111111222222222222$recommendTab");
         await Navigator.pushNamed(context, "main/songListPage",arguments: {
           "id":"${songSheetList![index].id} ",
         "title":songSheetList![index].name,
+          "IsTheSame":false,
         "type":"to_page_song_list"});
         _focusNode.unfocus();
 
@@ -973,6 +984,7 @@ print("object1111111111111111222222222222$recommendTab");
         await Navigator.pushNamed(context, "main/songListPage",arguments: {
           "id":"${albumList![index].id}",
           "title":albumList![index].name,
+          "IsTheSame":false,
           "type":"to_albums"});
           _focusNode.unfocus();
 
@@ -988,7 +1000,11 @@ print("object1111111111111111222222222222$recommendTab");
           _focusNode.requestFocus();
           break;
         case "pressPage":
-          if(jump_page){
+          if(isOpenSheet){
+            Navigator.pop(context);
+            isOpenSheet = false;
+          }
+         else if(jump_page){
             Navigator.pop(context);
             setState(() {
               jump_page = false;

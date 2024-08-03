@@ -50,14 +50,14 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
     private List<SinglesAndAlbumsBean> list;
     private List<SinglesAndAlbumsBean> SongList;
     private Context context;
-    private int height;
+
     private int index;
     private final HomeFragment.NavigationToSecond secondPage;
 
-    public SingAndAlbumsItemAdapter(Context context, List<SinglesAndAlbumsBean> list, int height,HomeFragment.NavigationToSecond secondPage) {
+    public SingAndAlbumsItemAdapter(Context context, List<SinglesAndAlbumsBean> list, HomeFragment.NavigationToSecond secondPage) {
         this.list = list;
         this.context = context;
-        this.height = height;
+
         this.secondPage = secondPage;
         app = (App)context.getApplicationContext();
     }
@@ -79,12 +79,12 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
         if (position==0){
             layoutParams.topMargin=0;
         }
-        int newHeight = height / 3 - 18;
+
+        int newHeight = Utils.dp2px(context,200) / 3 - 18;
         layoutParams.height = newHeight;
         holder.lin_item.setLayoutParams(layoutParams);
-
-
         SinglesAndAlbumsBean bean = list.get(position);
+
         if (!bean.getCreativeType().equals("NEW_ALBUM_HOMEPAGE")) {
             holder.view.setVisibility(View.GONE);
         }
@@ -122,6 +122,7 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
             isOnClick = true;
             oldSheetId = "";
             if (bean.getResourceType().equals("song")) {
+                ((MainActivity)context).setCurrentMode("");
                 List<ListBean> listBeans = new ArrayList<>();
                 if(Long.parseLong(bean.getResourceId())!= playerInfo.getSongId()){
                     if (!app.touchType.equals(TouchType.SING_AND_ALBUMS)){
@@ -177,7 +178,7 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                                     }
                                     if(CURRENT_PLAY_MODE == RANDOM_PLAY_MODE){
                                         isUpData=2;
-                                        ((MainActivity)context).upData(position);
+                                        ((MainActivity)context).upData(Long.parseLong(bean.getResourceId()));
                                     }else setCurrentPageItem.setCurrentItem(index);
                                 }
                             }

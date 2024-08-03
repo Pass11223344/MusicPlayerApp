@@ -6,17 +6,25 @@ part of 'SongListBean.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-songListBean _$songListBeanFromJson(Map<String, dynamic> json) => songListBean(
-      json['name'] as String,
-      (json['id'] as num).toInt(),
-      (json['ar'] as List<dynamic>)
-          .map((e) => Ar.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      Al.fromJson(json['al'] as Map<String, dynamic>),
-  (json['songCount'] ) == null ?0:(json['songCount'] as num).toInt(),
-    );
+SongListBean _$SongListBeanFromJson(Map<String, dynamic> json) {
+  var data = json;
+if(json['simpleSong']!=null){
+   data = json['simpleSong'];
+}
+ var bean = SongListBean(
+   data['name'] ==null?"":data['name'] as String,
+   data['id']==null? 0: (data['id'] as num).toInt(),
+   data['ar'] ==null?[]:   (data['ar'] as List<dynamic>)
+        .map((e) => Ar.fromJson(e as Map<String, dynamic>))
+        .toList(),
+   data['al']==null? Al("", ""):   Al.fromJson(data['al'] as Map<String, dynamic>),
+    (data['songCount'] ) == null ?0:(data['songCount'] as num).toInt(),
+  );
+ bean.singerName = json['artist']==null?"":json['artist'];
+ return bean;
+}
 
-Map<String, dynamic> _$songListBeanToJson(songListBean instance) =>
+Map<String, dynamic> _$SongListBeanToJson(SongListBean instance) =>
     <String, dynamic>{
       'name': instance.name,
       'id': instance.id,

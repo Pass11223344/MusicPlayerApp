@@ -7,8 +7,7 @@ import 'package:flutter_misic_module/bean/MsgBean.dart';
 import 'package:flutter_misic_module/page/chatPageController.dart';
 import 'package:flutter_misic_module/page/msgListPage.dart';
 import 'package:get/get.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+
 
 import '../main.dart';
 import 'myPageController.dart';
@@ -31,7 +30,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
  // late final WebSocketChannel socketChannel ;
   var pageController = Get.find<PageControllers>();
   var _textController ;
-  var _rePlyFocusNode ;
+  //var _rePlyFocusNode ;
   var fromUser;
   var toUser;
   var id;
@@ -46,7 +45,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
     super.initState();
 
     _textController = TextEditingController();
-    _rePlyFocusNode = FocusNode();
+   // _rePlyFocusNode = FocusNode();
   //  socketChannel = IOWebSocketChannel.connect(Uri.parse("wss://www.consistent.top/msg/private/history?uid=${ widget.data["id"]}"));
     receiveDataFromAndroid();
     getData();
@@ -63,7 +62,8 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
         }
 
       }
-    });}
+    });
+  }
 
 @override
   void dispose() {
@@ -172,7 +172,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
                               await  dioRequest.executeGet(url: "/send/text",params: params);
                               var dateTime = DateTime.now();
                               var now = dateTime.millisecondsSinceEpoch;
-                              controller.addMsgList([msgBean(fromUser, ToUser("","","",0), '{"msg":"${_textController.text}"}', 0, now )]);
+                              controller.addMsgList([MsgBean(fromUser, ToUser("","","",0), '{"msg":"${_textController.text}"}', 0, now )]);
                               _textController.clear();
                             },
                             child: Align(alignment: Alignment.center,child: Text("发送"),) ,
@@ -202,7 +202,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
 
    var data = await dioRequest.executeGet(url: "/msg/private/history",params: {"uid":widget.data['id']});
 
-    var list = (data as List<dynamic>).map((json)=>msgBean.fromJson(json)).toList();
+    var list = (data as List<dynamic>).map((json)=>MsgBean.fromJson(json)).toList();
 
    controller.addMsgList(list.reversed.toList());
 
@@ -237,7 +237,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
               ),
             ),
             SizedBox(width: 6,),
-            getImg(url: controller.msgList[index].fromUser.avatarUrl,)]),
+            getCircularImg(url: controller.msgList[index].fromUser.avatarUrl,)]),
     );
   }else{
     // toUser = ToUser(controller.msgList[index].fromUser.nickname,
@@ -247,7 +247,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
       child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            getImg(url: controller.msgList[index].fromUser.avatarUrl),
+            getCircularImg(url: controller.msgList[index].fromUser.avatarUrl),
 
             const SizedBox(width: 6,),
             Container(

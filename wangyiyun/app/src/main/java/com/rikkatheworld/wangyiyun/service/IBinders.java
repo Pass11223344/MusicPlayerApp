@@ -7,6 +7,7 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_PAUSE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_STOP;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.animationUtils;
@@ -29,6 +30,7 @@ import com.rikkatheworld.wangyiyun.util.Utils;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
 
 public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     private final Context context;
@@ -103,9 +105,6 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
 
         if(State== STATE_STOP){
-
-
-
             mediaPlayer.start();
           //  starTime();
 
@@ -184,7 +183,11 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
         playOrPause(STATE_STOP);
         if (mp != null&&mp.isPlaying()) {
-
+//            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==mViewChange.currentIndex()){
+//                Log.d("TAG--------", "onPrepared:最后一首 ");
+//                isUpData = 1;
+//                mViewChange.loadUrl();
+//            }
             duration = mp.getDuration();
             String duration = Utils.getTime(this.duration);
             playerInfo.setDuration(duration);
@@ -201,22 +204,13 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
                     String Position = Utils.getTime((int) CurrentPosition);
                     playerInfo.setCurrentPosition(Position);
                     activityMainBinding.setPlayerInfo(playerInfo);
+                   // mediaPlayer.is
 
-                    if (duration.equals(Position)) {
-                        if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE){
-                            mediaPlayer.start();
-                        }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE){
-
-                           scrollPage();
-                        } else {
-                            animationUtils.stopRotate("pause");
-                            playerPageAdapterAnimation.stopRotate("pause");
-                            playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
-                            activityMainBinding.setPlayerInfo(playerInfo);
-                            stopTime();
-                        }
-
-                    }
+//                    if (duration.equals(Position)) {
+//
+//
+//
+//                    }
 
             }
 
@@ -248,6 +242,19 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
     @Override
     public void onCompletion(MediaPlayer mp) {
 
+        if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE){
+
+
+            mediaPlayer.start();
+        }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE||CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE){
+            scrollPage();
+        } else {
+            animationUtils.stopRotate("pause");
+            playerPageAdapterAnimation.stopRotate("pause");
+            playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
+            activityMainBinding.setPlayerInfo(playerInfo);
+            stopTime();
+        }
     }
 
     public class TTask extends TimerTask {

@@ -1,10 +1,15 @@
 
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
 
+
 import '../bean/RelayBean.dart';
+import '../bean/UserInfoBean.dart';
+import '../bean/VideoListBean.dart';
 import '../main.dart';
+import 'TrianglePainter.dart';
+import 'myPageController.dart';
 
 
 
@@ -16,21 +21,28 @@ class MyApps extends StatefulWidget {
   }
 }
 
+
+
 class MyAppState extends State<MyApps> with TickerProviderStateMixin {
+
+
   final List<ListItem> listData = [];
   ScrollController sc = new ScrollController(initialScrollOffset: 0.0);
   late TabController tc;
   late TabController tc1;
+ late List<VideoListBean> videoList;
   Duration _kScrollDuration = Duration(milliseconds: 100);
   Curve _kScrollCurve = Curves.fastOutSlowIn;
-   relayBean? _relayBeans ;
+  late myPageController _myPageController;
+  RelayBean? _relayBeans ;
   @override
   void initState() {
     for (int i = 0; i < 20; i++) {
       listData.add(new ListItem("我是测试标题$i", Icons.cake));
     }
-    getTabData();
+  getTabData();
     tc = new TabController(length: 2, vsync: this);
+    _myPageController = myPageController();
     tc.addListener(() {
       //var offset=sc.offset+1000;
 
@@ -44,20 +56,34 @@ class MyAppState extends State<MyApps> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
   }
-  getTabData() async {
-    //relay;
-    var   executeGet = await dioRequest.executeGet(url: "/user/event",params: {"uid":287870880});
-    var relayBeans = relayBean.fromJson(executeGet);
-    relayBeans.events.forEach((event) {
-      var message = Message.fromJson(jsonDecode(event.json));
-      event.set(message);
+  String getType(String type){
+    switch(type){
+      case "album":
+        return "专辑";
+      case "song":
+        return "单曲";
+      case "playlist":
+        return "歌单";
+    }
+    return "";
+  }
+  getTabData() async  {
+    var data = await dioRequest.executeGet(url: "/user/detail",params: {"uid":287870880});
+    var users = UserInfoBean.fromJson(data['profile']);
+    print("object-------${users.avatarUrl}");
+    var videoJson   =  await dioRequest.executeGet(url: "/record/recent/video");
+    videoList= (videoJson['list'] as List<dynamic>).map((json)=>VideoListBean.fromJson(json)).toList();
+    setState(() {
+      for (var value in videoList) {
+        print("----------${value.data.name}");
+      }
     });
-    print("object11111122211111${relayBeans.events[0].message?.msg}");
-    _relayBeans = relayBeans;
-
-setState((){});
-
-
+    //relay;
+    // dioRequest.executeGet(url: "/user/event",params: {"uid":287870880}).then((value){
+    //   var relayBeans = RelayBean.fromJson(value);
+    //
+    //   // print("object999999999999${_myPageController.relayInfo!.events.length}");
+    // });
   }
   @override
   Widget build(BuildContext context) {
@@ -65,68 +91,25 @@ setState((){});
     return
       //PullAndPush(
       Scaffold(body:
-          Container(
-            color: Colors.blueAccent,
-            margin: EdgeInsets.only(top: 500),
-            alignment: Alignment.center,
-            constraints:BoxConstraints(maxHeight: 200) ,
-            child:  Row(
 
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(color: Colors.red,width: 50,height: 50,margin: EdgeInsets.only(right: 10),),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Text("data11111111111111"),
-                  Text("22:46"),
-                Container(
-                  constraints:BoxConstraints(maxHeight: 80) ,
-                  child:   Text(
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      "22:\n"
-                      "22:\n"
-                      "46aaaaaaaaaaaaa\n"),
-                ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    width:MediaQuery.of(context).size.width-80,
-                    color: Colors.grey,
-                    child: Row(
-                      children: [
-                        Container(width: 40,height: 40,),
-                        Column(children: [
-                          Text("data"),
-                          Text("data"),
-                        ],)
-                      ],
-                    ),
-                  ),
-                    Container(
-                      width:MediaQuery.of(context).size.width-80,
-                      child:    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton.icon(onPressed: (){}, label: Text("aaaa"),icon: Icon(Icons.question_answer),),
-                          TextButton.icon(onPressed: (){}, label: Text("bbb"),icon: Icon(Icons.favorite_border_outlined),),
-                          Image.asset("images/more.png",width: 15,height: 15)
-                        ],),
-                    )
+        CustomPaint(
+        size: Size(90, 90),
+    painter: TrianglePainter(
+    color: Colors.black,
+    position: RelativeRect.fromLTRB(100, 100, 100, 100),
+    size: Size(80, 80),
+    screenWidth: MediaQuery.of(context).size.width,
+    )));
 
-
-                ],)
-              ],
-            ),
-          )
         // );
 //      DefaultTabController(
 //      length: 2,
 //      child:
 //        Scaffold(
 //      body: getBody(),
-      );
+      //)
     // );
+
   }
 
   Widget getBody() {
@@ -195,7 +178,7 @@ setState((){});
               pinned: true,
               floating: false,
               delegate: _SliverAppBarDelegate(
-                new TabBar(
+                 TabBar(
 
                   controller: tc,
                   labelColor: Colors.black87,
@@ -442,6 +425,7 @@ class _LoadImgByLocAppPageState extends State
 //      },
 //      itemCount: listData.length,
 //    );
+
   }
 
   // TODO: implement wantKeepAlive

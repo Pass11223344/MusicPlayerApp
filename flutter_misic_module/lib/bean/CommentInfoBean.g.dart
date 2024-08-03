@@ -11,9 +11,10 @@ CommentInfoBean _$CommentInfoBeanFromJson(Map<String, dynamic> json) =>
       (json['comments'] as List<dynamic>)
           .map((e) => Comments.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['totalCount'] as num).toInt(),
-      (json['sortType'] as num).toInt(),
-      json['cursor'] as String,
+          json['totalCount']==null?json['total']:  (json['totalCount'] as num).toInt(),
+          json['sortType']==null?0: (json['sortType'] as num).toInt(),
+          json['cursor']==null?"":  json['cursor'] as String,
+        json['hasMore']==null?false: json['hasMore'] as bool
     );
 
 Map<String, dynamic> _$CommentInfoBeanToJson(CommentInfoBean instance) =>
@@ -31,12 +32,13 @@ Comments _$CommentsFromJson(Map<String, dynamic> json) => Comments(
           .toList(),
       (json['commentId'] as num).toInt(),
       (json['likedCount'] as num).toInt(),
-      (json['replyCount'] as num).toInt(),
+  json['replyCount']==null?0: (json['replyCount'] as num).toInt(),
       (json['parentCommentId'] as num).toInt(),
       json['timeStr'] as String,
       json['content'] as String,
       json['liked'] as bool,
-      IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
+    json['ipLocation']==null?IpLocation(""):  IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
+  (json['time'] as num).toInt(),
     );
 
 Map<String, dynamic> _$CommentsToJson(Comments instance) => <String, dynamic>{
@@ -54,8 +56,9 @@ Map<String, dynamic> _$CommentsToJson(Comments instance) => <String, dynamic>{
 
 BeReplied _$BeRepliedFromJson(Map<String, dynamic> json) => BeReplied(
       User.fromJson(json['user'] as Map<String, dynamic>),
-      json['content'] as String,
+      json['content'] ==null?"": json['content']as String,
       (json['beRepliedCommentId'] as num).toInt(),
+      IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$BeRepliedToJson(BeReplied instance) => <String, dynamic>{
@@ -74,10 +77,10 @@ Map<String, dynamic> _$IpLocationToJson(IpLocation instance) =>
     };
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
-      json['followed'] as bool,
+  json['followed']==null?false: json['followed'] as bool,
       (json['userId'] as num).toInt(),
       json['avatarUrl'] as String,
-      json['nickname'] as String,
+  json['nickname']==null?"":  json['nickname'] as String,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{

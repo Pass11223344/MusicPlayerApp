@@ -6,9 +6,9 @@ part of 'NotificationListBean.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-notificationListBean _$notificationListBeanFromJson(
+NotificationListBean _$NotificationListBeanFromJson(
         Map<String, dynamic> json) =>
-    notificationListBean(
+    NotificationListBean(
       (json['msgCount'] as num).toInt(),
       (json['newMsgCount'] as num).toInt(),
       json['lastMsgTime'] as String,
@@ -22,8 +22,8 @@ notificationListBean _$notificationListBeanFromJson(
       json['receiveAvatarUrl'] as String,
     );
 
-Map<String, dynamic> _$notificationListBeanToJson(
-        notificationListBean instance) =>
+Map<String, dynamic> _$NotificationListBeanToJson(
+    NotificationListBean instance) =>
     <String, dynamic>{
       'msgCount': instance.msgCount,
       'newMsgCount': instance.newMsgCount,

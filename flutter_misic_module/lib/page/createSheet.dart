@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 
 class BottomPopupInput extends StatefulWidget {
@@ -57,7 +55,6 @@ class _MyHomePageState extends State<BottomPopupInput> with WidgetsBindingObserv
         builder: (ctx) {
           return
           Container(
-
             height:_virtualHeight+200,
             child:  Column(
               children: [

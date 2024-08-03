@@ -9,6 +9,7 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SHE
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SONG;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SEARCH;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SHEET;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SING_AND_ALBUMS;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 
 import android.content.Context;
@@ -134,18 +135,6 @@ public class SecondPage extends Fragment implements EngineBindings.EngineBinding
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-//        if (app.touchType == TouchType.ALBUMS) {
-//            otherFragment = FlutterFragment.withCachedEngine(OTHER_PAGE)
-//                    .build();
-//        }else {
-//            otherFragment = FlutterFragment.withCachedEngine(OTHER_PAGE)
-//                    .renderMode(RenderMode.texture)
-//                    .build();
-//        }
-//        getActivity().getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.other_page,otherFragment)
-//                .commit();
         if (!hidden) {
             param= params.getParam();
             String type1 = String.valueOf(param.get("type"));
@@ -153,17 +142,20 @@ public class SecondPage extends Fragment implements EngineBindings.EngineBinding
                 case TO_EXCLUSIVE_SHEET:
                 case TO_MUSIC_RADAR_SHEET:
                 case TO_RECOMMEND_SHEET:
-
                 case TO_SHEET:
-                    Log.d("TAGqqqqqqqqqqq", "onHiddenChanged: "+param.get("type"));
+
+                    Log.d("TAGqqqqqqqqqqq", "onHiddenChanged: "+param.get("id").equals(oldId));
                     if (param.get("id").equals(oldId))
                         return;
                     oldId = String.valueOf(param.get("id"));
                     break;
                 case TO_RECOMMEND_SONG:
+                case TO_SING_AND_ALBUMS:
                 case TO_ALBUMS:
+                    oldId = "1008611";
                     break;
             }
+            Log.d("TAGqqqqqqqqqqq", "onHiddenChanged: "+param.get("type"));
             otherBindings.channel.invokeMethod("to_other_page", param);
 
         }

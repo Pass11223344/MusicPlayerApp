@@ -1,17 +1,19 @@
 
 
 
+
 part 'SongListBean.g.dart';
 
-class songListBean {
+class SongListBean {
   String name;
+  String? singerName;
   int id;
   List<Ar> ar;
   Al al;
   int songCount;
-  songListBean(this.name, this.id, this.ar, this.al,this.songCount);
-  factory songListBean.fromJson(Map<String,dynamic> json) => _$songListBeanFromJson(json);
-  Map<String,dynamic> toJson() => _$songListBeanToJson(this);
+  SongListBean(this.name, this.id, this.ar, this.al,this.songCount);
+  factory SongListBean.fromJson(Map<String,dynamic> json) => _$SongListBeanFromJson(json);
+  Map<String,dynamic> toJson() => _$SongListBeanToJson(this);
 
 }
 

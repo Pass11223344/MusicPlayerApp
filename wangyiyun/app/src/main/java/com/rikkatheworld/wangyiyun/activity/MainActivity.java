@@ -14,6 +14,8 @@ import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.homeHandler;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -23,19 +25,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -100,6 +110,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,7 +126,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, ViewPager.OnPageChangeListener, DataModel.DataModelObserver, EngineBindings.EngineBindingsDelegate {
 
 
-
+   private final int  MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE  =1;
     public static final String MY_ENGINE_ID = "my_engine_id";
     public static final String MSG_ENGINE_ID = "msg_engine_id";
     private static final String CHANNEL = "from_flutter";
@@ -168,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static PlayerInfo playerInfo;
     private RecyclerView player_song_list;
     public static beginPlay.CurrentItem setCurrentPageItem;
-    private static PlayerPageAdapter playerPageAdapter;
+    public  PlayerPageAdapter playerPageAdapter;
     static int position1 = 0;
     public static AnimationUtil animationUtils;
     private ImageView play_module;
@@ -188,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static final int SINGLE_PLAY_MODE = 0;
     public static final int SEQUENTIAL_MODE = 1;
     public static final int RANDOM_PLAY_MODE = 2;
+  //  public static final int UNLIMITED_PLAYBACK_MODE = 3;
     public static final int UNLIMITED_PLAYBACK_MODE = 3;
 
     public static int CURRENT_PLAY_MODE = SEQUENTIAL_MODE;
@@ -283,6 +295,17 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     long nowDate = 0;
     private float deltaX;
     private float deltaY;
+    private boolean isScroll = false;
+   private String info ="";
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        myFragment.onActivityResult(requestCode,resultCode,data);
+
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -290,8 +313,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-
         DataModel.getInstance().addObserver(this);
         activity = this;
         animationUtils = new AnimationUtil();
@@ -317,6 +338,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
+        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
+
 
 
          bottom_view = findViewById(R.id.bottom_navigation);
@@ -355,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         playerFl = include_player.findViewById(R.id.player_FL);
         player_seekBar = include_player.findViewById(R.id.player_seekBar);
         player_viewPage = include_player.findViewById(R.id.player_viewPage);
-        playerPageAdapter = new PlayerPageAdapter(this);
+        playerPageAdapter = new PlayerPageAdapter(this,app);
 
         play_module = include_player.findViewById(R.id.player_play_module);
         player_heart = include_player.findViewById(R.id.player_heart_off);
@@ -438,14 +461,27 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 case MotionEvent.ACTION_UP:
 
                     nowDate = new Date().getTime();
+                    Log.d("TAG111111111111222", "initView: "+isScroll+"sssss"+getCurrentPagerIdx());
+
+                    new Handler(Looper.getMainLooper()).postDelayed(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    if ((nowDate-lodDate)<300&&!isScroll) {
+
+                                        player_stylus.setVisibility(View.INVISIBLE);
+                                        mLrcView.setVisibility(View.VISIBLE);
+                                        player_viewPage.setVisibility(View.INVISIBLE);
+                                    }
+                                    isScroll = false;
+                                }
+                            },100
+                    );
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
                         return false;
                     }
-                    if ((nowDate-lodDate)<300) {
-                        player_stylus.setVisibility(View.INVISIBLE);
-                        mLrcView.setVisibility(View.VISIBLE);
-                        player_viewPage.setVisibility(View.INVISIBLE);
-                    }
+
+
                         break;
             }
 
@@ -531,7 +567,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 player_viewPage.setAdapter(playerPageAdapter);
                 playerInfo.setListBeans(listBean);
                 activityMainBinding.setPlayerInfo(playerInfo);
-
                 songListAdapter = new SongListAdapter(this);
                 player_song_list.setAdapter(songListAdapter);
 
@@ -636,9 +671,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             viewPager.setCurrentItem(0, false);
 
         } else if (itemId == R.id.item_my) {
+            app.touchType = TouchType.MY_PAGE;
             viewPager.setCurrentItem(1, false);
 
         } else {
+            app.touchType = TouchType.MSG_PAGE;
             viewPager.setCurrentItem(2, false);
 
         }
@@ -662,7 +699,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         super.onResume();
 
-        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
 
         player_rootView = include_player.findViewById(R.id.player_rootView);
         player_rootView.setPadding(0, statusBarHeight, 0, 0);
@@ -792,13 +828,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             int drawable_hashCode = drawable.getConstantState().hashCode();
             if (app.touchType == EXCLUSIVE_MUSIC) {
 
-                if (drawable.hashCode() == getDrawable(ExclusiveMusicMode[0]).getConstantState().hashCode()) {
+                Log.d("TAG----------------ss", "onClick: "+(getDrawable(ExclusiveMusicMode[0]).getConstantState().hashCode())+"---------"+drawable.hashCode());
+
+                if (CURRENT_PLAY_MODE ==   UNLIMITED_PLAYBACK_MODE) {
                     CURRENT_PLAY_MODE =   SINGLE_PLAY_MODE;
-                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
+                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
                 }else {
                     CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
-                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
+                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
                 }
+
                // ExclusiveMusicMode
             }else  for (int i = 0; i < playMode.length; i++) {
                 if (drawable_hashCode == getDrawable(playMode[i]).getConstantState().hashCode()) {
@@ -859,6 +898,9 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         } else if (id == R.id.player_next_song) {//下一曲
 
             switchSong = true;
+            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
+                playerPageAdapter.setData(playerInfo.getListBeans());}
+            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==getCurrentPagerIdx())return;
             next_song.setClickable(false);
 
                 if (isUpData==1) {
@@ -871,9 +913,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                         player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()+1 ,false);
                         pIndex = 0;
                     }
-
-
-
                 }else {
                     player_viewPage.setCurrentItem(position1 + 1);
 
@@ -892,6 +931,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             jumpTo jumpTo = mLrcView.setJump();
             if (jumpTo != null) jumpTo.toPosition();
         } else if (id == R.id.player_LrcView) {//隐藏滚动歌词显示唱片
+            Log.d("TAG----ssssfff-----", "onClick: ");
             player_stylus.setVisibility(View.VISIBLE);
             mLrcView.setVisibility(View.INVISIBLE);
             player_viewPage.setVisibility(View.VISIBLE);
@@ -915,11 +955,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         }else if(id==R.id.player_comment){
             Intent intent = new Intent(this, CommentActivity.class);
-            intent.putExtra("commentType", CommentType.T_SONG);
+
             intent.putExtra("songName",playerInfo.getSongName());
-            intent.putExtra("songId", playerInfo.getSongId());
+            intent.putExtra("Id", playerInfo.getSongId());
             intent.putExtra("singerName",playerInfo.getSingerName());
             intent.putExtra("imgUrl",playerInfo.getImgUrl());
+           // Log.d("TAG000011122233344455678", "onClick: "+playerInfo.getUserInfoBean().getUserId());
+            intent.putExtra("userId",playerInfo.getUserInfoBean().getUserId());
             intent.putExtras(intent);
             startActivity(intent);
 
@@ -929,7 +971,17 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     }
 
+      public void   setCurrentMode(String type){
+          if (type.equals("ExclusiveMusicMode")) {
+              CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
+              play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
+          }else{
 
+              CURRENT_PLAY_MODE = SEQUENTIAL_MODE  ;
+              play_module.setImageDrawable(getDrawable(playMode[1]));
+          }
+
+        }
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
@@ -978,6 +1030,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         public void RotateView() {
            beginRotate();
         }
+
+        @Override
+        public void loadUrl() {
+            homeFragment.loadMp3("radio");
+        }
+
+        @Override
+        public int currentIndex() {
+            return  player_viewPage.getCurrentItem();
+        }
     };
 
 
@@ -999,21 +1061,33 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     @Override
     public void onPageSelected(int position) {
-
+        Log.d("TAG11111111111122333", "onPageSelected: ");
+        isScroll = true;
         if (instance.serviceBinder!=null) {
             instance.serviceBinder.playOrPause(STATE_PLAY);
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
         }
         if (CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
-            if (playerInfo.getListBeans().size()-2==position) {
+            if (playerInfo.getListBeans().size()-1==position) {
                 homeFragment.loadOk = false;
+                isUpData = 1;
                 homeFragment.loadMp3("radio");
-
+                return;
             }
-            return;
+            if ( isUpData == 1){
+                isUpData = 2;
+                playerPageAdapter.setData(playerInfo.getListBeans());
+                return;
+            }
+
            // player_viewPage.setCurrentItem(position1+1);
         }
             if(!isOnClick&&!switchSong){
+                if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
+                    playerPageAdapter.setData(playerInfo.getListBeans());
+                return;
+                }
+
                 if (CURRENT_PLAY_MODE!=RANDOM_PLAY_MODE) {
                     if (inTO){
                         inTO = false;
@@ -1150,11 +1224,9 @@ public void setCurrentIdToFlutter(long id){
                orderList.set(nextIndex,nextPager);
                orderList.set(previousIndex,previousPager);
                 playerPageAdapter.setData(orderList);
-
                 playerPageAdapter.notifyDataSetChanged();
 
                 for (int i = 0; i < list.size(); i++) {
-
                     if (listBean.get(position1 % list.size()).getSongId() == list.get(i).getSongId()) {
                         position1 = position1 + i - ((position1 + i) % list.size() - i);
                         songListAdapter.setIndex(position1);
@@ -1194,12 +1266,9 @@ public void setCurrentIdToFlutter(long id){
                 temporaryList.set(nextPagerIdx,listBean.get(1));
                 temporaryList.set(previousPagerIdx,listBean.get(listBean.size()-1));
                 playerPageAdapter.setData(temporaryList);
-
-
                for (int i = 0; i < listBean.size(); i++) {
                    if (position1 % listBean.size() == 0) {
                        songListAdapter.setIndex(position1);
-
                        break;
                    } else position1 -= 1;
                 }
@@ -1208,8 +1277,14 @@ public void setCurrentIdToFlutter(long id){
         }
     }
 public void upData(long id){
+    if (listBean.size()!=0) {
+        listBean.clear();
+    }
+    listBean.addAll(PlayerList);
+
 switchSong=false;
     for (int i = 0; i < listBean.size(); i++) {
+
         if (listBean.get(i).getSongId()==id) {
             ListBean listBean1 = listBean.get(i);
             listBean.remove(listBean1);
@@ -1219,18 +1294,19 @@ switchSong=false;
             activityMainBinding.setPlayerInfo(playerInfo);
             songListAdapter.upData(listBean);
             playerPageAdapter.setData(listBean);
+            Log.d("TAG11111111111111111111111111", "upData:aaaaa ");
+
             for (int j = 0; j < listBean.size(); j++) {
         if (position1 % listBean.size() == 0) {
             songListAdapter.setIndex(position1);
             if (pIndex ==0) {
                 player_viewPage.setCurrentItem(position1+listBean.size());
-
                 pIndex = 1;
             }else {
                 player_viewPage.setCurrentItem(position1-listBean.size());
                 pIndex = 0;
             }
-
+            Log.d("TAG11111111111111hh", "upData: 11111sss"+getCurrentPagerIdx());
             break;
         } else position1 -= 1;
     }
@@ -1379,9 +1455,6 @@ switchSong=false;
 
     }
 
-
-
-
     @Override
     public void onNext() {
 
@@ -1489,7 +1562,6 @@ public interface SetCurrentMp3{
         void setCurrentMp3(List<UrlBeans> urlBeans);
 }
 
-
     public static void beginRotate(){
         Log.d("TAGpppppaaa", "beginRotate: ");
         animationUtils.Rotate(main_player_img);
@@ -1505,6 +1577,7 @@ public void onCountUpdate(Map<?, ?> newData) {
     formatDate(newData);
             }
  public void formatDate(Map<?, ?> data){
+     setCurrentMode("");
 switchSong = false;
      if (data!=null) {
          String str = String.valueOf(data.get("SongList"));
@@ -1532,7 +1605,7 @@ switchSong = false;
                      Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
                      List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(ar,token);
                      listBean.setSingerInfo(SingerInfo);
-                     Log.d("TAG--------", "formatDate: "+jsonObject);
+
                      listBean.setSongName(String.valueOf(jsonObject.get("name")));
                      listBean.setSongId(Long.parseLong(String.valueOf(jsonObject.get("id"))) );
                      listBean.setSubTitle(String.valueOf(((JSONObject)jsonObject.get("al")).get("name")));
@@ -1575,9 +1648,10 @@ switchSong = false;
              }
              if(CURRENT_PLAY_MODE==RANDOM_PLAY_MODE){
                  isUpData = 2;
+                 Log.d("TAG--------11111", "formatDate: "+Long.parseLong(songId));
+
                  upData(Long.parseLong(songId));
-             }else
-             if (pIndex ==0) {
+             }else if (pIndex ==0) {
                  player_viewPage.setCurrentItem(currentP+Sheetlist.size());
                  pIndex = 1;
              }else {
@@ -1597,17 +1671,11 @@ switchSong = false;
              }
 
              songId = String.valueOf(Sheetlist.get(index).getSongId());
-           //  int i = 0;
-//             for (ListBean bean : Sheetlist) {
-//                 if (Long.parseLong(songId) == bean.getSongId()) {
-//                     break;
-//                 }
-//             i++;
-//             }
+
 //
 
 
-             play(songId,null);
+           //  play(songId,null);
              int i = currentP % Sheetlist.size();
              if (index>i) {
                  currentP = currentP+index;
@@ -1635,6 +1703,7 @@ switchSong = false;
     }
     @Override
     public void onBackPressed() {
+
         if(homeFragment.songSheetFragment!=null&&homeFragment.songSheetFragment.isVisible()){
             if (secondFragment!=null&&secondFragment.isVisible()) {
                 getSupportFragmentManager()
@@ -1646,9 +1715,13 @@ switchSong = false;
                                 R.anim.fade_out)
                         .hide(secondFragment)
                         .commit();
+                app.page-=1;
                 return;
             }
+
+
             homeFragment.hideFragment();
+            Log.d("TAG111111111111222333", "onBackPressed: "+app.page);
             showView();
             viewPager.setBackground(getDrawable(R.drawable.home_background));
 
@@ -1659,11 +1732,21 @@ switchSong = false;
             behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             return;
         }
+        if(app.touchType == TouchType.MY_PAGE){
+            myFragment.myBindings.channel.invokeMethod("back","");
+            return;
+        }
         if( app.touchType ==TouchType.SEARCH_PAGE){
+            Log.d("TAG----------aaaaaa", "onBackPressed: ");
             homeFragment.searchFragment.getBack().back();
             return;
         }
+        if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.ALBUMS){
+            secondFragment.getBack().back();
+            return;
+        }
         if (app.page>0){
+            Log.d("TAG11111111111111111111111", "onBackPressed: ");
             app.page-=1;
             if (homeFragment.searchFragment!=null&&homeFragment.searchFragment.isVisible()){
                 getSupportFragmentManager()
@@ -1680,7 +1763,6 @@ switchSong = false;
             }
             if (secondFragment!=null&&secondFragment.isVisible()) {
 
-                secondFragment.getBack().back();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(
@@ -1691,13 +1773,17 @@ switchSong = false;
                         .hide(secondFragment)
                         .commit();
             }else {
-                Log.d("TAG---------", "onBackPressed: "+(myFragment.isVisible()));
-                if (myFragment.isVisible()) {
-                    myFragment.myBindings.channel.invokeMethod("back","");
-
-                }
-                if (msgFragment.isVisible()) {
+                Log.d("TAG---------", "onBackPressed: "+(myFragment.isVisible()&&viewPager.getCurrentItem()==1));
+//                if (myFragment.isVisible()&&viewPager.getCurrentItem()==1) {
+//                   // myFragment.myBindings.channel.invokeMethod("back","");
+//                    app.touchType = TouchType.MY_PAGE;
+//                    showView();
+//                    return;
+//                }
+                if (msgFragment.isVisible()&&viewPager.getCurrentItem()==2) {
                     msgFragment.msgBindings.channel.invokeMethod("back","");
+                    showView();
+                    return;
                 }
 
             }
@@ -1729,7 +1815,10 @@ switchSong = false;
         viewPager.setBackground(getDrawable(R.color.white));
     }
     public void showView() {
-        animationUtil.showView(bottom_view);
+        if (app.page==0) {
+            animationUtil.showView(bottom_view);
+        }
+
         if (playerLayoutParams!=null){
             player_control.setVisibility(View.INVISIBLE);
             new Handler(Looper.getMainLooper()).postDelayed(
@@ -1745,6 +1834,8 @@ switchSong = false;
         }
     }
     public void hideView() {
+        //隐藏Bottom_view
+        if(bottom_view.getVisibility()==View.GONE||bottom_view.getVisibility()==View.INVISIBLE)return;
         animationUtil.hideView(bottom_view);
         bottom_view.setVisibility(View.GONE);
         if (player_control.getVisibility()== View.VISIBLE) {
@@ -1765,4 +1856,89 @@ switchSong = false;
 public void hide(){
     animationUtil.hideView(player_control);
 }
+    public void show(){
+        animationUtil.showView(player_control);
+    }
+public void requestPermission(String info){
+        this.info = info;
+    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
+        String[] strings = {Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO};
+        for (String string : strings) {
+            if (ContextCompat.checkSelfPermission(this, string)!= PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(this,
+                            strings,
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                            return;
+               // }
+            }
+        }
+
+    }else {
+        int checked = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if(checked==PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+            showPermissionRationaleDialog();
+        }else {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+    }
+
+}
+    private void showPermissionRationaleDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("权限请求")
+                .setMessage("我们需要读取存储的权限来访问您的相册。")
+                .setPositiveButton("确定", (dialog, which) -> requestPermission(info))
+                .setNegativeButton("取消", null)
+                .create()
+                .show();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            if(i==grantResults.length-1){
+                                File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                                String downloadsPath = downloadsDir.getAbsolutePath();
+                                Map<String,Object> result = new HashMap<>();
+                                result.put("isSuccess",true);
+                                result.put("action", info.isEmpty() ?"chooseImg":"saveImg");
+                                result.put("info",info);
+                                result.put("path",downloadsPath);
+                               // myFragment.myBindings.channel.invokeMethod("RequestResults",result);
+                                secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
+                            }
+                        }else {
+                            CustomToast.showToast(this,"未授予权限或权限不完整！");
+                            return;
+                        }
+                    }
+
+                    // 权限被用户授予，可以继续操作
+                }
+                    // 权限被用户拒绝，处理这种情况
+
+
+                break;
+            }
+            // 其他权限请求处理
+            // ...
+        }
+    }
+   public void upImage(String path){
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://"+path)));
+    }
 }

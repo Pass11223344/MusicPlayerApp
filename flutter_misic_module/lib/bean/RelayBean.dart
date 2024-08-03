@@ -1,37 +1,42 @@
+
+
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 
 import 'AlbumListBean.dart';
 import 'CommentInfoBean.dart';
+import 'SongSheetList.dart';
 part 'RelayBean.g.dart';
 @JsonSerializable()
-class relayBean{
+class RelayBean{
   int size ;
 
   List<Events> events;
 
 
-  relayBean(this.size,this.events);
-  factory relayBean.fromJson(Map<String,dynamic> json)=>_$relayBeanFromJson(json);
-  Map<String,dynamic> toJson() => _$relayBeanToJson(this);
+  RelayBean(this.size,this.events);
+  factory RelayBean.fromJson(Map<String,dynamic> json)=>_$RelayBeanFromJson(json);
+  Map<String,dynamic> toJson() => _$RelayBeanToJson(this);
 }
 @JsonSerializable()
 class Events {
   Info info;
-
   int id;
-
   int showTime ;
   String json;
   IpLocation ipLocation;
   User user;
-  Message? message;
-  Message? get() => message;
- Events set(Message? msg) {
-  message = msg;
-  return this;
-  }
+  Message message;
+  String threadId;
+  int type;
+ //  Message? get() => message;
+ // Events set(Message? msg) {
+ //  message = msg;
+ //  return this;
+ //  }
   Events(this.info, this.id, this.showTime, this.json, this.ipLocation,
-      this.user);
+      this.user,this.threadId,this.type,this.message);
   factory Events.fromJson(Map<String,dynamic> json)=>_$EventsFromJson(json);
   Map<String,dynamic> toJson() => _$EventsToJson(this);
 
@@ -49,23 +54,35 @@ class Info {
   factory Info.fromJson(Map<String,dynamic> json)=>_$InfoFromJson(json);
   Map<String,dynamic> toJson() => _$InfoToJson(this);
 }
-@JsonSerializable()
+
 class CommentThread {
   String resourceTitle;
-
-  CommentThread(this.resourceTitle);
+  List<LatestLikedUsers> latestLikedUsers;
+  CommentThread(this.resourceTitle,this.latestLikedUsers);
   factory CommentThread.fromJson(Map<String,dynamic> json)=>_$CommentThreadFromJson(json);
   Map<String,dynamic> toJson() => _$CommentThreadToJson(this);
 }
 
-@JsonSerializable()
+class LatestLikedUsers {
+  int s;
+
+  LatestLikedUsers(this.s);
+}
+
+
 class Message{
   String msg;
-  Song song;
+  OtherInfo info;
 
-  Message(this.msg, this.song);
-  factory Message.fromJson(Map<String,dynamic> json)=>_$MessageFromJson(json);
+  Message(this.msg, this.info);
+  factory Message.fromJson(Map<String,dynamic> json,int type)=>_$MessageFromJson(json,type);
   Map<String,dynamic> toJson() => _$MessageToJson(this);
+}
+
+class OtherInfo {
+  Song? song;
+  Album? album;
+  SongSheetList? playlist;
 }
 @JsonSerializable()
 class Song {

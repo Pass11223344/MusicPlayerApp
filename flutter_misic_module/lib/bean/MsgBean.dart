@@ -6,16 +6,16 @@ import 'package:json_annotation/json_annotation.dart';
 part 'MsgBean.g.dart';
 
 @JsonSerializable()
-class msgBean {
+class MsgBean {
 FromUser fromUser;
 ToUser toUser;
 String msg;
 int id;
 int time;
 
-msgBean(this.fromUser, this.toUser, this.msg, this.id, this.time);
-factory msgBean.fromJson(Map<String,dynamic> json)=>_$msgBeanFromJson(json);
-Map<String,dynamic> toJson() => _$msgBeanToJson(this);
+MsgBean(this.fromUser, this.toUser, this.msg, this.id, this.time);
+factory MsgBean.fromJson(Map<String,dynamic> json)=>_$MsgBeanFromJson(json);
+Map<String,dynamic> toJson() => _$MsgBeanToJson(this);
 }
 @JsonSerializable()
 class ToUser {

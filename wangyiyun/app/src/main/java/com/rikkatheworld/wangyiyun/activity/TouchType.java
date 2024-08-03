@@ -14,5 +14,10 @@ public enum TouchType {
     EXCLUSIVE_MUSIC,//私人漫游
     ALBUMS,//数字专辑
     SING_AND_ALBUMS,//新歌新碟
-    SEARCH_PAGE
+    SEARCH_PAGE,//搜索
+    FLUTTER_SONG,
+    MY_PAGE,
+    MSG_PAGE,
+
+
 }

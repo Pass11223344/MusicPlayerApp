@@ -5,10 +5,11 @@ import 'package:flutter_misic_module/bean/UserInfoBean.dart';
 part 'SongSheetList.g.dart';
 
 class SongSheetList{
-   userInfoBean creator;
+   UserInfoBean creator;
    int trackCount,playCount,id,userId,shareCount,commentCount,subscribedCount,cloudTrackCount;
    String coverImgUrl,name,description,updateFrequency,backgroundCoverUrl,detailPageTitle;
-   List<SharedUsers> sharedUsers;
+   List<UserInfoBean> sharedUsers;
+   bool subscribed;
 
 
    SongSheetList(
@@ -27,7 +28,8 @@ class SongSheetList{
       this.updateFrequency,
       this.backgroundCoverUrl,
       this.detailPageTitle,
-      this.sharedUsers);
+      this.sharedUsers,
+       this.subscribed);
 
   factory SongSheetList.fromJson(Map<String,dynamic> json) => _$SongSheetListFromJson(json);
 Map<String,dynamic> toJson() => _$SongSheetListToJson(this);

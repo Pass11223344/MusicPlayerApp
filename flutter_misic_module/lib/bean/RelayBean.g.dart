@@ -6,27 +6,36 @@ part of 'RelayBean.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-relayBean _$relayBeanFromJson(Map<String, dynamic> json) => relayBean(
+RelayBean _$RelayBeanFromJson(Map<String, dynamic> json) => RelayBean(
       (json['size'] as num).toInt(),
       (json['events'] as List<dynamic>)
           .map((e) => Events.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$relayBeanToJson(relayBean instance) => <String, dynamic>{
+Map<String, dynamic> _$RelayBeanToJson(RelayBean instance) => <String, dynamic>{
       'size': instance.size,
       'events': instance.events,
     };
 
-Events _$EventsFromJson(Map<String, dynamic> json) => Events(
-      Info.fromJson(json['info'] as Map<String, dynamic>),
-      (json['id'] as num).toInt(),
-      (json['showTime'] as num).toInt(),
-      json['json'] as String,
-      IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
-      User.fromJson(json['user'] as Map<String, dynamic>),
+Events _$EventsFromJson(Map<String, dynamic> json) {
+  var type = (json['type'] as num).toInt();
+  var data = jsonDecode(json['json'] as String);
+  Message message = Message.fromJson(data,type);
 
-    );
+  return Events(
+    Info.fromJson(json['info'] as Map<String, dynamic>),
+    (json['id'] as num).toInt(),
+    (json['showTime'] as num).toInt(),
+      json['json'] as String,
+    IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
+    User.fromJson(json['user'] as Map<String, dynamic>),
+    json['threadId'] as String,
+    type,
+    message
+
+  );
+}
 
 Map<String, dynamic> _$EventsToJson(Events instance) => <String, dynamic>{
       'info': instance.info,
@@ -55,7 +64,9 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
 
 CommentThread _$CommentThreadFromJson(Map<String, dynamic> json) =>
     CommentThread(
-      json['resourceTitle'] ==null?"分享单曲":  json['resourceTitle'] as String,
+      json['resourceTitle'] ==null?"":  json['resourceTitle'] as String,
+      json['latestLikedUsers'] ==null?[]: (json['latestLikedUsers']as List<dynamic>).map((e)=>LatestLikedUsers(e['s'])).toList()
+
     );
 
 Map<String, dynamic> _$CommentThreadToJson(CommentThread instance) =>
@@ -63,14 +74,30 @@ Map<String, dynamic> _$CommentThreadToJson(CommentThread instance) =>
       'resourceTitle': instance.resourceTitle,
     };
 
-Message _$MessageFromJson(Map<String, dynamic> json) => Message(
-      json['msg'] as String,
-      Song.fromJson(json['song'] as Map<String, dynamic>),
-    );
+Message _$MessageFromJson(Map<String, dynamic> json,int type){
+  OtherInfo info = OtherInfo();
+  switch(type){
+    case 18:
+      info.song =  Song.fromJson(json['song'] as Map<String, dynamic>);
+      break;
+    case 19:
+      info.album =  Album.fromJson(json['album'] as Map<String, dynamic>);
+      break;
+    case 13:
+    case 35:
+    info.playlist =  SongSheetList.fromJson(json['playlist'] as Map<String, dynamic>);
+    break;
+  }
+
+  return Message(
+    json['msg'] as String,
+    info,
+  );
+}
 
 Map<String, dynamic> _$MessageToJson(Message instance) => <String, dynamic>{
       'msg': instance.msg,
-      'song': instance.song,
+      'info': instance.info,
     };
 
 Song _$SongFromJson(Map<String, dynamic> json) => Song(

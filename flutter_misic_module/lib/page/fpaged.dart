@@ -1,69 +1,72 @@
 import 'package:flutter/material.dart';
 
-class dd extends StatelessWidget{
+import 'WPopupMenu.dart';
+
+class PopupRoutePage extends StatefulWidget {
+  @override
+  _PopupRoutePageState createState() => _PopupRoutePageState();
+}
+
+class _PopupRoutePageState extends State<PopupRoutePage> {
+  final List<String> actions = [
+    '复制',
+    '转发',
+    '收藏',
+    '删除',
+    '转发',
+    '收藏',
+    '删除',
+
+  ];
+
+
   @override
   Widget build(BuildContext context) {
-       final List<String> _tabs = <String>['Tab 1', 'Tab 2'];
-       return DefaultTabController(
-        length: _tabs.length, // This is the number of tabs.
-         child: Scaffold(
-           body: NestedScrollView(
-             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-               // These are the slivers that show up in the "outer" scroll view.
-               return <Widget>[
-                 SliverOverlapAbsorber(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('PopupRoutePage'),
+        ),
+        body: Stack(
+          children: <Widget>[
+            ListView.builder(
+                shrinkWrap: true,
+                itemCount: 40,
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    alignment: index % 2 == 0
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    child: WPopupMenu(
+                      onValueChanged: (int value) {
+                       print("object-----------------点击了$value");
+                      },
+                      pressType: PressType.longPress,
+                      actions: actions,
+                      key: null,
+                      child: UnconstrainedBox(
+                        child: Container(
+                          height: 40,
+                          color: Colors.cyan,
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              Image.asset("images/img.png",fit: BoxFit.cover,),
+                              Text(
+                                '我是Title $index',
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
 
-                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                   sliver: SliverAppBar(
-                     title: const Text('Books'), // This is the title in the app bar.
-                     pinned: true,
-                     expandedHeight: 150.0,
-
-                     forceElevated: innerBoxIsScrolled,
-                     bottom: TabBar(
-                       // These are the widgets to put in each tab in the tab bar.
-                       tabs: _tabs.map((String name) => Tab(text: name)).toList(),
-                     ),
-                  ),
-                ),
-               ];
-             },
-             body: TabBarView(
-               // These are the contents of the tab views, below the tabs.
-               children: _tabs.map((String name) {
-                 return SafeArea(
-                   top: false,
-                   bottom: false,
-                   child: Builder(
-
-                     builder: (BuildContext context) {
-                       return CustomScrollView(
-
-                         key: PageStorageKey<String>(name),
-                         slivers: <Widget>[
-                           SliverOverlapInjector(
-
-                             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                           ),
-                           SliverPadding(
-                             padding: const EdgeInsets.all(8.0),
-
-                             sliver:SliverToBoxAdapter(
-                               child: Container(
-                                 height: 200,
-                                 color: Colors.orangeAccent,child: Text("sdhbjfkhsDK"),),
-                             )
-                           ),
-                         ],
-                       );
-                     },
-                   ),
-                 );
-               }).toList(),
-             ),
-           ),
-         ),
-       );
-     }
-  
+          ],
+        ));
+//    );
+  }
 }

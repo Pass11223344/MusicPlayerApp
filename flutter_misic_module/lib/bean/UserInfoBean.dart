@@ -1,10 +1,8 @@
 
 
-import 'dart:convert';
 
-import 'package:json_annotation/json_annotation.dart';
 
-class userInfoBean{
+class UserInfoBean{
    String avatarUrl;
    String backgroundUrl;
    String nickname;
@@ -17,7 +15,7 @@ class userInfoBean{
    int eventCount;
    int userId;
 
-   userInfoBean(
+   UserInfoBean(
       this.avatarUrl,
       this.backgroundUrl,
       this.nickname,
@@ -30,9 +28,9 @@ class userInfoBean{
       this.eventCount,
        this.userId);
 
-   factory userInfoBean.fromJson(Map<String,dynamic> json)=> _$userInfoBeanFromJson(json);
+   factory UserInfoBean.fromJson(Map<String,dynamic> json)=> _$UserInfoBeanFromJson(json);
 
-   Map<String,dynamic> toJson(userInfoBean u)=>
+   Map<String,dynamic> toJson(UserInfoBean u)=>
        <String,dynamic>{
           "avatarUrl":u.avatarUrl,
           "backgroundUrl":u.backgroundUrl,
@@ -50,12 +48,12 @@ class userInfoBean{
 
 }
 
-userInfoBean  _$userInfoBeanFromJson(Map<String,dynamic> json) {
+UserInfoBean  _$UserInfoBeanFromJson(Map<String,dynamic> json) {
 
-   return userInfoBean(
+   return UserInfoBean(
        json["avatarUrl"] ==null?"":  (json["avatarUrl"] as String),
        ( json["backgroundUrl"] )==null?"":( json["backgroundUrl"] as String),
-       (json["nickname"] as String),
+       json["nickname"]==null?"": (json["nickname"] as String),
        json["birthday"] ==null?0:(json["birthday"] as num ).toInt(),
         json["province"] ==null?0: ( json["province"] as num ).toInt(),
         json["gender"] ==null?0: ( json["gender"] as num ).toInt(),

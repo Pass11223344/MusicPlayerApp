@@ -28,8 +28,10 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.rikkatheworld.wangyiyun.AnimationPage.AnimationUtil;
 
+import com.rikkatheworld.wangyiyun.App;
 import com.rikkatheworld.wangyiyun.R;
 import com.rikkatheworld.wangyiyun.activity.MainActivity;
+import com.rikkatheworld.wangyiyun.activity.TouchType;
 import com.rikkatheworld.wangyiyun.bean.ListBean;
 import com.rikkatheworld.wangyiyun.util.Utils;
 
@@ -37,23 +39,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerPageAdapter extends PagerAdapter {
+    private final App app;
     private  List<ListBean> list = new ArrayList<>();
     private final Context context;
 
-    private int position1=0;
+    private int position1=-1;
     public static AnimationUtil playerPageAdapterAnimation;
 
 
     private float d;
     private int index=-1;
 
+  //private App  app = (App) getApplicationContext();
 
 
 
 
-
-    public PlayerPageAdapter(Context context) {
+    public PlayerPageAdapter(Context context,App app) {
         this.context = context;
+        this.app = app;
         if (playerPageAdapterAnimation==null) {
             playerPageAdapterAnimation= new AnimationUtil();
         }
@@ -65,7 +69,7 @@ public class PlayerPageAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return 10000;
+        return app.touchType== TouchType.EXCLUSIVE_MUSIC?list.size():100000;
     }
 
     @Override
@@ -130,11 +134,12 @@ public class PlayerPageAdapter extends PagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
    super.setPrimaryItem(container, position, object);
+        Log.d("TAGppppp", "setPrimaryItem: "+position+"--"+position1);
         ViewGroup   currentView = (ViewGroup) object;
         ImageView   imgView = currentView.findViewById(position);
 
         if (position!=position1) {
-            Log.d("TAGppppp", "setPrimaryItem: "+position+"--"+position1);
+
 
             if (playerPageAdapterAnimation != null) {
                 playerPageAdapterAnimation.stopRotate("cancel");

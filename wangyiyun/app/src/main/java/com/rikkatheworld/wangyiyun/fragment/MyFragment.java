@@ -6,6 +6,7 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,7 +40,9 @@ import com.rikkatheworld.wangyiyun.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.embedding.android.FlutterFragment;
 import io.flutter.embedding.android.RenderMode;
@@ -51,14 +54,13 @@ import io.flutter.embedding.engine.dart.DartExecutor;
 public class MyFragment extends Fragment implements EngineBindings.EngineBindingsDelegate {
 
     public EngineBindings  myBindings;;
-    private String profile;
+    private JSONObject profile;
     private MyFragmentHandler handler;
     private static  final int SONG_SHEET_ID = 1;
     private UserInfoBean userInfoBean;
     private boolean isFirst = true;
-
-
-
+    public FlutterFragment myflutterFragment;
+    private Map<String, Object> map;
 
 
     @Nullable
@@ -68,6 +70,13 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
 
         return inflate;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        myflutterFragment.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -88,35 +97,38 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
 
     private void initView() {
         userInfoBean = playerInfo.getUserInfoBean();
-
         handler = new MyFragmentHandler();
-          LoadData();
+        //  LoadData();
         FlutterEngineCache.getInstance().put(MY_ENGINE_ID,myBindings.engine);
         myBindings.attach();
-        FlutterFragment myflutterFragment = FlutterFragment.withCachedEngine(MY_ENGINE_ID)
+        myflutterFragment = FlutterFragment.withCachedEngine(MY_ENGINE_ID)
                 .renderMode(RenderMode.texture)
                 .build();
 
         SharedPreferences userInfoData = getContext().getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
         String string = userInfoData.getString("UserInfo","");
+        String string1 = userInfoData.getString("token","");
+
         if (!string.equals("")|| !TextUtils.isEmpty(string)) {
             JSONObject info = null;
             try {
                 info = new JSONObject(string);
-                profile = String.valueOf(info.get("profile"));
+                profile = (JSONObject) info.get("profile");
+                map = new HashMap<>();
+                map.put("userId" ,profile.get("userId"));
+                map.put("token" ,string1);
+
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
 
-
-
-        myBindings.channel.invokeMethod("to_myPage",profile);
-
+        myBindings.channel.invokeMethod("to_myPage", map);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.my_Fl_flutterView,myflutterFragment)
+                .add(R.id.my_Fl_flutterView, myflutterFragment)
                 .commit();
+
     }
     private EngineBindings getMyBindings() {
         if (myBindings == null) {
@@ -144,7 +156,6 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
                             JSONObject object = new JSONObject(obj);
                             String o = object.getString("playlist");
                             List<UserSheetBean> sheetList = (List<UserSheetBean>) MyGsonUtil.getInstance().press(o, "sheetList", getActivity());
-                            Log.d("TAGdispatchMessage", "dispatchMessage: "+sheetList.size());
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }

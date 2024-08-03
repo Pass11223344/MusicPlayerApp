@@ -3,12 +3,12 @@
 part 'NotificationListBean.g.dart';
 //receiveUserId = toUser为自己
 //sendUserUserId = fromUser为对方
-class notificationListBean{
+class NotificationListBean{
   int msgCount,newMsgCount,sendUserUserId,receiveUserId;
   String sendUserSendIdentityIconUrl,sendUserNickname,sendUserAvatarUrl,msg,receiveNickname,receiveAvatarUrl,lastMsgTime;
 
 
-  notificationListBean(
+  NotificationListBean(
       this.msgCount,
       this.newMsgCount,
       this.lastMsgTime,
@@ -21,7 +21,7 @@ class notificationListBean{
       this.receiveNickname,
       this.receiveAvatarUrl);
 
-  factory notificationListBean.fromJson(Map<String,dynamic> json)=>_$notificationListBeanFromJson(json);
+  factory NotificationListBean.fromJson(Map<String,dynamic> json)=>_$NotificationListBeanFromJson(json);
 
-Map<String,dynamic> toJson() =>_$notificationListBeanToJson(this);
+Map<String,dynamic> toJson() =>_$NotificationListBeanToJson(this);
 }

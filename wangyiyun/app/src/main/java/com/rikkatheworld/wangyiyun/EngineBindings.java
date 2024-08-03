@@ -1,6 +1,9 @@
 package com.rikkatheworld.wangyiyun;
 
 import android.app.Activity;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
@@ -12,6 +15,7 @@ import com.rikkatheworld.wangyiyun.activity.CommentActivity;
 import com.rikkatheworld.wangyiyun.activity.MainActivity;
 import com.rikkatheworld.wangyiyun.activity.TouchType;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Objects;
 
@@ -29,6 +33,7 @@ public class EngineBindings {
     private  MainActivity activity;
     private  CommentActivity commentActivity;
     private final App app;
+
 
     public EngineBindings(Activity activity, EngineBindingsDelegate  delegate, String entrypoint){
 
@@ -51,10 +56,11 @@ public class EngineBindings {
         channel.setMethodCallHandler((call, result) -> {
             switch (call.method) {
                 case "sendSongList":
-                    Log.d("TAG1111111aaaaaaaaaa11111", "attach: "+(String.valueOf(((Map<?, ?>) call.arguments).get("title"))));
+                    Log.d("TAG1111111aaaaaaaaaa11111", "1111111111111111111111111111");
                     isOnClick = true;
                     firstDownWithRecommend = true;
                     DataModel.getInstance().set((Map<?, ?>) call.arguments);
+                   app.touchType = TouchType.FLUTTER_SONG;
                     playerInfo.setTitle(String.valueOf(((Map<?, ?>) call.arguments).get("title")));
                     activityMainBinding.setPlayerInfo(playerInfo);
                     result.success(null);
@@ -71,29 +77,31 @@ public class EngineBindings {
                     result.success(null);
                     break;
                 case "addPage":
-                    Log.d("TAG2222222222222222222222222", "attach: 执行");
-                    app.page+=1;
-                   activity.hideView();
-                    if (!call.arguments.equals("")) {
 
-                        Map<String,Object> arguments1 = (Map<String, Object>) call.arguments;
-                        activity.setRecommendSheetId(String.valueOf(arguments1.get("sheetId")));
-                    }else activity.hide();
+                    Log.d("TAG2222222222222222222222222", "attach: 执行"+(!call.arguments.equals("")));
+                    if (call.arguments.equals("chatPage")) {
+                        app.page+=1;
+                        activity.hideView();
+                        activity.hide();
+                        result.success(null);
+                        break;
+                    }else {
+                        activity.hideView();
+                    }
+
 
                     result.success(null);
                     break;
                 case "back":
                     if (call.arguments!=""&&!call.arguments.equals("")) {
                         Map<?, ?> map = (Map<?, ?>) call.arguments;
-
                         switch (String.valueOf(map.get("origin"))){
                             case "my_page":
-                                app.page-=1;
-                                activity.showView();
+//                                app.page-=1;
+                             activity.showView();
+
                                 break;
                             case "other_page":
-                                activity.onBackPressed();
-                                break;
                             case "not_intercept":
                                 app.touchType = TouchType.DEFAULT;
                                 activity.onBackPressed();
@@ -102,13 +110,12 @@ public class EngineBindings {
 
                         }
                     }else {
-
+                        app.page-=1;
                         activity.showView();
                     }
                     result.success(null);
                     break;
                 case "sendAlbum":
-                    Log.d("TAG1111111111111111111111111", "attach: 1111111111111111111111111111");
                     isOnClick = true;
                     firstDownWithRecommend = true;
                     DataModel.getInstance().set((Map<?, ?>) call.arguments);
@@ -116,6 +123,47 @@ public class EngineBindings {
                     activityMainBinding.setPlayerInfo(playerInfo);
                     result.success(null);
 
+                    break;
+                case  "requestPermission":
+                    Map<?, ?> info = ((Map<?, ?>) call.arguments);
+                    String str = String.valueOf(info.get("info"));
+                    activity.requestPermission(str);
+                    result.success(null);
+                    break;
+                case "getPath":
+                    File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                    String downloadsPath = downloadsDir.getAbsolutePath();
+                    result.success(downloadsPath);
+                    break;
+                case "upDataImage":
+                    String path = String.valueOf(call.arguments);
+                    activity.upImage(path);
+                    break;
+                case"upSheetId":
+
+                    if (!call.arguments.equals("")) {
+                       // app.page+=1;
+                        Map<String,Object> arguments1 = (Map<String, Object>) call.arguments;
+//                        if (-1 == (int) arguments1.get("id")) {
+//                            activity.hideView();
+//                            return;
+//                        }else if(-2 == (int) arguments1.get("id")){
+//                            return;
+//                        }
+                        activity.hideView();
+                        activity.setRecommendSheetId(String.valueOf(arguments1.get("sheetId")));
+                    }else activity.hideView();
+                    result.success(null);
+                    break;
+                case "hideOrShowView":
+                   boolean flag = (boolean) call.arguments;
+                    if (flag) {
+                        activity.hide();
+                    }else {
+                        activity.show();
+                    }
+
+                    result.success(null);
                     break;
                 default:
                     result.notImplemented();

@@ -1,11 +1,12 @@
 
 
 import 'dart:convert';
-
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 
 
@@ -26,7 +27,7 @@ class msgListPage extends StatefulWidget{
 }
 class msgListState extends State<msgListPage>{
  // static const  channel =  MyApp.channel ;
-List<notificationListBean> notificationList =[] ;
+List<NotificationListBean> notificationList =[] ;
 var pageController = Get.find<PageControllers>();
 
 
@@ -70,7 +71,8 @@ receiveDataFromAndroid();
 
                   itemBuilder:(context,index){
                     return _listItem(index);
-                  })))
+                  }))),
+          const SizedBox(height:25),
 
         ],
       )
@@ -90,7 +92,7 @@ receiveDataFromAndroid();
       pageController.userId = data['userId'];
 
       var list = jsonDecode(json) as List<dynamic>;
-      notificationList= list.map((json)=>notificationListBean.fromJson(json)).toList();
+      notificationList= list.map((json)=>NotificationListBean.fromJson(json)).toList();
 
       setState(() {});
     }
@@ -103,7 +105,7 @@ Widget _listItem(int index){
     child: Column(
       children: [
         ListTile(
-          leading:getImg(url: notificationList[index].sendUserAvatarUrl),
+          leading:getCircularImg(url: notificationList[index].sendUserAvatarUrl),
           title: Text("${notificationList[index].sendUserNickname}"),
           subtitle: Container(
             width: 100,
@@ -112,7 +114,7 @@ Widget _listItem(int index){
           ),
           trailing: Text("${notificationList[index].lastMsgTime}",style: TextStyle(fontSize: 8,color: Colors.black)),
           onTap: () async {
-            channel.invokeMethod("addPage","");
+            channel.invokeMethod("addPage","chatPage");
             final result = await Navigator.pushNamed(context, "main/chatPage",arguments: {
               "name":notificationList[index].sendUserNickname,
               "id":notificationList[index].sendUserUserId});
@@ -139,17 +141,17 @@ ImgModule(IconData data,Color color,String str){
 }
 
 }
-class getImg extends StatefulWidget{
+class getCircularImg extends StatefulWidget{
    final String url;
   final double? size ;
 
-   getImg({super.key, required this.url,this.size=50} );
+   getCircularImg({super.key, required this.url,this.size=50} );
   @override
-  State<StatefulWidget> createState() => getImgState();
+  State<StatefulWidget> createState() => getCircularImgState();
 
 }
-class getImgState extends State<getImg>{
-  //getImgState(String url);
+class getCircularImgState extends State<getCircularImg>{
+  //getCircularImgState(String url);
 
   @override
   Widget build(BuildContext context) {
@@ -157,9 +159,12 @@ class getImgState extends State<getImg>{
     // TODO: implement build
    return ClipOval(
      child: CachedNetworkImage(
+       httpHeaders: { 'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 SLBrowser/9.0.3.5211 SLBChan/103',
+       },
       width: widget.size,
        height: widget.size,
        imageUrl:widget.url ,
+       fit: BoxFit.cover,
         placeholder: (context, url) => Container(
           width: widget.size,
           height: widget.size,
