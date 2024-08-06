@@ -13,8 +13,10 @@ public class App extends Application {
     public Gson gson;
     public String HomeData;
     public TouchType touchType = TouchType.DEFAULT;
+    public boolean isOpenFence =false;
     public   int page = 0;
     public String Cookie;
+    public boolean isUpViewpage = false;
 
     @Override
     public void onCreate() {

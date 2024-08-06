@@ -4,6 +4,8 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MOD
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SEQUENTIAL_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
+
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_PAUSE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.STATE_STOP;
@@ -110,7 +112,6 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
         }else if(State ==STATE_PLAY){
             mediaPlayer.pause();
-
             stopTime();
 
             Log.d("State..", String.valueOf(State));
@@ -219,7 +220,7 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
                             mViewChange.RotateView();
                         }
                     }
-            ,800);
+            ,1000);
 
 
     }
@@ -234,7 +235,7 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+CURRENT_PLAY_MODE);
-        if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE){
+        if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
             mediaPlayer.start();
         }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE||CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE){
             scrollPage();

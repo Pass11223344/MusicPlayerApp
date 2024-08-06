@@ -99,8 +99,11 @@ public class EngineBindings {
                             case "my_page":
 //                                app.page-=1;
                              activity.showView();
-
                                 break;
+                           case "my_page2":
+                               app.isOpenFence = true;
+                               activity.onBackPressed();
+                               break;
                             case "other_page":
                             case "not_intercept":
                                 app.touchType = TouchType.DEFAULT;
@@ -110,7 +113,8 @@ public class EngineBindings {
 
                         }
                     }else {
-                        app.page-=1;
+                        Log.d("TAGwotmzoulzhe", "attach: 1");
+                      //  app.page-=1;
                         activity.showView();
                     }
                     result.success(null);
@@ -163,6 +167,19 @@ public class EngineBindings {
                         activity.show();
                     }
 
+                    result.success(null);
+                    break;
+                case  "FoldOrUnfold":
+                    boolean flag1 = (boolean) call.arguments;
+                    if (flag1) {
+                        activity.setStop();
+
+                        activity.hideView();
+                        activity.hide();
+                    }else {
+                        activity.showView();
+                        activity.setPlay();
+                    }
                     result.success(null);
                     break;
                 default:

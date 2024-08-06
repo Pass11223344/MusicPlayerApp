@@ -3,11 +3,17 @@ package com.rikkatheworld.wangyiyun.fragment;
 
 
 import static android.os.Build.VERSION_CODES.N;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
+
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RANKING;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SHEET;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SONG;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SEARCH;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.getLrcString;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.setCurrentPageItem;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.setImg;
@@ -43,6 +49,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rikkatheworld.wangyiyun.App;
@@ -391,8 +398,13 @@ public void hideFragment(){
           ((MainActivity) getContext()).setRecommendSheetId("-1");
           secondPage.toSecond(TO_RECOMMEND_SONG, "-1");
       }else if(id==R.id.lin_radio){
-          if (app.touchType== TouchType.EXCLUSIVE_MUSIC)return;
-          app.touchType = TouchType.EXCLUSIVE_MUSIC;
+          if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE)
+          {
+              ((MainActivity) getContext()).OpenSheet();
+              return;
+          }
+
+          //app.touchType = TouchType.EXCLUSIVE_MUSIC;
           ((MainActivity)getActivity()).setCurrentMode("ExclusiveMusicMode");
           //if (playerInfo!=null) {
               if (playerInfo.getListBeans()!=null)  playerInfo.getListBeans().clear();
@@ -430,6 +442,9 @@ public void hideFragment(){
           }
 
       }else if(id==R.id.lin_rankingList){
+          app.page+=1;
+          app.touchType = TouchType.RANKING_PAGE;
+          secondPage.toSecond(TO_RANKING,"12138");
 
       }else if(id==R.id.search_btn){
           app.page+=1;
@@ -466,7 +481,6 @@ public void hideFragment(){
                     }else number -=1;
                     generated.add(number);
 
-                Log.d("TAG---aaaaaa", "loadMp3: "+number);
 
                 NetworkUtils.makeRequest(NetworkInfo.URL +"/aidj/content/rcmd?longitude="+number+"&latitude="+(number-1),homeHandler,SONGS,true,getContext());
                 break;
@@ -507,55 +521,9 @@ public void hideFragment(){
                             }.getType();
                            List<UrlBeans> urlBeans = gson.fromJson(data,listType);
 
-//                            String ss= "abcabc";
-//                            String n = "";
-//                            for (int i = 0; i < ss.length(); i++) {
-//                                String substring = ss.substring(i, i + 1);
-//
-////                                if (n.contains(substring)) {
-////                                    n+=substring;
-////                                    Log.d("TAGsss", "dispatchMessage: "+(i+1));
-////                                }else break;
-////                                if (n.indexOf(substring)==-1) {
-////                                    n+=substring;
-////                                    Log.d("TAGsss", "dispatchMessage: "+(i+1));
-////                                }else break;
-//
-//                            }
 
-//                            Collections.sort(urlBeans, new Comparator<UrlBeans>() {
-//                                @Override
-//                                public int compare(UrlBeans o1, UrlBeans o2) {
-//                                    // 获取ListA中所有内部列表的ID
-//                                    List<Long> idsMap = new ArrayList<>();
-//                                    for (List<RecommendableMusicsBean> innerList : recommendableMusics) {
-//                                        for (RecommendableMusicsBean a : innerList) {
-//                                            idsMap.add(a.getSongId());
-//                                        }
-//                                    }
-//                                    // 查找o1和o2的ID在映射中的位置
-//                                    int indexO1 = idsMap.indexOf(o1.getId());
-//                                    int indexO2 = idsMap.indexOf(o2.getId());
-//
-//                                    // 如果索引相同，保持原始顺序
-//                                    if (indexO1 == indexO2) {
-//
-//                                        return 0;
-//                                    }
-//                                    // 如果o1的索引小于o2的索引，返回负数
-//                                    // 如果o1的索引大于o2的索引，返回正数
-//                                    return Integer.compare(indexO1, indexO2);
-//                                }
-//                            });
-//                            for (UrlBeans urlBean : urlBeans) {
-//                                Log.d("TAG9797", "dispatchMessage: "+urlBean.getId());
-//                            }
-                           // Collections.swap();
                             mp3Info.getMp3Info(urlBeans);
-//                            recommendableMusicAdapter.setData(recommendableMusics);
-//                            recommendableMusicAdapter.setUrlData(urlBeans);
-//                            vp_recommend_music.setAdapter(recommendableMusicAdapter);
-//                            recommendableMusicAdapter.notifyDataSetChanged();
+
 
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -674,10 +642,12 @@ public void hideFragment(){
                         if (playerInfo.getListBeans()!=null) {
                            playerInfo.addListBeans(list);
                             activityMainBinding.setPlayerInfo(playerInfo);
-                            for (ListBean listBean : list) {
-                                Log.d("TAG--------过来的数据为", "dispatchMessage: "+listBean.getSongName());
-                            }
-                           // ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
+                            isUpData =2;
+                            app.isUpViewpage =true;
+                            ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
+                            ((MainActivity) getContext()).songListAdapter.upData(playerInfo.getListBeans());
+
+
                         }else {
                             playerInfo.setListBeans(list);
                             setImg.setImg(list.get(0).getImgUrl());
@@ -690,7 +660,7 @@ public void hideFragment(){
                             playerInfo.setSingerName(name);
                             playerInfo.setSongId(list.get(0).getSongId());
                             activityMainBinding.setPlayerInfo(playerInfo);
-
+                            ((MainActivity) getContext()).OpenSheet();
                             ((MainActivity) getContext())
                                     .play(String.valueOf(playerInfo.getListBeans().get(0).getSongId()),null);
                             setList.setListInfo(playerInfo.getListBeans());

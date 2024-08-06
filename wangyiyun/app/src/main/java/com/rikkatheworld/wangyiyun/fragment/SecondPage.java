@@ -5,6 +5,7 @@ package com.rikkatheworld.wangyiyun.fragment;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_ALBUMS;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_EXCLUSIVE_SHEET;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_MUSIC_RADAR_SHEET;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RANKING;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SHEET;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SONG;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SEARCH;
@@ -145,13 +146,13 @@ public class SecondPage extends Fragment implements EngineBindings.EngineBinding
                 case TO_SHEET:
 
                     Log.d("TAGqqqqqqqqqqq", "onHiddenChanged: "+param.get("id").equals(oldId));
-                    if (param.get("id").equals(oldId))
-                        return;
+
                     oldId = String.valueOf(param.get("id"));
                     break;
                 case TO_RECOMMEND_SONG:
                 case TO_SING_AND_ALBUMS:
                 case TO_ALBUMS:
+                case TO_RANKING:
                     oldId = "1008611";
                     break;
             }

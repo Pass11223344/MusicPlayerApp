@@ -81,7 +81,7 @@ class mySongListPageState extends State<mySongListPage>{
       Navigator.pop(context);
       return false;
     }
-
+    Navigator.pop(context);
     return true;
   }
   show(bool flag){
@@ -102,6 +102,10 @@ class mySongListPageState extends State<mySongListPage>{
     // TODO: implement dispose
   _scrollController.removeListener(_scrollListener);
   _scrollController.dispose();
+  ListController.albumInfo=null;
+    ListController.songSheet = null;
+    SongList = null;
+
     super.dispose();
   }
   @override
@@ -148,7 +152,7 @@ class mySongListPageState extends State<mySongListPage>{
         key: _childKey,
         children: [
           Obx((){
-            return pageController.pageIsOk?
+            return ListController.albumInfo!=null||ListController.songSheet!=null?
             Scaffold(
                 backgroundColor: Colors.white,
                 extendBodyBehindAppBar: true,
@@ -163,50 +167,49 @@ class mySongListPageState extends State<mySongListPage>{
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                              flex: 1,
-                              child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  child:
-                                  TextButton.icon(onPressed: (){
-                                    if( ListController.isSearch) {
-                                      ListController.isSearch = false;
-                                      return;
-                                    }
-                                    pageController.pageIsOk = false;
-                                    var p;
+                          Container(
+                              alignment: Alignment.centerLeft,
+                              child:
+                              TextButton.icon(onPressed: (){
+                                if( ListController.isSearch) {
+                                  ListController.isSearch = false;
+                                  return;
+                                }
+                                pageController.pageIsOk = false;
+                                var p;
 
-                                    if(widget.data['type']=="to_my_page_song_list"||widget.data['type']=="to_sing_and_albums"){
-                                      Navigator.pop(context);
-                                      p= {"origin":"my_page"};
-                                      channel.invokeMethod("back",p);
-                                    }else if(widget.data['type']=="to_page_song_list"||widget.data['type']=="to_albums")
-                                      Navigator.pop(context);
-                                    // channel.invokeMethod("back",{"origin":"search"});
+                                if(widget.data['type']=="to_my_page_song_list"||widget.data['type']=="to_sing_and_albums"){
+                                  Navigator.pop(context);
+                                  p= {"origin":"my_page"};
+                                  channel.invokeMethod("back",p);
+                                }else if(widget.data['type']=="to_page_song_list"||widget.data['type']=="to_albums") {
+                                  Navigator.pop(context);
+                                }else Navigator.pop(context);
 
-                                  },
-                                      label:Obx((){
-                                        return ListController.isSearch?const Text(""):
-                                        Text("${widget.data['title']!=null?ListController.expandedHeight>eHeight/2?widget.data['title']:"歌单":
-                                        ListController.albumInfo!=null?
-                                        (ListController.expandedHeight>eHeight/2?ListController.albumInfo?.album.name:"专辑")
-                                            :( ListController.songSheet?.detailPageTitle==null?
-                                        ListController.expandedHeight>eHeight/2? ListController.songSheet?.name:"歌单":
-                                        ListController.expandedHeight>eHeight/2? ListController.songSheet?.name:"官方歌单")}",
-                                          style: TextStyle(fontSize: 16,color: Colors.black),);
-                                      }),
-                                      icon:const Icon(Icons.arrow_back, color: Colors.black) )
+                                // channel.invokeMethod("back",{"origin":"search"});
+
+                              },
+                                  label:Obx((){
+                                    return ListController.isSearch?const Text(""):
+                                    Text("${widget.data['title']!=null?ListController.expandedHeight>eHeight/2?widget.data['title']:"歌单":
+                                    ListController.albumInfo!=null?
+                                    (ListController.expandedHeight>eHeight/2?ListController.albumInfo?.album.name:"专辑")
+                                        :( ListController.songSheet?.detailPageTitle==null?
+                                    ListController.expandedHeight>eHeight/2? ListController.songSheet?.name:"歌单":
+                                    ListController.expandedHeight>eHeight/2? ListController.songSheet?.name:"官方歌单")}",
+                                      style: TextStyle(fontSize: 16,color: Colors.black),);
+                                  }),
+                                  icon:const Icon(Icons.arrow_back, color: Colors.black) )
 
 
-                              )),
+                          ),
                           Visibility(
                               visible: ListController.isSearch,
                               child: Expanded(
                                 flex: 6,
                                 child:  Container(
-                                  width: width-120,
                                   padding: EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                       border: Border(bottom:BorderSide(color: Colors.black,width: 2) )
                                   ),
                                   child:  TextField(
@@ -241,7 +244,15 @@ class mySongListPageState extends State<mySongListPage>{
                         ],
                       ),
                     )),
-                body: Stack(
+                body: PopScope(
+                  onPopInvoked: (_){
+                    if(!pageController.pageIsOk){
+                      dioRequest.cancelToken();
+                      return;
+                    }
+                    pageController.pageIsOk = false;
+                  },
+                  child: Stack(
                   children: [
                     NestedScrollView(
                       physics: BouncingScrollPhysics(),
@@ -352,80 +363,80 @@ class mySongListPageState extends State<mySongListPage>{
                                                           )),
                                                       Obx((){
                                                         List<Widget> list=[];
-                                                       if( ListController.songSheet!.sharedUsers.length!=0){
-                                                        list=  ListController.songSheet!.sharedUsers.asMap().entries.map((entry){
-                                                           int index = entry.key;
-                                                             UserInfoBean user = entry.value;
-                                                           print("-------------------$index");
-                                                           if(index>=2)return SizedBox();
-                                                           return Positioned(
-                                                               right: ListController.songSheet!.sharedUsers.length>=2?(index+1)*10:index*15,
-                                                               child:  Container(
-                                                                 //  margin: EdgeInsets.only(right: ListController.songSheet!.sharedUsers.length>=2?20:0),
-                                                                 width: 30,height: 30,
-                                                                 alignment: Alignment.topCenter,
-                                                                 decoration: BoxDecoration(
-                                                                     border: Border.all(color:Colors.white,width: 1),
-                                                                     borderRadius: BorderRadius.circular(100),
+                                                        if( ListController.songSheet!.sharedUsers.length!=0){
+                                                          list=  ListController.songSheet!.sharedUsers.asMap().entries.map((entry){
+                                                            int index = entry.key;
+                                                            UserInfoBean user = entry.value;
+                                                            print("-------------------$index");
+                                                            if(index>=2)return SizedBox();
+                                                            return Positioned(
+                                                                right: ListController.songSheet!.sharedUsers.length>=2?(index+1)*10:index*15,
+                                                                child:  Container(
+                                                                  //  margin: EdgeInsets.only(right: ListController.songSheet!.sharedUsers.length>=2?20:0),
+                                                                  width: 30,height: 30,
+                                                                  alignment: Alignment.topCenter,
+                                                                  decoration: BoxDecoration(
+                                                                    border: Border.all(color:Colors.white,width: 1),
+                                                                    borderRadius: BorderRadius.circular(100),
 
-                                                                 ),
-                                                                 child: getCircularImg(url: user.avatarUrl,size: 30,),
-                                                               ));
-                                                         }).toList();
+                                                                  ),
+                                                                  child: getCircularImg(url: user.avatarUrl,size: 30,),
+                                                                ));
+                                                          }).toList();
 
-                                                         list.add(Container(
-                                                           width: 30,height: 30,
-                                                           decoration: BoxDecoration(
+                                                          list.add(Container(
+                                                            width: 30,height: 30,
+                                                            decoration: BoxDecoration(
 
-                                                               border: Border.all(color: Colors.white,width: 1),
-                                                               borderRadius: BorderRadius.circular(100)
-                                                           ),
-                                                           child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl),
-                                                         ));
+                                                                border: Border.all(color: Colors.white,width: 1),
+                                                                borderRadius: BorderRadius.circular(100)
+                                                            ),
+                                                            child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl),
+                                                          ));
 
-                                                       }
+                                                        }
 
                                                         return ListController.albumInfo!=null?SizedBox():
                                                         GestureDetector(
                                                             onTap: ()  {
-                                                          channel.invokeMethod("hideOrShowView",true).then((_){
-                                                            ListController.isOpenSheet = true;
-                                                            showCreator();
-                                                          });
+                                                              channel.invokeMethod("hideOrShowView",true).then((_){
+                                                                ListController.isOpenSheet = true;
+                                                                showCreator();
+                                                              });
 
-                                                        },
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            Container(
-                                                              width:ListController.songSheet!.sharedUsers.length==0?null:60 ,
-                                                              child: Stack(
-                                                                  children:
-                                                                  ListController.songSheet!.sharedUsers.length==0?[Container(
-                                                                    width: 30,height: 30,
-                                                                    decoration: BoxDecoration(
-                                                                        border: Border.all(color: Colors.white,width: 1),
-                                                                        borderRadius: BorderRadius.circular(100)
-                                                                    ),
-                                                                    child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl,size: 30,),
-                                                                  )]:
-                                                                  list
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                              Container(
-                                                                //width: double.infinity,
+                                                            },
+                                                            child: Row(
+                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                              children: [
+                                                                Container(
+                                                                  width:ListController.songSheet!.sharedUsers.length==0?null:60 ,
+                                                                  child: Stack(
+                                                                      children:
+                                                                      ListController.songSheet!.sharedUsers.length==0?[Container(
+                                                                        width: 30,height: 30,
+                                                                        decoration: BoxDecoration(
+                                                                            border: Border.all(color: Colors.white,width: 1),
+                                                                            borderRadius: BorderRadius.circular(100)
+                                                                        ),
+                                                                        child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl,size: 30,),
+                                                                      )]:
+                                                                      list
+                                                                  ),
+                                                                ),
+                                                                Flexible(
+                                                                  child:
+                                                                  Container(
+                                                                    //width: double.infinity,
 
-                                                                  child: Text("  ${ListController.songSheet!.sharedUsers.length==0?ListController.songSheet!.creator.nickname:
-                                                                  "${ListController.songSheet!.creator.nickname}等${ListController.songSheet!.sharedUsers.length+1}人"}>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)
-                                                              ),
-
-
-                                                            )
+                                                                      child: Text("  ${ListController.songSheet!.sharedUsers.length==0?ListController.songSheet!.creator.nickname:
+                                                                      "${ListController.songSheet!.creator.nickname}等${ListController.songSheet!.sharedUsers.length+1}人"}>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)
+                                                                  ),
 
 
-                                                          ],));
+                                                                )
+
+
+                                                              ],));
 
                                                       })
                                                     ],
@@ -472,19 +483,19 @@ class mySongListPageState extends State<mySongListPage>{
                                                       backgroundColor: Colors.white70
                                                   ),
                                                   onPressed: (){
-                                                  var p ;
-                                                  if (ListController.albumInfo!=null) {
-                                                  p =  {"id":ListController.albumInfo!.album.id,"type":"album",
-                                                    "img":ListController.albumInfo!.album.blurPicUrl,
-                                                    "title":ListController.albumInfo!.album.name,
-                                                  "subTitle":"歌手:${Utils.getSubTitle(ListController.albumInfo?.album.artists)}"};
-                                                  }else{
-                                                    p =  {"id":ListController.songSheet!.id,"type":"playlist",
-                                                      "img": ListController.songSheet!.coverImgUrl,"title":ListController.songSheet!.name,
-                                                      "subTitle":"创建者:${ListController.songSheet!.creator.nickname}"};
-                                                  }
-                                                  ListController.isOpenSheet = true;
-                                                  channel.invokeMethod("hideOrShowView",true);
+                                                    var p ;
+                                                    if (ListController.albumInfo!=null) {
+                                                      p =  {"id":ListController.albumInfo!.album.id,"type":"album",
+                                                        "img":ListController.albumInfo!.album.blurPicUrl,
+                                                        "title":ListController.albumInfo!.album.name,
+                                                        "subTitle":"歌手:${Utils.getSubTitle(ListController.albumInfo?.album.artists)}"};
+                                                    }else{
+                                                      p =  {"id":ListController.songSheet!.id,"type":"playlist",
+                                                        "img": ListController.songSheet!.coverImgUrl,"title":ListController.songSheet!.name,
+                                                        "subTitle":"创建者:${ListController.songSheet!.creator.nickname}"};
+                                                    }
+                                                    ListController.isOpenSheet = true;
+                                                    channel.invokeMethod("hideOrShowView",true);
                                                     Navigator.pushNamed(context, "main/sendPage",arguments: p);
                                                   }, label: Text(maxLines: 1,style: TextStyle(fontSize: 14,color: Colors.black),
                                                     Utils.formatNumber(ListController.albumInfo!=null?ListController.albumInfo!.album.info.shareCount:ListController.songSheet!.shareCount,"分享")
@@ -500,22 +511,22 @@ class mySongListPageState extends State<mySongListPage>{
                                                       backgroundColor: Colors.white70
                                                   ),
                                                   onPressed: () async {
-                                                  var p ;
-                                                  if (ListController.albumInfo!=null) {
-                                                    p={"Id":ListController.albumInfo!.album.id,"commentType":3,
-                                                      "userId":pageController.userId,"imgUrl":ListController.albumInfo!.album.blurPicUrl,
-                                                    "songName":ListController.albumInfo!.album.name,
-                                                    "singerName":Utils.getSubTitle(ListController.albumInfo?.album.artists)};
-                                                  }else{
-                                                    p ={"Id":ListController.songSheet!.id,
-                                                      "commentType":2,"userId":pageController.userId,
-                                                      "imgUrl":ListController.songSheet!.coverImgUrl,
-                                                    "songName":ListController.songSheet!.name,
-                                                    "singerName":ListController.songSheet!.creator.nickname};
-                                                  }
-                                                  pageController.isOpenCommentPage = true;
+                                                    var p ;
+                                                    if (ListController.albumInfo!=null) {
+                                                      p={"Id":ListController.albumInfo!.album.id,"commentType":3,
+                                                        "userId":pageController.userId,"imgUrl":ListController.albumInfo!.album.blurPicUrl,
+                                                        "songName":ListController.albumInfo!.album.name,
+                                                        "singerName":Utils.getSubTitle(ListController.albumInfo?.album.artists)};
+                                                    }else{
+                                                      p ={"Id":ListController.songSheet!.id,
+                                                        "commentType":2,"userId":pageController.userId,
+                                                        "imgUrl":ListController.songSheet!.coverImgUrl,
+                                                        "songName":ListController.songSheet!.name,
+                                                        "singerName":ListController.songSheet!.creator.nickname};
+                                                    }
+                                                    pageController.isOpenCommentPage = true;
                                                     Navigator.pushNamed(context, "main/CommentPage",arguments: p);
-                                                  channel.invokeMethod("hideOrShowView",true);
+                                                    channel.invokeMethod("hideOrShowView",true);
 
                                                   }, label: Text(
                                                     maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
@@ -529,42 +540,42 @@ class mySongListPageState extends State<mySongListPage>{
                                                 flex: 1,
                                                 child: TextButton.icon(
 
-                                                  style: TextButton.styleFrom(
-                                                      padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                                                      backgroundColor: Colors.white70
-                                                  ),
-                                                  onPressed: widget.data["IsTheSame"]?null:(){
-                                                    //必选参数：歌单
-                                                    //t ：类型，1：收藏，2：取消收藏
-                                                    ListController.isOpenSheet =  true;
-                                                    if(ListController.albumInfo!=null){
-                                                      if (ListController.albumInfo!.album.info.liked) {
-                                                        _showAlertDialog( "album");
+                                                    style: TextButton.styleFrom(
+                                                        padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                                        backgroundColor: Colors.white70
+                                                    ),
+                                                    onPressed: widget.data["IsTheSame"]?null:(){
+                                                      //必选参数：歌单
+                                                      //t ：类型，1：收藏，2：取消收藏
+                                                      ListController.isOpenSheet =  true;
+                                                      if(ListController.albumInfo!=null){
+                                                        if (ListController.albumInfo!.album.info.liked) {
+                                                          _showAlertDialog( "album");
+                                                        }else{
+                                                          ListController.setLiked(true);
+                                                          dioRequest.executeGet(url: '/album/sub',params: {'t':1,'id':ListController.albumInfo!.album.id});
+                                                        }
                                                       }else{
-                                                        ListController.setLiked(true);
-                                                        dioRequest.executeGet(url: '/album/sub',params: {'t':1,'id':ListController.albumInfo!.album.id});
+                                                        if (ListController.songSheet!.subscribed) {
+
+                                                          _showAlertDialog( "sheet");
+                                                        }else{
+                                                          ListController.setLiked(true);
+                                                          //ListController.songSheet!.subscribed = true;
+                                                          dioRequest.executeGet(url: '/playlist/subscribe',params: {'t':1,'id':ListController.songSheet!.id});
+
+                                                        }
                                                       }
-                                                    }else{
-                                                      if (ListController.songSheet!.subscribed) {
 
-                                                        _showAlertDialog( "sheet");
-                                                      }else{
-                                                        ListController.setLiked(true);
-                                                        //ListController.songSheet!.subscribed = true;
-                                                        dioRequest.executeGet(url: '/playlist/subscribe',params: {'t':1,'id':ListController.songSheet!.id});
+                                                      ///playlist/subscribe?t=1&id=196697785
+                                                      //专辑：
+                                                      ///album/sub?t=1&id=
 
-                                                      }
-                                                    }
-
-                                                        ///playlist/subscribe?t=1&id=196697785
-                                                   //专辑：
-                                                    ///album/sub?t=1&id=
-
-                                                  }, label: Text(
+                                                    }, label: Text(
                                                     maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
                                                     Utils.formatNumber(
                                                         ListController.albumInfo!=null?
-                                                    ListController.albumInfo!.album.info.likedCount:ListController.songSheet!.subscribedCount,"收藏")
+                                                        ListController.albumInfo!.album.info.likedCount:ListController.songSheet!.subscribedCount,"收藏")
                                                 ),icon:Obx((){
                                                   return ListController.albumInfo!=null?
                                                   ListController.albumInfo!.album.info.liked||widget.data["IsTheSame"]?  Icon(Icons.library_add_check,color: Colors.redAccent,size: 24,)
@@ -799,13 +810,13 @@ class mySongListPageState extends State<mySongListPage>{
                           :SizedBox();
                     })
                   ],
-                )
+                ),)
             ) :Container(color: Colors.white,
                 alignment: Alignment.center,
                 child: CircularProgressIndicator(color: Colors.red,strokeWidth: 1));
           }),
           Obx((){
-            return pageController.pageIsOk?  Visibility(
+            return  ListController.albumInfo!=null||ListController.songSheet!=null?  Visibility(
               visible: ListController.isShow,
               child: Scaffold(
                 backgroundColor: ListController.imgColor,
@@ -934,7 +945,6 @@ class mySongListPageState extends State<mySongListPage>{
       case"to_recommend_song_sheet":
       case"to_my_page_song_list":
       case"to_page_song_list":
-      case"to_ranking":
         var SongSheet = await dioRequest.executeGet(url: "/playlist/detail",params: {"id":id});
         var SList =  await dioRequest.executeGet(url: "/playlist/track/all",params: {"id":id,"limit":20,"offset":0});
 
@@ -1011,9 +1021,13 @@ class mySongListPageState extends State<mySongListPage>{
   Future<void> showCreator() async {
     List<UserInfoBean> list = [];
     if (ListController.songSheet!=null) {
+      list = ListController.songSheet!.sharedUsers;
+      if (list.length>0) {
+        if( list[0].userId!=ListController.songSheet!.creator.userId)list.insert(0, ListController.songSheet!.creator);
+      }else{
 
-     list = ListController.songSheet!.sharedUsers;
-     if( list[0].userId!=ListController.songSheet!.creator.userId)list.insert(0, ListController.songSheet!.creator);
+        list.insert(0, ListController.songSheet!.creator);
+      }
 
     }
    await showModalBottomSheet(

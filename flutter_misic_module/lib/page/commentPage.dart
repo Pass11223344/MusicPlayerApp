@@ -130,6 +130,7 @@ class commentPageState extends State<commentPage>
                   children: [
                     GestureDetector(
                       onTap: (){
+
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -190,6 +191,8 @@ class commentPageState extends State<commentPage>
                                                     width: 40,
                                                     color: Colors.grey))),
                                         child: Row(
+
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Container(
                                               width: 80,
@@ -209,13 +212,14 @@ class commentPageState extends State<commentPage>
 
                                             Container(
                                               padding: EdgeInsets.only(left: 10),
-                                              width: Utils.customStringLength(commentInfo?['songName'])>24?
-                                              MediaQuery.of(context).size.width*0.46 :null,
+                                              // width: Utils.customStringLength(commentInfo?['songName'])>24?
+                                              // MediaQuery.of(context).size.width*0.46 :null,
+                                              constraints: BoxConstraints(maxWidth:MediaQuery.of(context).size.width*0.4 ),
                                               child:  Text(
                                                 " ${commentInfo?['songName']}",
                                                 overflow:
                                                 TextOverflow
-                                                    .visible,
+                                                    .ellipsis,
                                                 maxLines: 1,
                                                 style: const TextStyle(
                                                     color: Colors
@@ -223,10 +227,10 @@ class commentPageState extends State<commentPage>
                                                     fontSize: 14),
                                               ),
                                             ),
+                                            Flexible(child:Container(
+                                              // width: Utils.customStringLength( commentInfo?['singerName'])>24?
+                                              // MediaQuery.of(context).size.width*0.3:null,
 
-                                            Container(
-                                              width: Utils.customStringLength( commentInfo?['singerName'])>24?
-                                              MediaQuery.of(context).size.width*0.3:null,
                                               child: Text(
                                                 textAlign: TextAlign.left,
                                                 "-${commentInfo?['singerName']}",
@@ -240,7 +244,7 @@ class commentPageState extends State<commentPage>
 
 
                                               ),
-                                            ),
+                                            )),
                                           ],
                                         ),
                                       ),

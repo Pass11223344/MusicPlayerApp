@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_misic_module/page/VideoPage.dart';
 import 'package:flutter_misic_module/page/eg.dart';
 import 'package:flutter_misic_module/page/rankingListPage.dart';
+
 import 'package:flutter_misic_module/util/Utils.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
@@ -13,8 +14,7 @@ import 'package:flutter_misic_module/NetWork/DioRequest.dart';
 import 'package:flutter_misic_module/page/WebPage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_misic_module/page/commentPage.dart';
-import 'package:flutter_misic_module/page/fpaged.dart';
-import 'package:flutter_misic_module/page/ggggg.dart';
+
 import 'package:flutter_misic_module/page/msgListPage.dart';
 import 'package:flutter_misic_module/page/musicCloudDiskPage.dart';
 import 'package:flutter_misic_module/page/myPage.dart';
@@ -121,7 +121,7 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
 
 var datas ;
-final GlobalKey<songListPageState> _childKey = GlobalKey<songListPageState>();
+static final  GlobalKey<songListPageState> childKey = GlobalKey<songListPageState>();
 
 final PageControllers pageController = Get.find<PageControllers>();
 
@@ -183,9 +183,11 @@ getPage() {
         case "to_sing_and_albums":
         case"to_recommend_song":
         case "to_sheet":
-         return  songListPage(data: datas,key: _childKey);
+         return  songListPage(data: datas,key: childKey);
         case "to_albums":
           return WebPage(url: datas['id']);
+        case"to_ranking":
+          return rankingListPage();
       }
     case "to_search":
       return  searchPage();
@@ -202,9 +204,9 @@ getPage() {
         "commentCount":2,
         "likedCount":4
       };
-    //  return  MyApps();
+      return  MyApps();
      // _initializeGlobalController();
-     return  rankingListPage();
+   //  return  rankingListPage();
       //return  Player_page();
    //  return  purchasedPage();
     //  return  ss();
@@ -215,17 +217,25 @@ getPage() {
 
   void receiveDataFromAndroid() {
 channel.setMethodCallHandler((call) async {
-  print("object1111111111111111111122222222222222${call.method}");
+  print("object1111111111111111111122222222222222${childKey.currentState==null}");
       switch(call.method){
         case "pressPage":
-          _childKey.currentState?.isPop();
+          bool  isBack = true;
+
+          if (childKey.currentState==null) {
+            var p = {"origin":"other_page"};
+            await channel.invokeMethod("back",p);
+            return;
+          }
           if( pageController.pageIsOk){
             channel.invokeMethod("loadComplete",true);
           }else{
             channel.invokeMethod("loadComplete",false);
             songListPageState.cancelRequest();
-            pageController.pageIsOk = false;
+
           }
+
+          isBack =  await childKey.currentState?.isPop()??false;
 
           break;
         case "to_other_page":
@@ -237,7 +247,7 @@ channel.setMethodCallHandler((call) async {
             });
             pageController.cookie = datas['token'];
             pageController.userId = datas['userId'];
-            print("object1111111111111111111122222222222222fffff${pageController.userId}");
+
           }
           break;
         case "RequestResults":
@@ -250,7 +260,7 @@ channel.setMethodCallHandler((call) async {
                 Utils.downloadImage(info['info'],pageController.path).then((flag){
                   print("object-------xxxxx-----${info['action']}---------${info['info']}");
 
-                  _childKey.currentState?.show(flag);
+                  childKey.currentState?.show(flag);
 
 
                 });

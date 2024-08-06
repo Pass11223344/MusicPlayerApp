@@ -1,4 +1,5 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_misic_module/bean/AlbumListBean.dart';
 import 'package:flutter_misic_module/bean/CommentInfoBean.dart';
 import 'package:flutter_misic_module/bean/RelayBean.dart';
@@ -61,27 +62,36 @@ class PageControllers extends GetxController{
 }
 class myPageController extends GetxController{
 
-  var _selectedIndex = 0.obs;
-  var _isExpanded = true.obs;
-  var _isListExpanded=true.obs;
+
+
   var _relayInfo = Rx<RelayBean?>(null);
   var _msgInfo = Rx<Message?>(null);
   var _songSheetInfo = Rx<SongSheetList?>(null);
   var _traceCommentInfo = Rx<CommentInfoBean?>(null);
   var _users = Rx<UserInfoBean?>(null);
-  RxList<Events> _events = <Events>[].obs;
 
-  var _traceCommentTabIndex = 0.obs;
-  var _descriptionH = 0.0.obs;
+var _scrollType = ScrollPhysics().obs;
+
+  var _myPageIsShow = true.obs;
+
+
   var _isTraceComment = false.obs;
   var _isReplyComment = false.obs;
+  var _needHide = false.obs;
+  var _isExpanded = true.obs;
+  var _isListExpanded=true.obs;
+  var _showSongsIsOk = false.obs;
 
-
+  var _descriptionH = 0.0.obs;
+  var _paddingH = 0.0.obs;
+  var _paddingW = 0.0.obs;
+  var _traceCommentTabIndex = 0.obs;
+  var _selectedIndex = 0.obs;
   var _ItemCount = 0.obs;
-
   var _currentCommentId = 0.obs;
   var _currentReplyComment = 0.obs;
-  var _maps = {"":[]}.obs;
+
+
   final RxList<SongListBean> _recentlyPlayedSongs = <SongListBean>[].obs;
   final RxList<ShowSongSheet> _recentlyPlayedSongSheets = <ShowSongSheet>[].obs;
   final RxList<SongSheetList> _myPageSongSheets = <SongSheetList>[].obs;
@@ -89,16 +99,23 @@ class myPageController extends GetxController{
   final RxList<VideoListBean> _videoList = <VideoListBean>[].obs;
   final RxList<ShowSong>? _showSongs = <ShowSong>[].obs;
   final RxList<VideoInfoBean?> _videoInfoBean = <VideoInfoBean?>[].obs;
+  final RxList<Events> _events = <Events>[].obs;
 
-  var _showSongsIsOk = false.obs;
+
   final Map<String, Player?> _pool = {};
   var  _isFavorites = {"":false}.obs;
+  Map<String,CommentInfoBean>? viewPageComment ={};
+  var _maps = {"":[]}.obs;
+
 
   int get selectedIndex => _selectedIndex.value;
   set selectedIndex(int index) => _selectedIndex.value = index;
   bool get isExpanded => _isExpanded.value;
   set isExpanded(bool flag) => _isExpanded.value = flag;
-
+  bool get needHide => _needHide.value;
+  set needHide(bool flag) => _needHide.value = flag;
+  bool get myPageIsShow => _myPageIsShow.value;
+  set myPageIsShow(bool flag) => _myPageIsShow.value = flag;
   bool get isListExpanded => _isListExpanded.value;
   set isListExpanded(bool flag) => _isListExpanded.value = flag;
   SongSheetList? get songSheetInfo =>_songSheetInfo.value;
@@ -148,8 +165,14 @@ class myPageController extends GetxController{
   // set players(List<String?> list)=>_players.value = list;
   double get descriptionH => _descriptionH.value;
   set descriptionH(double v)=>_descriptionH.value = v;
+  double get paddingH => _paddingH.value;
+  set paddingH(double v)=>_paddingH.value = v;
+  double get paddingW => _paddingW.value;
+  set paddingW(double v)=>_paddingW.value = v;
   Map<String,bool> get isFavorites =>_isFavorites.value;
   set isFavorites(Map<String,bool> info) => _isFavorites.value = info;
+  ScrollPhysics get  scrollType =>_scrollType.value;
+  set scrollType(ScrollPhysics type) => _scrollType.value = type;
   void insertVideoInfoBean(int index ,VideoInfoBean? info,bool isFirst){
     _videoInfoBean.replaceRange(index,index+1, [info]);
     _videoInfoBean.refresh();
@@ -161,7 +184,29 @@ class myPageController extends GetxController{
     // }
 
   }
+  addViewPageComment(String id,CommentInfoBean info){
+    viewPageComment![id] = info;
+    update();
+  }
+  // addViewPageCommentReplay(int index,String id,List<BeReplied> info){
+  //  viewPageComment![id].comments[index].beReplied = info;
+  //  update();
+  // }
+  onDoubleFavorite(int index){
+    if(!_videoInfoBean[index]!.liked){
+      _videoInfoBean[index]!.likedCount+=1;
+    }
+    if(!_videoInfoBean[index]!.liked)_videoInfoBean[index]!.liked = true;
+    _videoInfoBean.refresh();
+  }
+  onClickFavorite(int index){
+    if(_videoInfoBean[index]!.liked){
+      _videoInfoBean[index]!.likedCount-=1;
+    }else _videoInfoBean[index]!.likedCount+=1;
+    _videoInfoBean[index]!.liked = !_videoInfoBean[index]!.liked;
+    _videoInfoBean.refresh();
 
+  }
 void removeEvents(int index){
 
   _events.removeAt(index);
@@ -190,13 +235,10 @@ getPlayer(String? url){
     return _pool[url];
 }
   createPlayer(String url,bool autoPlay,SourceType type)   {
-    // if (_pool.length<=3) {
-    //   _pool[url] =  Player()..setCommonDataSource(url,autoPlay:autoPlay,type:type)..setLoop(0);
-    //  // return  _pool[url];
-    // } else{
+
     if (_pool.containsKey(url)) return;
       _pool[url] =  Player()..setCommonDataSource(url,autoPlay:autoPlay,type:type)..setLoop(0);
-      if (_pool.length>3) {
+      if (_pool.length>10) {
         final oldestKey  = _pool.keys.first;
         _pool[oldestKey]?.dispose();
         _pool[oldestKey] = null;
@@ -209,9 +251,11 @@ getPlayer(String? url){
   }
   disposePlayer(){
     _pool.forEach((k,v){
+      v?.stop();
       v?.release();
       v?.dispose();
     });
+    _pool.clear();
   }
   @override
   void dispose() {

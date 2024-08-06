@@ -106,54 +106,11 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
               padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
               width: double.infinity,
               height: 38,
-              child: Row(
-                mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child:GestureDetector(
-                        child:  Container(
-                          alignment: Alignment.centerLeft,
-
-                          height: double.infinity,
-                          child: Image.asset(
-                            "images/menu.png",
-                          ),
-                        ),
-                        onTap: (){
-                        },
-                      )),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                          height: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [Icon(Icons.outlet,size: 20,),
-                              Container(
-                                  alignment: Alignment.center,
-                                  height: double.infinity,
-                                  child: Text(_myPageController.users!.nickname,style: TextStyle(fontSize: 8),)
-                              )
-                            ],
-                          ))),
-                  Expanded(
-                      flex: 1,
-                      child: Container(
-                          height: double.infinity,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [Icon(Icons.saved_search_outlined,size: 20,),
-                              Container(
-
-                                alignment: Alignment.centerRight,
-                                height: double.infinity,
-                                child:  Image.asset("images/more.png"),
-                              )
-                            ],
-                          )))
-                ],
-              ),
+              child:   Container(
+                  alignment: Alignment.center,
+                  height: double.infinity,
+                  child: Text(_myPageController.users!.nickname,style: TextStyle(fontSize: 8),)
+              )
             ),
           ),
 
@@ -253,6 +210,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                                                 onTap: (){
                                                   channel.invokeMethod("addPage","");
                                                   Navigator.pushNamed(context, "main/recentlyPlayedPage");
+                                                  _myPageController.myPageIsShow = false;
                                                 },
                                                 child:_functionTable(Icons.access_time_filled_outlined,"最近") ,
                                               )),
@@ -262,6 +220,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                                                 onTap: (){
                                                   channel.invokeMethod("addPage","");
                                                   Navigator.pushNamed(context, "main/musicCloudDiskPage");
+                                                  _myPageController.myPageIsShow = false;
                                                 },
                                                 child:_functionTable(Icons.backup_rounded,"云盘") ,
                                               )),
@@ -270,6 +229,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                                                 onTap: (){
                                                   channel.invokeMethod("addPage","");
                                                   Navigator.pushNamed(context, "main/purchasedPage");
+                                                  _myPageController.myPageIsShow = false;
                                                 },
                                                 child:_functionTable(Icons.receipt_long,"已购"),
                                               )),
@@ -407,11 +367,11 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                 return  Obx((){
                   return
                     _myPageController.myPageSongSheets.length!=0 ? CustomScrollView(
-                    controller: PrimaryScrollController.of(context),
+                      key: PageStorageKey("${_tabController.index}-${_tabControllerWithMusicTab.index}"),
+                      controller: PrimaryScrollController.of(context),
                     slivers: <Widget>[
                       SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
                       SliverFixedExtentList(
-                          key: PageStorageKey("${_tabController.index}-${_tabControllerWithMusicTab.index}"),
                           delegate:
                           SliverChildBuilderDelegate(
                               childCount: _myPageController.myPageSongSheets.length,
@@ -471,11 +431,12 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
               builder: (context){
                 return  Obx((){
                   return _myPageController.myPageSongSheets.length!=0 ? CustomScrollView(
+                    key:  PageStorageKey("${_tabController.index}-${_tabControllerWithMusicTab.index}"),
+
                     controller: PrimaryScrollController.of(context),
                     slivers: <Widget>[
                       SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
                       SliverFixedExtentList(
-                          key:  PageStorageKey("${_tabController.index}-${_tabControllerWithMusicTab.index}"),
                           delegate:
                           SliverChildBuilderDelegate(
                               childCount: _myPageController.myPageSongSheets.length,
@@ -536,16 +497,19 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
     return  Builder(builder: (context){
         return  Obx((){
           return _myPageController.videoList.length!=0? CustomScrollView(
+            key: PageStorageKey<String>("listKey${_tabController.index}IN1"),
           slivers: <Widget>[
             SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
             SliverFixedExtentList(
-                key: PageStorageKey<String>("listKey${_tabController.index}IN1"),
+
                 delegate:
                 SliverChildBuilderDelegate(
                     childCount: _myPageController.videoList.length,
                         (context,index){
                       return InkWell(onTap: (){
+                        channel.invokeMethod("FoldOrUnfold",true);
                         Navigator.pushNamed(context, "main/VideoPage",arguments: index );
+                        _myPageController.myPageIsShow = false;
                       },
                       child:  Padding(padding: EdgeInsets.only(left: 10,right: 10,bottom: 10),
                         child: Row(
@@ -584,11 +548,12 @@ return  Builder(builder: (context){
 
   return Obx((){
     return _myPageController.relayInfo!=null?  CustomScrollView(
-     key: PageStorageKey<String>("listKey${_tabController.index}IN2"),
+      key: PageStorageKey<String>("listKey${_tabController.index}IN2"),
       slivers: <Widget>[
         SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
 
         SliverList.builder(
+
             itemCount:  _myPageController.events.length,
             itemBuilder: (context,index){
           var info = _myPageController.events[index].message!.info;
@@ -644,6 +609,7 @@ return  Builder(builder: (context){
     };
                          channel.invokeMethod("upSheetId",{"id":-1});
      // Navigator.push(context,CustomUpPageRoute(widget: traceCommentPage(params: params,)));
+    _myPageController.myPageIsShow = false;
      Navigator.pushNamed(context, "main/traceCommentPage",arguments: params);
   }
   String getType(int type){
@@ -696,16 +662,33 @@ return  Builder(builder: (context){
            break;
 
          case"back":
-           print("----------------------------------------------");
+
+           bool isTrue = false;
+
            bool  isBack = true;
-         isBack =  await childKey.currentState?.isPop()??true;
-           print("----------------------------------------------$isBack---${childKey.currentState==null}");
+         isBack =  await childKey.currentState?.isPop()??false;
+
+           print("--------------------------${ ModalRoute.of(context)?.settings.name}--------------------$isBack---${childKey.currentState==null}");
          if(isBack){
+           print("----------------------------------------------1");
            var   p= {"origin":"my_page"};
            await channel.invokeMethod("back",p);
             pageController.pageIsOk = false;
-           Navigator.pop(context);
          }
+           if (childKey.currentState==null) {
+             if(!_myPageController.myPageIsShow){
+               print("----------------------------------------------2");
+               _myPageController.myPageIsShow = true;
+               Navigator.pop(context);
+             }else  {
+               print("----------------------------------------------3");
+               var   p= {"origin":"my_page2"};
+               await channel.invokeMethod("back",p);
+             }
+           }
+
+
+
 
            break;
          case"currentId":
@@ -826,6 +809,7 @@ return  Builder(builder: (context){
 
 
                       IconButton(onPressed: (){
+                        _myPageController.myPageIsShow = false;
                         _showAlertDialog( index);
                       }, icon: Icon(Icons.dangerous_outlined,color: Colors.grey,))
                     ],),

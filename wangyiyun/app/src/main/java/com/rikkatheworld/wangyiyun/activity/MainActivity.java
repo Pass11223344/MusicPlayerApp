@@ -3,7 +3,7 @@ package com.rikkatheworld.wangyiyun.activity;
 
 
 
-import static com.rikkatheworld.wangyiyun.activity.TouchType.EXCLUSIVE_MUSIC;
+
 import static com.rikkatheworld.wangyiyun.adapter.PlayerPageAdapter.playerPageAdapterAnimation;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.ADD_OR_REMOVE;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.LRC_ID;
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static Boolean StateFlag = false;
     private LinearLayout lin_player;
-    private BottomSheetBehavior<FrameLayout> behavior;
+    public  BottomSheetBehavior<FrameLayout> behavior;
     private ImageView player_btn_to_back;
     private int statusBarHeight;
 
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static PlayerInfo playerInfo;
     private RecyclerView player_song_list;
     public static beginPlay.CurrentItem setCurrentPageItem;
-    public  PlayerPageAdapter playerPageAdapter;
+    public static PlayerPageAdapter playerPageAdapter;
     static int position1 = 0;
     public static AnimationUtil animationUtils;
     private ImageView play_module;
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private ImageView play_btn;
     private ImageView next_song;
     private ImageView main_play;
-    private SongListAdapter songListAdapter;
+    public static SongListAdapter songListAdapter;
     public static LrcView mLrcView;
     private static String LrcString;
     public static GetLrcString getLrcString;
@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static final int RANDOM_PLAY_MODE = 2;
   //  public static final int UNLIMITED_PLAYBACK_MODE = 3;
     public static final int UNLIMITED_PLAYBACK_MODE = 3;
+    public static final int SINGLE_PLAY_MODE_ONE = 4;
 
     public static int CURRENT_PLAY_MODE = SEQUENTIAL_MODE;
     private boolean hasMove = false;
@@ -262,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static final String TO_RECOMMEND_SHEET = "to_recommend_song_sheet";
     public static final String TO_SHEET = "to_sheet";
+    public static final String TO_RANKING = "to_ranking";
     public static final String TO_RECOMMEND_SONG = "to_recommend_song";
     public static final String TO_EXCLUSIVE_SHEET = "to_exclusive_scene_song_sheet";
     public static final String TO_MUSIC_RADAR_SHEET = "to_music_radar_song_sheet";
@@ -340,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private void initView() {
         NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
 
-
+        app.touchType = TouchType.HOME_PAGE;
 
          bottom_view = findViewById(R.id.bottom_navigation);
         dlMainDrawer = findViewById(R.id.DL_main_drawer);
@@ -575,6 +577,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         };
         setCurrentPageItem = current -> {
 
+
           player_viewPage.setCurrentItem(current);
             if (animationUtils != null) {
                 animationUtils.stopRotate("cancel");
@@ -668,6 +671,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         }
 
         if (itemId == R.id.item_home) {
+            app.touchType = TouchType.HOME_PAGE;
             viewPager.setCurrentItem(0, false);
 
         } else if (itemId == R.id.item_my) {
@@ -740,7 +744,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     protected void onDestroy() {
         super.onDestroy();
         DataModel.getInstance().removeObserver(this);
-        if (instance != null) {
+        if (instance != null&&instance.serviceConnection!=null) {
           unbindService(instance.serviceConnection);
             stopService(instance.intent);
             instance.serviceBinder.stopPlay();
@@ -796,7 +800,10 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         };
     };
 
-
+ public void   OpenSheet(){
+     mLrcView.setVisibility(View.INVISIBLE);
+     behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
     @Override
     public void onClick(View v) {
 
@@ -826,13 +833,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             isUpData = 1;
             Drawable drawable = play_module.getDrawable();
             int drawable_hashCode = drawable.getConstantState().hashCode();
-            Log.d("TAG----------------ss", "onClick: "+(app.touchType == EXCLUSIVE_MUSIC));
 
-            if (app.touchType == EXCLUSIVE_MUSIC) {
+
+            if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
 
 
                 if (CURRENT_PLAY_MODE ==   UNLIMITED_PLAYBACK_MODE) {
-                    CURRENT_PLAY_MODE =   SINGLE_PLAY_MODE;
+                    CURRENT_PLAY_MODE =   SINGLE_PLAY_MODE_ONE;
                     play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
                 }else {
                     CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
@@ -879,31 +886,15 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
 
         } else if (id == R.id.player_play || id == R.id.IV_play_btn) {
-            int state;
-            if (playerInfo.isPlayOrPause()) {
-                state = STATE_PLAY;
-                animationUtils.stopRotate("pause");
-                playerPageAdapterAnimation.stopRotate("pause");
-
-            } else {
-                state = STATE_PAUSE;
-                animationUtils.proceedRotate();
-                playerPageAdapterAnimation.proceedRotate();
-
-            }
-
-            instance.serviceBinder.playOrPause(state);
-            playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
-            animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
-            activityMainBinding.setPlayerInfo(playerInfo);
+            playerOrStop();
         } else if (id == R.id.player_next_song) {//下一曲
 
             switchSong = true;
-            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
-                playerPageAdapter.setData(playerInfo.getListBeans());
-                songListAdapter.upData(playerInfo.getListBeans());
-            }
-            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==getCurrentPagerIdx())return;
+//            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
+//                playerPageAdapter.setData(playerInfo.getListBeans());
+//                songListAdapter.upData(playerInfo.getListBeans());
+//            }
+//            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==getCurrentPagerIdx())return;
             next_song.setClickable(false);
 
                 if (isUpData==1) {
@@ -974,7 +965,57 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     }
 
-      public void   setCurrentMode(String type){
+    public  void playerOrStop() {
+        int state;
+        if (playerInfo.isPlayOrPause()) {
+            state = STATE_PLAY;
+            animationUtils.stopRotate("pause");
+            playerPageAdapterAnimation.stopRotate("pause");
+
+        } else {
+            state = STATE_PAUSE;
+            animationUtils.proceedRotate();
+            playerPageAdapterAnimation.proceedRotate();
+        }
+
+        instance.serviceBinder.playOrPause(state);
+        playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
+        animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+        activityMainBinding.setPlayerInfo(playerInfo);
+    }
+    public  void setStop(){
+        int state ;
+        if (playerInfo.isPlayOrPause()) {
+            state = STATE_PLAY;
+            animationUtils.stopRotate("pause");
+            playerPageAdapterAnimation.stopRotate("pause");
+            instance.serviceBinder.playOrPause(state);
+            playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
+            animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            activityMainBinding.setPlayerInfo(playerInfo);
+        }
+
+
+    }
+    public  void setPlay(){
+        int state;
+
+        if (!playerInfo.isPlayOrPause()&& instance.serviceBinder!=null) {
+            state = STATE_PAUSE;
+            animationUtils.proceedRotate();
+            playerPageAdapterAnimation.proceedRotate();
+            instance.serviceBinder.playOrPause(state);
+            playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
+            animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            activityMainBinding.setPlayerInfo(playerInfo);
+        }
+
+
+
+
+    }
+
+    public void   setCurrentMode(String type){
           if (type.equals("ExclusiveMusicMode")) {
               CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
               play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
@@ -1070,18 +1111,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             instance.serviceBinder.playOrPause(STATE_PLAY);
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
         }
-        if (app.touchType == EXCLUSIVE_MUSIC) {
+        if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
             if (playerInfo.getListBeans().size()-1==position) {
                 homeFragment.loadOk = false;
-                isUpData = 1;
+             //   isUpData = 1;
                 homeFragment.loadMp3("radio");
+
                // return;
-            } else   if ( isUpData == 1){
-                Log.d("TAG-------------->", "onPageSelected: ");
-                isUpData = 2;
-                playerPageAdapter.setData(playerInfo.getListBeans());
-                songListAdapter.upData(playerInfo.getListBeans());
-              //  return;
             }
            // player_viewPage.setCurrentItem(position1+1);
         }
@@ -1321,7 +1357,9 @@ switchSong=false;
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if (position1 <= 9999 && position1 >= 0) {
+                if (position1 <= 100000 && position1 >= 0) {
+                    Log.d("TAGppppppppppppppp", "run: "+(position1 + 1));
+                    player_viewPage.getAdapter().notifyDataSetChanged();
                     player_viewPage.setCurrentItem(position1 + 1);
                 }
             }
@@ -1705,7 +1743,7 @@ switchSong = false;
     }
     @Override
     public void onBackPressed() {
-
+        Log.d("TAG11111111111111111111111", "onBackPressed: "+app.page);
         if(homeFragment.songSheetFragment!=null&&homeFragment.songSheetFragment.isVisible()){
             if (secondFragment!=null&&secondFragment.isVisible()) {
                 getSupportFragmentManager()
@@ -1717,6 +1755,7 @@ switchSong = false;
                                 R.anim.fade_out)
                         .hide(secondFragment)
                         .commit();
+                Log.d("TAGwotmzoulzhe", "attach: 2");
                 app.page-=1;
                 return;
             }
@@ -1734,7 +1773,7 @@ switchSong = false;
             behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             return;
         }
-        if(app.touchType == TouchType.MY_PAGE){
+        if(app.touchType == TouchType.MY_PAGE&&!app.isOpenFence){
             myFragment.myBindings.channel.invokeMethod("back","");
             return;
         }
@@ -1743,12 +1782,13 @@ switchSong = false;
             homeFragment.searchFragment.getBack().back();
             return;
         }
-        if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.ALBUMS){
+        if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.RANKING_PAGE||app.touchType==TouchType.EXCLUSIVE_SCENE
+        ||app.touchType==TouchType.MUSIC_RADAR||app.touchType==TouchType.SING_AND_ALBUMS){
             secondFragment.getBack().back();
             return;
         }
         if (app.page>0){
-            Log.d("TAG11111111111111111111111", "onBackPressed: ");
+            Log.d("TAGwotmzoulzhe", "attach: 3");
             app.page-=1;
             if (homeFragment.searchFragment!=null&&homeFragment.searchFragment.isVisible()){
                 getSupportFragmentManager()
@@ -1809,6 +1849,7 @@ switchSong = false;
                 @Override
                 public void run() {
                     doubleBackToExitPressedOnce = false;
+                    app.isOpenFence = false;
                 }
             }, 2000);
         }
@@ -1920,8 +1961,11 @@ public void requestPermission(String info){
                                 result.put("action", info.isEmpty() ?"chooseImg":"saveImg");
                                 result.put("info",info);
                                 result.put("path",downloadsPath);
-                               // myFragment.myBindings.channel.invokeMethod("RequestResults",result);
-                                secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
+                                if (myFragment==null) {
+                                    secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
+                                }else  myFragment.myBindings.channel.invokeMethod("RequestResults",result);
+
+
                             }
                         }else {
                             CustomToast.showToast(this,"未授予权限或权限不完整！");

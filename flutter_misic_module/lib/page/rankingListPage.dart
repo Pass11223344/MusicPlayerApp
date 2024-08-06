@@ -41,10 +41,9 @@ class rankingListPageSatate extends State<rankingListPage>{
                    return
                      InkWell(
                        onTap: (){
-                         Navigator.pushNamed(context, "main/songListPage",arguments: {
+                         Navigator.pushNamed(context, "main/songListPage2",arguments: {
                            "id":"${rankingList![index].id}",
                            "title":rankingList![index].name,
-                           "IsTheSame":false,
                            "type":"to_ranking"});
                        },
                        child:Container(
@@ -68,8 +67,8 @@ class rankingListPageSatate extends State<rankingListPage>{
                                children: [
 
                                  getSquareImg(Url: rankingList![index].coverImgUrl,width:  60,height:  60),
-                                 Container(
-                                   width: 300,
+                                 Flexible(child: Container(
+
                                    alignment: Alignment.centerLeft,
                                    padding: EdgeInsets.only(left: 10),
                                    child: Column(
@@ -80,7 +79,7 @@ class rankingListPageSatate extends State<rankingListPage>{
                                          return Text("${index+1} ${entry.value.first} - ${entry.value.second}",style:
                                          const TextStyle(fontWeight: FontWeight.bold,),maxLines: 1,overflow: TextOverflow.ellipsis,);
                                        }).toList() ),
-                                 )
+                                 ))
 
                                ],
                              ),

@@ -6,6 +6,7 @@ import 'package:flutter_misic_module/page/mySongListPage.dart';
 import 'package:flutter_misic_module/page/traceCommentPage.dart';
 
 
+import '../main.dart';
 import '../page/VideoPage.dart';
 import '../page/drawerPage.dart';
 import '../page/msgListPage.dart';
@@ -22,6 +23,7 @@ Map route = {
   "main/myPage":(context)=> myPage(),
  "main/drawer":(context)=>drawerPage(),
   "main/songListPage":(context,{arguments})=>mySongListPage(data: arguments,key: myPageState.childKey,),
+  "main/songListPage2":(context,{arguments})=>songListPage(data: arguments,key: MyAppState.childKey,),
   "main/chatPage":(context,{arguments})=>chatPage(data: arguments),
   "main/traceCommentPage":(context,{arguments})=>  traceCommentPage(params: arguments,),
   "main/recentlyPlayedPage":(context)=>recentlyPlayed(),

@@ -49,94 +49,101 @@ public class LrcUtil {
 
         long startTime = 0;
        // long duration = 0;
-        for (int i = 0; i <  split.length; i++) {
-            String lrc="";
-            String lrcInfo = split[i];
-            if ("".equals(lrcInfo)|| TextUtils.isEmpty(lrcInfo)) continue;
-            if (lrcInfo.indexOf("}]}",lrcInfo.indexOf("{"))!=-1) {
-                try {
-                         jsonObject = new JSONObject(split[i]);
-                    if (jsonObject.has("t")) {
-                        startTime = Long.parseLong(jsonObject.getString("t"));
-                    }
-                    if (jsonObject.has("c")) {
-                        JSONArray contentArray = jsonObject.getJSONArray("c");
-                        for (int j = 0; j < contentArray.length(); j++) {
-                            JSONObject contentObject = contentArray.getJSONObject(j);
-                            if (contentObject.has("tx")) {
-                                lrc = lrc+contentObject.getString("tx");
+        try{
+            for (int i = 0; i <  split.length; i++) {
+                String lrc="";
+                String lrcInfo = split[i];
+                if ("".equals(lrcInfo)|| TextUtils.isEmpty(lrcInfo)) continue;
+                if (lrcInfo.indexOf("}]}",lrcInfo.indexOf("{"))!=-1) {
+                    try {
+                        jsonObject = new JSONObject(split[i]);
+                        if (jsonObject.has("t")) {
+                            startTime = Long.parseLong(jsonObject.getString("t"));
+                        }
+                        if (jsonObject.has("c")) {
+                            JSONArray contentArray = jsonObject.getJSONArray("c");
+                            for (int j = 0; j < contentArray.length(); j++) {
+                                JSONObject contentObject = contentArray.getJSONObject(j);
+                                if (contentObject.has("tx")) {
+                                    lrc = lrc+contentObject.getString("tx");
+                                }
                             }
                         }
-                    }
-                    LrcBean lrcBean = new LrcBean(lrc,startTime);
-                    list.add(lrcBean);
+                        LrcBean lrcBean = new LrcBean(lrc,startTime);
+                        list.add(lrcBean);
 
                         list.get(list.size()-1).setEnd(startTime+200);
 
 
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
 
-            }else {
+                }else {
 
-                if (lrcInfo.contains("]")) {
+                    if (lrcInfo.contains("]")) {
 
-                    lrc = lrcInfo.substring(lrcInfo.indexOf("]")+1);
+                        lrc = lrcInfo.substring(lrcInfo.indexOf("]")+1);
 
                         if ("".equals(lrc)|| TextUtils.isEmpty(lrc)||"//".equals(lrc))
                             continue;
-                    LrcBean lrcBean = new LrcBean(lrc);
-                    list.add(lrcBean);
-                       // if (times==null){
-                            String min = lrcInfo.substring(lrcInfo.indexOf("[") + 1, lrcInfo.indexOf("[") + 3);
-                    if (min.contains(":")) {
-                         min = lrcInfo.substring(lrcInfo.indexOf("[") + 1, lrcInfo.indexOf("[") + 2);
-                    }
-                            String seconds = lrcInfo.substring(lrcInfo.indexOf(":") + 1, lrcInfo.indexOf("]"));
-                    Log.d("TAGpwwwwwwwwwww", "parseStr2List: "+min+"sss"+seconds);
-                            startTime = (long) (Long.parseLong(min)*60*1000 +
-                                                                Double.parseDouble(seconds)*1000);
-
-                            lrcBean.setStart(startTime);
-                            if (list.size()>1) {
-                                list.get(list.size()-2).setEnd(startTime);
-                            }
-                            if (i == split.length - 1) list.get(list.size() - 1).setEnd(startTime + 2000);
-
-
-
-                }else {
-                    LrcBean lrcBean = new LrcBean(lrcInfo,0);
-                    list.add(lrcBean);
-                }
-
-                }
-        }
-
-        String tLrcText = getText(tLrc);
-        String[] tLrcSplit = tLrcText.split("\n");
-        for (int i = 0; i < tLrcSplit.length; i++) {
-            if (tLrcSplit[i].contains("by")) continue;
-           if (tLrcSplit[i].equals(""))continue;
-            String s = tLrcSplit[i];
-            String tLrcString = s.substring(s.indexOf("]") + 1);
-            if (tLrcString.equals(""))continue;
-            String min = s.substring(s.indexOf("[") + 1, s.indexOf("[") + 3);
-            String seconds = s.substring(s.indexOf(":") + 1, s.indexOf("]") );
-
-            long  startTimes = (long) (Long.parseLong(min)*60*1000 +
+                        LrcBean lrcBean = new LrcBean(lrc);
+                        list.add(lrcBean);
+                        // if (times==null){
+                        String min = lrcInfo.substring(lrcInfo.indexOf("[") + 1, lrcInfo.indexOf("[") + 3);
+                        if (min.contains(":")) {
+                            min = lrcInfo.substring(lrcInfo.indexOf("[") + 1, lrcInfo.indexOf("[") + 2);
+                        }
+                        String seconds = lrcInfo.substring(lrcInfo.indexOf(":") + 1, lrcInfo.indexOf("]"));
+                        Log.d("TAGpwwwwwwwwwww", "parseStr2List: "+min+"sss"+seconds);
+                        startTime = (long) (Long.parseLong(min)*60*1000 +
                                 Double.parseDouble(seconds)*1000);
-            for (LrcBean lrcBean : list) {
-                if (lrcBean.getStart()>=startTimes) {
-                    lrcBean.setTranslateLrc(tLrcString);
-                    break;
+
+                        lrcBean.setStart(startTime);
+                        if (list.size()>1) {
+                            list.get(list.size()-2).setEnd(startTime);
+                        }
+                        if (i == split.length - 1) list.get(list.size() - 1).setEnd(startTime + 2000);
+
+
+
+                    }else {
+                        LrcBean lrcBean = new LrcBean(lrcInfo,0);
+                        list.add(lrcBean);
+                    }
+
                 }
             }
 
+            String tLrcText = getText(tLrc);
+            String[] tLrcSplit = tLrcText.split("\n");
+            for (int i = 0; i < tLrcSplit.length; i++) {
+                if (tLrcSplit[i].contains("by")) continue;
+                if (tLrcSplit[i].equals(""))continue;
+                String s = tLrcSplit[i];
+                String tLrcString = s.substring(s.indexOf("]") + 1);
+                if (tLrcString.equals(""))continue;
+                String min = s.substring(s.indexOf("[") + 1, s.indexOf("[") + 3);
+                String seconds = s.substring(s.indexOf(":") + 1, s.indexOf("]") );
+
+                long  startTimes = (long) (Long.parseLong(min)*60*1000 +
+                        Double.parseDouble(seconds)*1000);
+                for (LrcBean lrcBean : list) {
+                    if (lrcBean.getStart()>=startTimes) {
+                        lrcBean.setTranslateLrc(tLrcString);
+                        break;
+                    }
+                }
+
+            }
+
+            return list;
+        }catch (Exception ignored){
+            list.clear();
+            list.add(new LrcBean("暂无歌词"));
+            return  list;
         }
 
-        return list;
     }
 
 

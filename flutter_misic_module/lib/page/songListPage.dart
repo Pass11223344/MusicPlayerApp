@@ -62,26 +62,32 @@ var type ;
 
 
 
- isPop() async{
+ Future<bool> isPop() async{
  if (ListController.isSearch) {
       ListController.isSearch = false;
-      return;
+      return false;
     }
     if (ListController.isShow) {
       ListController.isShow = false;
-      return;
+      return false;
     }
  if(ListController.isOpenSheet){
    ListController.isOpenSheet = false;
    Navigator.pop(context);
-   return ;
+   return false;
  }
  if(pageController.isOpenCommentPage){
    Navigator.pop(context);
-   return ;
+   return false;
+ }
+ if (widget.data['type']=="to_ranking") {
+   Navigator.pop(context);
+   return false;
  }
  var p = {"origin":"other_page"};
  await channel.invokeMethod("back",p);
+ pageController.pageIsOk =false;
+ return true;
   }
 
   @override
@@ -90,7 +96,6 @@ var type ;
     super.didUpdateWidget(oldWidget);
     pageController.pageIsOk = false;
     type =widget.data['type'];
-
     getData(widget.data['id']);
 
   }
@@ -132,6 +137,9 @@ var type ;
     // TODO: implement dispose
    _scrollController.removeListener(_scrollListener);
    _scrollController.dispose();
+   ListController.albumInfo=null;
+   ListController.songSheet = null;
+   ListController.songList = [];
     super.dispose();
 
   }
@@ -196,8 +204,8 @@ var type ;
                            flex: 6,
                            child:  Container(
 
-                             padding: EdgeInsets.all(6),
-                             decoration: BoxDecoration(
+                             padding:  EdgeInsets.all(6),
+                             decoration: const BoxDecoration(
                                  border: Border(bottom:BorderSide(color: Colors.black,width: 2) )
                              ),
                              child:  TextField(
@@ -234,569 +242,579 @@ var type ;
 
              ),
              body:
-             Stack(
-               children: [
-                 NestedScrollView(
-                  controller: _scrollController,
-                   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled){
-                     return [
-                       SliverOverlapAbsorber(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                         sliver: SliverAppBar(
-                           backgroundColor: type=="to_recommend_song"?Colors.white: ListController.imgColor,
-                           pinned: true,
-                           scrolledUnderElevation: 0.0,
-                           forceElevated: innerBoxIsScrolled,
-                           toolbarHeight: 0,
-                           expandedHeight: height/2-100,
-                           flexibleSpace: FlexibleSpaceBar(
-                             // collapseMode: CollapseMode.pin,
-                             background:
-                             type=="to_recommend_song"?
-                             Container(child: getSquareImg(Url: ListController.songList[0].al.picUrl,height:height/2-100 ,width: double.infinity,),):
-                             Stack(
-                               children: <Widget>[
-                                 Positioned.fill(
-                                   child: Container(color: ListController.imgColor,),
-                                 ),
-                                 Container(
-                                   alignment: Alignment.center,
-                                   margin: EdgeInsets.only(top: statusHeight+16,left: 20,right: 20),
-                                   child:  Column(children: [
-                                     Row(
-                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: [
-                                         Container(
-                                           width: 100,height:  110,
-                                           child:
-                                           GestureDetector(
-                                             onTap: (){
-                                               ListController.isShow = true;
-                                             },
-                                             child: Stack(
-                                               alignment: Alignment.center,
-                                               children: [
-                                                 Container(width:85 ,height: 100 ,
-                                                   decoration: BoxDecoration(
-                                                       color: Colors.white24,
-                                                       borderRadius: BorderRadius.circular(8)
-                                                   ),
-                                                 ),
-                                                 Container(
-                                                   alignment: Alignment.bottomCenter,
-                                                   child: ClipRRect(
-                                                       borderRadius:  BorderRadius.circular(8.0),
-                                                       child: getSquareImg(Url:ListController.albumInfo!=null ? ListController.albumInfo!.album.blurPicUrl :  ListController.songSheet!.coverImgUrl,width:110 ,height: 100 ,)
-                                                     //Image.asset("images/img.png",fit: BoxFit.cover,),
-                                                   ),
-                                                 ),
-                                                 Visibility(
-                                                     visible: ListController.albumInfo==null,
-                                                     child: Container(
-                                                       padding: EdgeInsets.only(top: 10,right: 10),
-                                                       alignment: Alignment.topRight,
-                                                       width: 100,
-                                                       child: Row(
-                                                         mainAxisAlignment: MainAxisAlignment.end,
-                                                         children: [
-                                                           Icon(Icons.play_arrow,color: Colors.white,size: 20,),
-                                                           Text("${Utils.formatNumber(ListController.albumInfo==null? ListController.songSheet!.playCount:0,"")}",style: TextStyle(fontSize: 10,color: Colors.white,))
-                                                         ],
-                                                       ),
-                                                     ) )
+                 PopScope(
+                  onPopInvoked: (_){
+                    if (type =="to_ranking") {
 
-                                               ],
-                                             ),
-                                           )
-                                            ,
-                                         ),
-                                         Container(
-                                           height: 110,
-                                           width: width-140,
-                                           padding: EdgeInsets.only(left: 10,right: 10),
-                                           child:
-                                           Column(
+                      return;
+                    }
+                    pageController.pageIsOk =false;
+                  },
+                   child: Stack(
+                     children: [
+                       NestedScrollView(
+                         controller: _scrollController,
+                         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled){
+                           return [
+                             SliverOverlapAbsorber(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                               sliver: SliverAppBar(
+                                 backgroundColor: type=="to_recommend_song"?Colors.white: ListController.imgColor,
+                                 pinned: true,
+                                 scrolledUnderElevation: 0.0,
+                                 forceElevated: innerBoxIsScrolled,
+                                 toolbarHeight: 0,
+                                 expandedHeight: height/2-100,
+                                 flexibleSpace: FlexibleSpaceBar(
+                                   // collapseMode: CollapseMode.pin,
+                                   background:
+                                   type=="to_recommend_song"?
+                                   Container(child: getSquareImg(Url: ListController.songList[0].al.picUrl,height:height/2-100 ,width: double.infinity,),):
+                                   Stack(
+                                     children: <Widget>[
+                                       Positioned.fill(
+                                         child: Container(color: ListController.imgColor,),
+                                       ),
+                                       Container(
+                                         alignment: Alignment.center,
+                                         margin: EdgeInsets.only(top: statusHeight+16,left: 20,right: 20),
+                                         child:  Column(children: [
+                                           Row(
                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                                              children: [
-
-                                               Column(
-                                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                 mainAxisAlignment: MainAxisAlignment.start,
-                                                 children: [
-                                                   Container(width: double.infinity,
-                                                       child:   Text(
-                                                           "${widget.data['title']!=null?widget.data['title']:ListController.albumInfo!=null?ListController.albumInfo?.album.name :  ListController.songSheet?.name}",
-                                                           style: TextStyle(fontWeight: FontWeight.bold,fontSize:14 ),
-                                                           maxLines: 2,overflow: TextOverflow.ellipsis)),
-                                                   Visibility(
-                                                       visible: ListController.albumInfo  !=null,
-                                                       child: InkWell(
-                                                         onTap: (){
-                                                           showCreator();
-                                                         },
-                                                         child: Text("歌手:${ListController.albumInfo!=null?Utils.getSubTitle(ListController.albumInfo?.album.artists):""}>",
-                                                           style: const TextStyle(fontSize:12,color: Colors.black )
-                                                           ,overflow: TextOverflow.ellipsis,maxLines: 1,),
-                                                       ))],
-                                               ),
-                                               Column(
-                                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                                 children: [
-                                                   Visibility(
-                                                     visible:ListController.albumInfo!=null ,
-                                                     child:  Text("发行时间:${ListController.albumInfo!=null?Utils.formatDate(ListController.albumInfo!.album.publishTime):""}",style: TextStyle(fontSize:12,color: Colors.grey )),
-                                                   ),
-                                                   Visibility(
-                                                       visible:ListController.albumInfo!=null  ,
-                                                       child: GestureDetector(
-                                                         child: Text("${ListController.albumInfo!=null?ListController.albumInfo?.album.description:""}>",style: TextStyle(fontSize:12,color: Colors.grey ),overflow: TextOverflow.ellipsis,maxLines: 1,),
-                                                       ))
-                                                   ,
-                                                   ListController.albumInfo!=null?const SizedBox():  Obx((){
-                                                     List<Widget> list=[];
-                                                     if( ListController.songSheet!.sharedUsers.length!=0){
-                                                       list=  ListController.songSheet!.sharedUsers.asMap().entries.map((entry){
-                                                         int index = entry.key;
-                                                           UserInfoBean user = entry.value;
-                                                         if(index>=2)return SizedBox();
-                                                         return Positioned(
-                                                             right: ListController.songSheet!.sharedUsers.length>=2?(index+1)*10:index*15,
-                                                             child:  Container(
-                                                               //  margin: EdgeInsets.only(right: ListController.songSheet!.sharedUsers.length>=2?20:0),
-                                                               width: 30,height: 30,
-                                                               alignment: Alignment.topCenter,
-                                                               decoration: BoxDecoration(
-                                                                   border: Border.all(color:Colors.white,width: 1),
-                                                                   borderRadius: BorderRadius.circular(100),
-
-                                                               ),
-                                                               child: getCircularImg(url: user.avatarUrl,size: 30,),
-                                                             ));
-                                                       }).toList();
-
-                                                       list.add(Container(
-                                                         width: 30,height: 30,
+                                               Container(
+                                                 width: 100,height:  110,
+                                                 child:
+                                                 GestureDetector(
+                                                   onTap: (){
+                                                     ListController.isShow = true;
+                                                   },
+                                                   child: Stack(
+                                                     alignment: Alignment.center,
+                                                     children: [
+                                                       Container(width:85 ,height: 100 ,
                                                          decoration: BoxDecoration(
-
-                                                             border: Border.all(color: Colors.white,width: 1),
-                                                             borderRadius: BorderRadius.circular(100)
+                                                             color: Colors.white24,
+                                                             borderRadius: BorderRadius.circular(8)
                                                          ),
-                                                         child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl),
-                                                       ));
+                                                       ),
+                                                       Container(
+                                                         alignment: Alignment.bottomCenter,
+                                                         child: ClipRRect(
+                                                             borderRadius:  BorderRadius.circular(8.0),
+                                                             child: getSquareImg(Url:ListController.albumInfo!=null ? ListController.albumInfo!.album.blurPicUrl :  ListController.songSheet!.coverImgUrl,width:110 ,height: 100 ,)
+                                                           //Image.asset("images/img.png",fit: BoxFit.cover,),
+                                                         ),
+                                                       ),
+                                                       Visibility(
+                                                           visible: ListController.albumInfo==null,
+                                                           child: Container(
+                                                             padding: EdgeInsets.only(top: 10,right: 10),
+                                                             alignment: Alignment.topRight,
+                                                             width: 100,
+                                                             child: Row(
+                                                               mainAxisAlignment: MainAxisAlignment.end,
+                                                               children: [
+                                                                 Icon(Icons.play_arrow,color: Colors.white,size: 20,),
+                                                                 Text("${Utils.formatNumber(ListController.albumInfo==null? ListController.songSheet!.playCount:0,"")}",style: TextStyle(fontSize: 10,color: Colors.white,))
+                                                               ],
+                                                             ),
+                                                           ) )
 
-                                                     }
+                                                     ],
+                                                   ),
+                                                 )
+                                                 ,
+                                               ),
+                                               Container(
+                                                 height: 110,
+                                                 width: width-140,
+                                                 padding: EdgeInsets.only(left: 10,right: 10),
+                                                 child:
+                                                 Column(
+                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                   children: [
 
-                                                     return ListController.albumInfo!=null?SizedBox():
-                                                     GestureDetector(
-                                                         onTap: ()  {
-                                                       channel.invokeMethod("hideOrShowView",true).then((_){
-                                                         ListController.isOpenSheet = true;
-                                                         showCreator();
-                                                       });
-
-                                                     },
-                                                     child:
-                                                     Row(
+                                                     Column(
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                        mainAxisAlignment: MainAxisAlignment.start,
                                                        children: [
-                                                         Container(
-                                                           width:ListController.songSheet!.sharedUsers.length==0?null:60 ,
-                                                           child: Stack(
-                                                               children:
-                                                               ListController.songSheet!.sharedUsers.length==0?[Container(
-                                                                 width: 30,height: 30,
-                                                                 decoration: BoxDecoration(
-
-                                                                     border: Border.all(color: Colors.white,width: 1),
-                                                                     borderRadius: BorderRadius.circular(100)
-                                                                 ),
-                                                                 child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl,size: 30,),
-                                                               )]:
-                                                               list
-                                                           ),
+                                                         Container(width: double.infinity,
+                                                             child:   Text(
+                                                                 "${widget.data['title']!=null?widget.data['title']:ListController.albumInfo!=null?ListController.albumInfo?.album.name :  ListController.songSheet?.name}",
+                                                                 style: TextStyle(fontWeight: FontWeight.bold,fontSize:14 ),
+                                                                 maxLines: 2,overflow: TextOverflow.ellipsis)),
+                                                         Visibility(
+                                                             visible: ListController.albumInfo  !=null,
+                                                             child: InkWell(
+                                                               onTap: (){
+                                                                 showCreator();
+                                                               },
+                                                               child: Text("歌手:${ListController.albumInfo!=null?Utils.getSubTitle(ListController.albumInfo?.album.artists):""}>",
+                                                                 style: const TextStyle(fontSize:12,color: Colors.black )
+                                                                 ,overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                                             ))],
+                                                     ),
+                                                     Column(
+                                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                                       children: [
+                                                         Visibility(
+                                                           visible:ListController.albumInfo!=null ,
+                                                           child:  Text("发行时间:${ListController.albumInfo!=null?Utils.formatDate(ListController.albumInfo!.album.publishTime):""}",style: TextStyle(fontSize:12,color: Colors.grey )),
                                                          ),
-                                                         Flexible(
-                                                             child:
-                                                             Container(
-                                                               //width: double.infinity,
+                                                         Visibility(
+                                                             visible:ListController.albumInfo!=null  ,
+                                                             child: GestureDetector(
+                                                               child: Text("${ListController.albumInfo!=null?ListController.albumInfo?.album.description:""}>",style: TextStyle(fontSize:12,color: Colors.grey ),overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                                             ))
+                                                         ,
+                                                         ListController.albumInfo!=null?const SizedBox():  Obx((){
+                                                           List<Widget> list=[];
+                                                           if( ListController.songSheet!.sharedUsers.length!=0){
+                                                             list=  ListController.songSheet!.sharedUsers.asMap().entries.map((entry){
+                                                               int index = entry.key;
+                                                               UserInfoBean user = entry.value;
+                                                               if(index>=2)return SizedBox();
+                                                               return Positioned(
+                                                                   right: ListController.songSheet!.sharedUsers.length>=2?(index+1)*10:index*15,
+                                                                   child:  Container(
+                                                                     //  margin: EdgeInsets.only(right: ListController.songSheet!.sharedUsers.length>=2?20:0),
+                                                                     width: 30,height: 30,
+                                                                     alignment: Alignment.topCenter,
+                                                                     decoration: BoxDecoration(
+                                                                       border: Border.all(color:Colors.white,width: 1),
+                                                                       borderRadius: BorderRadius.circular(100),
 
-                                                                 child: Text("  ${ListController.songSheet!.sharedUsers.length==0?ListController.songSheet!.creator.nickname:
-                                                                 "${ListController.songSheet!.creator.nickname}等${ListController.songSheet!.sharedUsers.length+1}人"}>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)
-                                                             )
-                                                         )
+                                                                     ),
+                                                                     child: getCircularImg(url: user.avatarUrl,size: 30,),
+                                                                   ));
+                                                             }).toList();
+
+                                                             list.add(Container(
+                                                               width: 30,height: 30,
+                                                               decoration: BoxDecoration(
+
+                                                                   border: Border.all(color: Colors.white,width: 1),
+                                                                   borderRadius: BorderRadius.circular(100)
+                                                               ),
+                                                               child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl),
+                                                             ));
+
+                                                           }
+
+                                                           return ListController.albumInfo!=null?SizedBox():
+                                                           GestureDetector(
+                                                               onTap: ()  {
+                                                                 channel.invokeMethod("hideOrShowView",true).then((_){
+                                                                   ListController.isOpenSheet = true;
+                                                                   showCreator();
+                                                                 });
+
+                                                               },
+                                                               child:
+                                                               Row(
+                                                                 mainAxisAlignment: MainAxisAlignment.start,
+                                                                 children: [
+                                                                   Container(
+                                                                     width:ListController.songSheet!.sharedUsers.length==0?null:60 ,
+                                                                     child: Stack(
+                                                                         children:
+                                                                         ListController.songSheet!.sharedUsers.length==0?[Container(
+                                                                           width: 30,height: 30,
+                                                                           decoration: BoxDecoration(
+
+                                                                               border: Border.all(color: Colors.white,width: 1),
+                                                                               borderRadius: BorderRadius.circular(100)
+                                                                           ),
+                                                                           child:getCircularImg(url: ListController.songSheet!.creator.avatarUrl,size: 30,),
+                                                                         )]:
+                                                                         list
+                                                                     ),
+                                                                   ),
+                                                                   Flexible(
+                                                                       child:
+                                                                       Container(
+                                                                         //width: double.infinity,
+
+                                                                           child: Text("  ${ListController.songSheet!.sharedUsers.length==0?ListController.songSheet!.creator.nickname:
+                                                                           "${ListController.songSheet!.creator.nickname}等${ListController.songSheet!.sharedUsers.length+1}人"}>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)
+                                                                       )
+                                                                   )
 
 
-                                                       ],));
-                                                   })
-                                                 ],
+                                                                 ],));
+                                                         })
+                                                       ],
+                                                     ),
+
+
+                                                   ],
+                                                 ),
                                                ),
-
-
                                              ],
                                            ),
-                                         ),
-                                       ],
-                                     ),
-                                     Visibility(
-                                         visible:ListController.albumInfo==null ,
-                                         child: InkWell(
-                                           onTap: (){
-                                             ListController.isShow = true;
-                                           },
-                                           child:  Container(
-                                             margin: const EdgeInsets.only(top: 10),
-                                             width: double.infinity,
-                                             alignment: Alignment.centerLeft,
-                                             child:Visibility(
-                                                 visible:   ListController.songSheet?.description!="",
-                                                 child: Text(" ${  ListController.songSheet?.description }>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)),
-                                           ),
-                                         )),
-                                     Padding(padding: EdgeInsets.only(top: 10),
-                                       child: Row(
-                                         children: [
-                                           Expanded(
-                                             flex: 1,
-                                             child: TextButton.icon(
-                                               style: TextButton.styleFrom(
-                                                   padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0),
-                                                   backgroundColor: Colors.white70
-                                               ),
-                                               onPressed: (){
-                                                 var p ;
-                                                 if (ListController.albumInfo!=null) {
-                                                   p =  {"id":ListController.albumInfo!.album.id,"type":"album",
-                                                     "img":ListController.albumInfo!.album.blurPicUrl,
-                                                     "title":ListController.albumInfo!.album.name,
-                                                     "subTitle":"歌手:${Utils.getSubTitle(ListController.albumInfo?.album.artists)}"};
-                                                 }else{
-                                                   p =  {"id":ListController.songSheet!.id,"type":"playlist",
-                                                     "img": ListController.songSheet!.coverImgUrl,"title":ListController.songSheet!.name,
-                                                     "subTitle":"创建者:${ListController.songSheet!.creator.nickname}"};
-                                                 }
-                                                 ListController.isOpenSheet = true;
-                                                 channel.invokeMethod("hideOrShowView",true);
-                                                 Navigator.pushNamed(context, "main/sendPage",arguments: p);
-
-                                               }, label: Text(maxLines: 1,style: TextStyle(fontSize: 14,color: Colors.black),
-                                                 Utils.formatNumber(ListController.albumInfo!=null?ListController.albumInfo!.album.info.shareCount:ListController.songSheet!.shareCount,"分享")
-                                            ),icon: Icon(Icons.telegram,color:Colors.white,size:24),),
-                                           ),
-                                           const SizedBox(width: 8),
-                                           Expanded(
-                                             flex: 1,
-                                             child:  TextButton.icon(
-                                               style: TextButton.styleFrom(
-
-                                                   padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                                                   backgroundColor: Colors.white70
-                                               ),
-                                               onPressed: (){
-                                                 var p ;
-                                                 if (ListController.albumInfo!=null) {
-                                                   p={"Id":ListController.albumInfo!.album.id,"commentType":3,
-                                                     "userId":pageController.userId,"imgUrl":ListController.albumInfo!.album.blurPicUrl,
-                                                     "songName":ListController.albumInfo!.album.name,
-                                                     "singerName":Utils.getSubTitle(ListController.albumInfo?.album.artists)};
-                                                 }else{
-                                                   p ={"Id":ListController.songSheet!.id,
-                                                     "commentType":2,"userId":pageController.userId,
-                                                     "imgUrl":ListController.songSheet!.coverImgUrl,
-                                                     "songName":ListController.songSheet!.name,
-                                                     "singerName":ListController.songSheet!.creator.nickname};
-                                                 }
-                                                 pageController.isOpenCommentPage = true;
-                                                 Navigator.pushNamed(context, "main/CommentPage",arguments: p);
-                                                 channel.invokeMethod("hideOrShowView",true);
-
-                                               }, label: Text(
-                                                 maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
-                                                 Utils.formatNumber(
-                                                     ListController.albumInfo!=null?
-                                                     ListController.albumInfo!.album.info.commentCount:ListController.songSheet!.commentCount,"评论")
-                                             ),icon: const Icon(Icons.question_answer_rounded,color:Colors.white,size:24),),
-                                           ),
-                                           const SizedBox(width: 8),
-                                           Expanded(
-                                             flex: 1,
-                                             child: TextButton.icon(
-
-                                                 style: TextButton.styleFrom(
-                                                     padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                                                     backgroundColor: Colors.white70
+                                           Visibility(
+                                               visible:ListController.albumInfo==null ,
+                                               child: InkWell(
+                                                 onTap: (){
+                                                   ListController.isShow = true;
+                                                 },
+                                                 child:  Container(
+                                                   margin: const EdgeInsets.only(top: 10),
+                                                   width: double.infinity,
+                                                   alignment: Alignment.centerLeft,
+                                                   child:Visibility(
+                                                       visible:   ListController.songSheet?.description!="",
+                                                       child: Text(" ${  ListController.songSheet?.description }>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)),
                                                  ),
-                                                 onPressed: (){
-                                                   //必选参数：歌单
-                                                   //t ：类型，1：收藏，2：取消收藏
-                                                   ListController.isOpenSheet =  true;
-                                                   if(ListController.albumInfo!=null){
-                                                     if (ListController.albumInfo!.album.info.liked) {
-                                                       _showAlertDialog( "album");
-                                                     }else{
-                                                       ListController.setLiked(true);
-                                                       dioRequest.executeGet(url: '/album/sub',params: {'t':1,'id':ListController.albumInfo!.album.id});
-                                                     }
-                                                   }else{
-                                                     if (ListController.songSheet!.subscribed) {
+                                               )),
+                                           Padding(padding: EdgeInsets.only(top: 10),
+                                             child: Row(
+                                               children: [
+                                                 Expanded(
+                                                   flex: 1,
+                                                   child: TextButton.icon(
+                                                     style: TextButton.styleFrom(
+                                                         padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0),
+                                                         backgroundColor: Colors.white70
+                                                     ),
+                                                     onPressed: (){
+                                                       var p ;
+                                                       if (ListController.albumInfo!=null) {
+                                                         p =  {"id":ListController.albumInfo!.album.id,"type":"album",
+                                                           "img":ListController.albumInfo!.album.blurPicUrl,
+                                                           "title":ListController.albumInfo!.album.name,
+                                                           "subTitle":"歌手:${Utils.getSubTitle(ListController.albumInfo?.album.artists)}"};
+                                                       }else{
+                                                         p =  {"id":ListController.songSheet!.id,"type":"playlist",
+                                                           "img": ListController.songSheet!.coverImgUrl,"title":ListController.songSheet!.name,
+                                                           "subTitle":"创建者:${ListController.songSheet!.creator.nickname}"};
+                                                       }
+                                                       ListController.isOpenSheet = true;
+                                                       channel.invokeMethod("hideOrShowView",true);
+                                                       Navigator.pushNamed(context, "main/sendPage",arguments: p);
 
-                                                       _showAlertDialog( "sheet");
-                                                     }else{
-                                                       ListController.setLiked(true);
-                                                       //ListController.songSheet!.subscribed = true;
-                                                       dioRequest.executeGet(url: '/playlist/subscribe',params: {'t':1,'id':ListController.songSheet!.id});
+                                                     }, label: Text(maxLines: 1,style: TextStyle(fontSize: 14,color: Colors.black),
+                                                       Utils.formatNumber(ListController.albumInfo!=null?ListController.albumInfo!.album.info.shareCount:ListController.songSheet!.shareCount,"分享")
+                                                   ),icon: Icon(Icons.telegram,color:Colors.white,size:24),),
+                                                 ),
+                                                 const SizedBox(width: 8),
+                                                 Expanded(
+                                                   flex: 1,
+                                                   child:  TextButton.icon(
+                                                     style: TextButton.styleFrom(
 
-                                                     }
-                                                   }
+                                                         padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                                         backgroundColor: Colors.white70
+                                                     ),
+                                                     onPressed: (){
+                                                       var p ;
+                                                       if (ListController.albumInfo!=null) {
+                                                         p={"Id":ListController.albumInfo!.album.id,"commentType":3,
+                                                           "userId":pageController.userId,"imgUrl":ListController.albumInfo!.album.blurPicUrl,
+                                                           "songName":ListController.albumInfo!.album.name,
+                                                           "singerName":Utils.getSubTitle(ListController.albumInfo?.album.artists)};
+                                                       }else{
+                                                         p ={"Id":ListController.songSheet!.id,
+                                                           "commentType":2,"userId":pageController.userId,
+                                                           "imgUrl":ListController.songSheet!.coverImgUrl,
+                                                           "songName":ListController.songSheet!.name,
+                                                           "singerName":ListController.songSheet!.creator.nickname};
+                                                       }
+                                                       pageController.isOpenCommentPage = true;
+                                                       Navigator.pushNamed(context, "main/CommentPage",arguments: p);
+                                                       channel.invokeMethod("hideOrShowView",true);
 
-                                                   ///playlist/subscribe?t=1&id=196697785
-                                                   //专辑：
-                                                   ///album/sub?t=1&id=
+                                                     }, label: Text(
+                                                       maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
+                                                       Utils.formatNumber(
+                                                           ListController.albumInfo!=null?
+                                                           ListController.albumInfo!.album.info.commentCount:ListController.songSheet!.commentCount,"评论")
+                                                   ),icon: const Icon(Icons.question_answer_rounded,color:Colors.white,size:24),),
+                                                 ),
+                                                 const SizedBox(width: 8),
+                                                 Expanded(
+                                                   flex: 1,
+                                                   child: TextButton.icon(
 
-                                                 }, label: Text(
-                                                 maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
-                                                 Utils.formatNumber(
-                                                     ListController.albumInfo!=null?
-                                                     ListController.albumInfo!.album.info.likedCount:ListController.songSheet!.subscribedCount,"收藏")
-                                             ),icon:Obx((){
-                                               return ListController.albumInfo!=null?
-                                               ListController.albumInfo!.album.info.liked?  Icon(Icons.library_add_check,color: Colors.redAccent,size: 24,)
-                                                   :Icon(Icons.add_box,color:Colors.white,size:24,)
-                                                   : ListController.songSheet!.subscribed?Icon(Icons.library_add_check,color: Colors.redAccent,size: 24,)
-                                                   :Icon(Icons.add_box,color:Colors.white,size:24,);
-                                             })),
-                                           ),
-                                         ],
-                                       ) ,)
+                                                       style: TextButton.styleFrom(
+                                                           padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                                                           backgroundColor: Colors.white70
+                                                       ),
+                                                       onPressed: (){
+                                                         //必选参数：歌单
+                                                         //t ：类型，1：收藏，2：取消收藏
+                                                         ListController.isOpenSheet =  true;
+                                                         if(ListController.albumInfo!=null){
+                                                           if (ListController.albumInfo!.album.info.liked) {
+                                                             _showAlertDialog( "album");
+                                                           }else{
+                                                             ListController.setLiked(true);
+                                                             dioRequest.executeGet(url: '/album/sub',params: {'t':1,'id':ListController.albumInfo!.album.id});
+                                                           }
+                                                         }else{
+                                                           if (ListController.songSheet!.subscribed) {
+
+                                                             _showAlertDialog( "sheet");
+                                                           }else{
+                                                             ListController.setLiked(true);
+                                                             //ListController.songSheet!.subscribed = true;
+                                                             dioRequest.executeGet(url: '/playlist/subscribe',params: {'t':1,'id':ListController.songSheet!.id});
+
+                                                           }
+                                                         }
+
+                                                         ///playlist/subscribe?t=1&id=196697785
+                                                         //专辑：
+                                                         ///album/sub?t=1&id=
+
+                                                       }, label: Text(
+                                                       maxLines: 1,style:  TextStyle(fontSize: 14,color: Colors.black),
+                                                       Utils.formatNumber(
+                                                           ListController.albumInfo!=null?
+                                                           ListController.albumInfo!.album.info.likedCount:ListController.songSheet!.subscribedCount,"收藏")
+                                                   ),icon:Obx((){
+                                                     return ListController.albumInfo!=null?
+                                                     ListController.albumInfo!.album.info.liked?  Icon(Icons.library_add_check,color: Colors.redAccent,size: 24,)
+                                                         :Icon(Icons.add_box,color:Colors.white,size:24,)
+                                                         : ListController.songSheet!.subscribed?Icon(Icons.library_add_check,color: Colors.redAccent,size: 24,)
+                                                         :Icon(Icons.add_box,color:Colors.white,size:24,);
+                                                   })),
+                                                 ),
+                                               ],
+                                             ) ,)
 
 
-                                   ],),
+                                         ],),
+                                       ),
+                                     ],
+                                   ),
+
+
                                  ),
-                               ],
+                                 bottom: PreferredSize(
+                                   preferredSize: Size.fromHeight(56),
+                                   child: Container(
+                                       height: 56,
+                                       alignment: Alignment.bottomLeft,
+                                       decoration: const BoxDecoration(
+                                           borderRadius: BorderRadius.only(topRight: Radius.circular(16),topLeft: Radius.circular(16)),
+                                           color: Colors.white
+                                       ),
+                                       child:TextButton.icon(
+                                           onPressed: (){},
+                                           label: Text("播放全部(${type=="to_recommend_song"?ListController.songList.length:ListController.albumInfo!=null?ListController.albumInfo!.songs.length: ListController.songSheet!.cloudTrackCount+ ListController.songSheet!.trackCount})",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color:Colors.black),),
+                                           icon: const Icon(Icons.play_circle,color:Colors.red,size:24 ))
+                                   ),
+                                 ),
+                               ),
                              ),
 
+                           ];
+                         },
+                         body:
+                         SafeArea(
+                           bottom: false,
+                           top: false,
+                           child: Builder(builder: (context){
+                             return
+                               NotificationListener<ScrollNotification>(
+                                 onNotification: (scrollNotification){
 
-                           ),
-                           bottom: PreferredSize(
-                             preferredSize: Size.fromHeight(56),
-                             child: Container(
-                                 height: 56,
-                                 alignment: Alignment.bottomLeft,
-                                 decoration: const BoxDecoration(
-                                     borderRadius: BorderRadius.only(topRight: Radius.circular(16),topLeft: Radius.circular(16)),
-                                     color: Colors.white
-                                 ),
-                                 child:TextButton.icon(
-                                     onPressed: (){},
-                                     label: Text("播放全部(${type=="to_recommend_song"?ListController.songList.length:ListController.albumInfo!=null?ListController.albumInfo!.songs.length: ListController.songSheet!.cloudTrackCount+ ListController.songSheet!.trackCount})",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color:Colors.black),),
-                                     icon: const Icon(Icons.play_circle,color:Colors.red,size:24 ))
-                             ),
-                           ),
-                         ),
-                       ),
+                                   expandedHeight = scrollNotification.metrics.pixels;
+                                   if (scrollNotification is ScrollUpdateNotification &&
+                                       scrollNotification.metrics.pixels ==
+                                           scrollNotification.metrics.maxScrollExtent) {
+                                     // 列表滑动到了底部
+                                     print('ListView is at the bottom');
+                                     if (type=="to_recommend_song")return true;
+                                     if( ListController.songList.length!= ListController.songSheet?.trackCount) {
+                                       if(!ListController.showSongsIsOk)  addMoreList();
+                                     };
 
-                     ];
-                   },
-                   body:
-                   SafeArea(
-                     bottom: false,
-                     top: false,
-                     child: Builder(builder: (context){
-                       return
-                         NotificationListener<ScrollNotification>(
-                           onNotification: (scrollNotification){
+                                     return true; // 阻止通知的进一步处理
+                                   }
+                                   return false; // 允许通知的进一步处理
+                                 },
+                                 child:
 
-                             expandedHeight = scrollNotification.metrics.pixels;
-                             if (scrollNotification is ScrollUpdateNotification &&
-                                 scrollNotification.metrics.pixels ==
-                                     scrollNotification.metrics.maxScrollExtent) {
-                               // 列表滑动到了底部
-                               print('ListView is at the bottom');
-                               if (type=="to_recommend_song")return true;
-                               if( ListController.songList.length!= ListController.songSheet?.trackCount) {
-                                 if(!ListController.showSongsIsOk)  addMoreList();
-                               };
-
-                               return true; // 阻止通知的进一步处理
-                             }
-                             return false; // 允许通知的进一步处理
-                           },
-                           child:
-
-                           CustomScrollView(
-                             slivers: [
-                               SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),),
-                               Obx((){
-                                 return  SliverFixedExtentList(
-                                   delegate: SliverChildBuilderDelegate(
-                                       childCount:type=="to_recommend_song"?ListController.songList.length: ListController.albumInfo!=null?ListController.albumInfo!.songs.length:ListController.songList?.length,
-                                           (context,index){
-                                         if(ListController.albumInfo!=null){
-                                           ListController.albumInfo?.songs[index].al.pic(ListController.albumInfo!.album.picUrl);
-                                         }
-
-                                         return ListController.albumInfo==null?
-                                         Container(
-                                           color: Colors.white,
-                                           child:  ListTile(
-                                             leading:type=="to_recommend_song"?getSquareImg(Url: ListController.songList[index].al.picUrl,height:55 ,width: 55): Text("${index+1}"),
-                                             title: Text(ListController.songList[index].name,maxLines: 1,),
-                                             titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
-                                                 overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
-                                             subtitle:Text(
-                                               "${Utils.getSubTitle(ListController.songList[index].ar)}-${ListController.songList[index].al.name!=""?ListController.songList[index].al.name:""}",maxLines: 1,) ,
-                                             subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
-                                                 overflow: TextOverflow.ellipsis),
-                                             trailing: Image.asset("images/more.png",width: 20,height: 20,),
-                                             onTap: (){
-                                               if(lastId==ListController.songList?[index].id) return;
-                                               lastId = ListController.songList![index].id;
-
-                                               channel.invokeMethod("sendSongList",{
-                                                 "title":type=="to_recommend_song"?"每日推荐":widget.data['title']!=null?widget.data['title']: ListController.songSheet?.name,
-                                                 "SongIndex":index,
-                                                 "SongList":jsonEncode(ListController.songList)
-                                               });
-                                             },
-                                           ),
-                                         )
-                                             :
-                                         Container(
-                                           color: Colors.white,
-                                           child:  ListTile(
-                                             leading: Text("${index+1}"),
-                                             title: Text(ListController.albumInfo!.songs[index].name,maxLines: 1,),
-                                             titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
-                                                 overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
-                                             subtitle:Text(Utils.getSubTitle(ListController.albumInfo?.songs[index].ar),maxLines: 1,) ,
-                                             subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
-                                                 overflow: TextOverflow.ellipsis),
-                                             trailing: Image.asset("images/more.png",width: 20,height: 20,),
-                                             onTap: (){
-
-                                               if( lastId==ListController.albumInfo!.songs[index].id) {
-                                                 return;
+                                 CustomScrollView(
+                                   slivers: [
+                                     SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),),
+                                     Obx((){
+                                       return  SliverFixedExtentList(
+                                         delegate: SliverChildBuilderDelegate(
+                                             childCount:type=="to_recommend_song"?ListController.songList.length: ListController.albumInfo!=null?ListController.albumInfo!.songs.length:ListController.songList?.length,
+                                                 (context,index){
+                                               if(ListController.albumInfo!=null){
+                                                 ListController.albumInfo?.songs[index].al.pic(ListController.albumInfo!.album.picUrl);
                                                }
 
-                                               lastId = ListController.albumInfo!.songs[index].id;
-                                               channel.invokeMethod("sendAlbum",{
-                                                 "title":widget.data['title']!=null?widget.data['title']:ListController.albumInfo!.album.name,
-                                                 "SongIndex":index,
-                                                 "SongList":jsonEncode(ListController.albumInfo?.songs)
-                                               });
-                                             },
-                                           ),
-                                         ) ;
+                                               return ListController.albumInfo==null?
+                                               Container(
+                                                 color: Colors.white,
+                                                 child:  ListTile(
+                                                   leading:type=="to_recommend_song"?getSquareImg(Url: ListController.songList[index].al.picUrl,height:55 ,width: 55): Text("${index+1}"),
+                                                   title: Text(ListController.songList[index].name,maxLines: 1,),
+                                                   titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
+                                                       overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
+                                                   subtitle:Text(
+                                                     "${Utils.getSubTitle(ListController.songList[index].ar)}-${ListController.songList[index].al.name!=""?ListController.songList[index].al.name:""}",maxLines: 1,) ,
+                                                   subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
+                                                       overflow: TextOverflow.ellipsis),
+                                                   trailing: Image.asset("images/more.png",width: 20,height: 20,),
+                                                   onTap: (){
+                                                     if(lastId==ListController.songList?[index].id) return;
+                                                     lastId = ListController.songList![index].id;
+
+                                                     channel.invokeMethod("sendSongList",{
+                                                       "title":type=="to_recommend_song"?"每日推荐":widget.data['title']!=null?widget.data['title']: ListController.songSheet?.name,
+                                                       "SongIndex":index,
+                                                       "SongList":jsonEncode(ListController.songList)
+                                                     });
+                                                   },
+                                                 ),
+                                               )
+                                                   :
+                                               Container(
+                                                 color: Colors.white,
+                                                 child:  ListTile(
+                                                   leading: Text("${index+1}"),
+                                                   title: Text(ListController.albumInfo!.songs[index].name,maxLines: 1,),
+                                                   titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
+                                                       overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
+                                                   subtitle:Text(Utils.getSubTitle(ListController.albumInfo?.songs[index].ar),maxLines: 1,) ,
+                                                   subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
+                                                       overflow: TextOverflow.ellipsis),
+                                                   trailing: Image.asset("images/more.png",width: 20,height: 20,),
+                                                   onTap: (){
+
+                                                     if( lastId==ListController.albumInfo!.songs[index].id) {
+                                                       return;
+                                                     }
+
+                                                     lastId = ListController.albumInfo!.songs[index].id;
+                                                     channel.invokeMethod("sendAlbum",{
+                                                       "title":widget.data['title']!=null?widget.data['title']:ListController.albumInfo!.album.name,
+                                                       "SongIndex":index,
+                                                       "SongList":jsonEncode(ListController.albumInfo?.songs)
+                                                     });
+                                                   },
+                                                 ),
+                                               ) ;
 
 
-                                       }
-                                   ),
-                                   itemExtent: type=="to_recommend_song"?70:55,
-                                 );
-                               }),
+                                             }
+                                         ),
+                                         itemExtent: type=="to_recommend_song"?70:55,
+                                       );
+                                     }),
 
-                               SliverToBoxAdapter(
-                                   child:
-                                   type=="to_recommend_song"?SizedBox(height: 100,):  Obx((){
-                                     return
-                                       Container(
-                                           color: Colors.white,
-                                           width: 70,height: ListController.songList.length== ListController.songSheet?.trackCount||
-                                           ListController.songList.length==ListController.albumInfo?.album.size?100:70,
-                                           alignment: Alignment.center,
-                                           child:
-                                           ( ListController.songSheet!=null?
-                                           ListController.songList.length!= ListController.songSheet!.cloudTrackCount+ ListController.songSheet!.trackCount:ListController.albumInfo!.songs.length!=ListController.albumInfo?.album.size)?
-                                           CircularProgressIndicator(color: Colors.red,strokeWidth: 1,)
-                                               :Container());
-                                   })
+                                     SliverToBoxAdapter(
+                                         child:
+                                         type=="to_recommend_song"?SizedBox(height: 100,):  Obx((){
+                                           return
+                                             Container(
+                                                 color: Colors.white,
+                                                 width: 70,height: ListController.songList.length== ListController.songSheet?.trackCount||
+                                                 ListController.songList.length==ListController.albumInfo?.album.size?100:70,
+                                                 alignment: Alignment.center,
+                                                 child:
+                                                 ( ListController.songSheet!=null?
+                                                 ListController.songList.length!= ListController.songSheet!.cloudTrackCount+ ListController.songSheet!.trackCount:ListController.albumInfo!.songs.length!=ListController.albumInfo?.album.size)?
+                                                 CircularProgressIndicator(color: Colors.red,strokeWidth: 1,)
+                                                     :Container());
+                                         })
 
-                               )
-                             ],
-                           ),
-                         );
-                     }),
-                   ) ,
-                 ),
-
-                 Visibility(
-                     visible: ListController.isSearch,
-                     child:  Obx((){
-                       return ListController.text!=""? Container(color: Colors.white,
-                         child:
-                         ListView.builder(
-                             itemCount:ListController.songList.length,
-
-                             itemBuilder: (context,index){
-                               return ListController.albumInfo==null?
-                               _focusNode.hasFocus&&_textEditingController.text.isNotEmpty ?
-                               ListController.songList[index].name.contains( _textEditingController.text)
-                                   || ListController.songList[index].ar.any((u) => u.name.contains( _textEditingController.text))
-                                   || ListController.songList[index].al.name.contains( _textEditingController.text)?
-                               Container(
-                                 height:   type=="to_recommend_song"?70:55,
-                                 color: Colors.white,
-                                 child:  ListTile(
-                                   leading:type=="to_recommend_song"?getSquareImg(Url: ListController.songList[index].al.picUrl,height:55 ,width: 55): Text("${index+1}"),
-                                   title: Text(ListController.songList[index].name,maxLines: 1,),
-                                   titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
-                                       overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
-                                   subtitle:Text(
-                                     "${Utils.getSubTitle(ListController.songList[index].ar)}${ListController.songList[index].al.name!=""?"-${ListController.songList[index].al.name}":""}",maxLines: 1,) ,
-                                   subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
-                                       overflow: TextOverflow.ellipsis),
-                                   trailing: Image.asset("images/more.png",width: 20,height: 20,),
-                                   onTap: (){
-                                     if(lastId==ListController.songList[index].id) return;
-                                     lastId = ListController.songList[index].id;
-
-                                     channel.invokeMethod("sendSongList",{
-                                       "title":type=="to_recommend_song"?"每日推荐":widget.data['title']!=""?widget.data['title']: ListController.songSheet?.name,
-                                       "SongIndex":index,
-                                       "SongList":jsonEncode(ListController.songList)
-                                     });
-                                   },
-                                 ),
-                               ): const SizedBox(): const SizedBox()
-                                   :
-
-                               Container(
-                                 color: Colors.white,
-                                 child:  ListTile(
-                                   leading: Text("${index+1}"),
-                                   title: Text(ListController.albumInfo!.songs[index].name,maxLines: 1,),
-                                   titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
-                                       overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
-                                   subtitle:Text("${Utils.getSubTitle(ListController.albumInfo?.songs[index].ar)}${ListController.albumInfo?.songs[index].al.name!=""?"-${ListController.albumInfo?.songs[index].al.name}":""}",maxLines: 1,) ,
-                                   subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
-                                       overflow: TextOverflow.ellipsis),
-                                   trailing: Image.asset("images/more.png",width: 20,height: 20,),
-                                   onTap: (){
-
-                                     if( lastId==ListController.albumInfo!.songs[index].id) {
-                                       return;
-                                     }
-
-                                     lastId = ListController.albumInfo!.songs[index].id;
-                                     channel.invokeMethod("sendAlbum",{
-                                       "title":widget.data['title']!=""?widget.data['title']:ListController.albumInfo!.album.name,
-                                       "SongIndex":index,
-                                       "SongList":jsonEncode(ListController.albumInfo?.songs)
-                                     });
-                                   },
+                                     )
+                                   ],
                                  ),
                                );
-                               //:!ListController.isContain?Center(child: Text("暂无搜索结果"),): const SizedBox();
-                             }),
-                       ):Container(color: Colors.white,);
-                     })),
-                 Obx((){
-                   return !ListController.isContain&&ListController.text!=""?Center(child: Text("暂无搜索结果"))
-                       :SizedBox();
-                 })
+                           }),
+                         ) ,
+                       ),
+
+                       Visibility(
+                           visible: ListController.isSearch,
+                           child:  Obx((){
+                             return ListController.text!=""? Container(color: Colors.white,
+                               child:
+                               ListView.builder(
+                                   itemCount:ListController.songList.length,
+
+                                   itemBuilder: (context,index){
+                                     return ListController.albumInfo==null?
+                                     _focusNode.hasFocus&&_textEditingController.text.isNotEmpty ?
+                                     ListController.songList[index].name.contains( _textEditingController.text)
+                                         || ListController.songList[index].ar.any((u) => u.name.contains( _textEditingController.text))
+                                         || ListController.songList[index].al.name.contains( _textEditingController.text)?
+                                     Container(
+                                       height:   type=="to_recommend_song"?70:55,
+                                       color: Colors.white,
+                                       child:  ListTile(
+                                         leading:type=="to_recommend_song"?getSquareImg(Url: ListController.songList[index].al.picUrl,height:55 ,width: 55): Text("${index+1}"),
+                                         title: Text(ListController.songList[index].name,maxLines: 1,),
+                                         titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
+                                             overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
+                                         subtitle:Text(
+                                           "${Utils.getSubTitle(ListController.songList[index].ar)}${ListController.songList[index].al.name!=""?"-${ListController.songList[index].al.name}":""}",maxLines: 1,) ,
+                                         subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
+                                             overflow: TextOverflow.ellipsis),
+                                         trailing: Image.asset("images/more.png",width: 20,height: 20,),
+                                         onTap: (){
+                                           if(lastId==ListController.songList[index].id) return;
+                                           lastId = ListController.songList[index].id;
+
+                                           channel.invokeMethod("sendSongList",{
+                                             "title":type=="to_recommend_song"?"每日推荐":widget.data['title']!=""?widget.data['title']: ListController.songSheet?.name,
+                                             "SongIndex":index,
+                                             "SongList":jsonEncode(ListController.songList)
+                                           });
+                                         },
+                                       ),
+                                     ): const SizedBox(): const SizedBox()
+                                         :
+
+                                     Container(
+                                       color: Colors.white,
+                                       child:  ListTile(
+                                         leading: Text("${index+1}"),
+                                         title: Text(ListController.albumInfo!.songs[index].name,maxLines: 1,),
+                                         titleTextStyle: const TextStyle(fontSize: 16,color: Colors.black,
+                                             overflow: TextOverflow.ellipsis,fontWeight: FontWeight.bold),
+                                         subtitle:Text("${Utils.getSubTitle(ListController.albumInfo?.songs[index].ar)}${ListController.albumInfo?.songs[index].al.name!=""?"-${ListController.albumInfo?.songs[index].al.name}":""}",maxLines: 1,) ,
+                                         subtitleTextStyle:const TextStyle(fontSize: 12,color: Colors.grey,
+                                             overflow: TextOverflow.ellipsis),
+                                         trailing: Image.asset("images/more.png",width: 20,height: 20,),
+                                         onTap: (){
+
+                                           if( lastId==ListController.albumInfo!.songs[index].id) {
+                                             return;
+                                           }
+
+                                           lastId = ListController.albumInfo!.songs[index].id;
+                                           channel.invokeMethod("sendAlbum",{
+                                             "title":widget.data['title']!=""?widget.data['title']:ListController.albumInfo!.album.name,
+                                             "SongIndex":index,
+                                             "SongList":jsonEncode(ListController.albumInfo?.songs)
+                                           });
+                                         },
+                                       ),
+                                     );
+                                     //:!ListController.isContain?Center(child: Text("暂无搜索结果"),): const SizedBox();
+                                   }),
+                             ):Container(color: Colors.white,);
+                           })),
+                       Obx((){
+                         return !ListController.isContain&&ListController.text!=""?Center(child: Text("暂无搜索结果"))
+                             :SizedBox();
+                       })
 
 
-               ],
-             )
+                     ],
+                   ),
+                 )
+
 
 
          )
@@ -940,12 +958,14 @@ var type ;
     case "to_music_radar_song_sheet":
       case"to_my_page_song_list":
       case "to_sheet":
+      case"to_ranking":
       var SongSheet = await dioRequest.executeGet(url: "/playlist/detail",params: {"id":id});
       var SList =  await dioRequest.executeGet(url: "/playlist/track/all",params: {"id":id,"limit":20});
 
       Future.microtask(() async {
+        print("object----------${SongSheet}");
 
-        if(SongSheet!=null&&SList!=null){
+        if(SongSheet!="error"&&SList!="error"){
 
           if(  ListController.albumInfo!=null)ListController.albumInfo=null;
              ListController.songSheet = SongSheetList.fromJson(SongSheet);
@@ -967,20 +987,24 @@ var type ;
           
           ListController.remove();
           ListController.albumInfo = AlbumListBean.fromJson(album);
+        if (album!="error") {
+          ListController.imgColor = await _getPaletteGenerator(ListController.albumInfo!.album.blurPicUrl);
+          pageController.pageIsOk = true;
+        }
 
-        ListController.imgColor = await _getPaletteGenerator(ListController.albumInfo!.album.blurPicUrl);
-        print("object-------------${ ListController.albumInfo?.album.name}");
-        pageController.pageIsOk = true;
         break;
       case "to_recommend_song":
         var SList =  await dioRequest.executeGet(url: "/recommend/songs");
-        print(SList);
+
         if( ListController.songSheet!=null) {
           ListController.songSheet = null;
         }
         if(  ListController.albumInfo!=null)ListController.albumInfo=null;
-        ListController.songList = (SList['dailySongs'] as List<dynamic>).map((json)=>SongListBean.fromJson(json)).toList();
-        pageController.pageIsOk = true;
+        if (SList!="error") {
+          ListController.songList = (SList['dailySongs'] as List<dynamic>).map((json)=>SongListBean.fromJson(json)).toList();
+          pageController.pageIsOk = true;
+        }
+
 
         break;
     }

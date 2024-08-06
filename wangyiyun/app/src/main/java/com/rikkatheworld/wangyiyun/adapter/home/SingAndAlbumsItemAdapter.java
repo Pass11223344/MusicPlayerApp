@@ -126,6 +126,10 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                 List<ListBean> listBeans = new ArrayList<>();
                 if(Long.parseLong(bean.getResourceId())!= playerInfo.getSongId()){
                     if (!app.touchType.equals(TouchType.SING_AND_ALBUMS)){
+                        if (playerInfo.getListBeans()!=null) {
+                            playerInfo.getListBeans().clear();
+                        }
+                        playerInfo.getListBeans().clear();
                         app.touchType = TouchType.SING_AND_ALBUMS;
                         playerInfo.setTitle("新歌新碟");
                         activityMainBinding.setPlayerInfo(playerInfo);

@@ -7,6 +7,8 @@ package com.rikkatheworld.wangyiyun.adapter;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.instance;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
 
@@ -69,7 +71,7 @@ public class PlayerPageAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return app.touchType== TouchType.EXCLUSIVE_MUSIC?list.size():100000;
+        return CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE?list.size():100000;
     }
 
     @Override
@@ -138,12 +140,11 @@ public class PlayerPageAdapter extends PagerAdapter {
         ViewGroup   currentView = (ViewGroup) object;
         ImageView   imgView = currentView.findViewById(position);
 
-        if (position!=position1) {
 
-
+        if (position!=position1||app.isUpViewpage) {
+            app.isUpViewpage = false;
             if (playerPageAdapterAnimation != null) {
                 playerPageAdapterAnimation.stopRotate("cancel");
-
             }
             playerPageAdapterAnimation.Rotate(imgView);
             playerPageAdapterAnimation.stopRotate("pause");
@@ -167,10 +168,7 @@ public void setData(List<ListBean> list){
 notifyDataSetChanged();
 }
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-    }
+
     @Override
     public int getItemPosition(Object object)   {
         View view = (View) object;

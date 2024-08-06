@@ -22,7 +22,26 @@ class MyApps extends StatefulWidget {
 }
 
 
+class Item {
+  String headerValue;
+  String expandedValue;
+  bool isExpanded;
 
+  Item({
+    required this.headerValue,
+    required this.expandedValue,
+    this.isExpanded = false,
+  });
+}
+
+List<Item> generateItems(int numberOfItems) {
+  return List<Item>.generate(numberOfItems, (int index) {
+    return Item(
+      headerValue: 'Item $index header',
+      expandedValue: 'This is item $index content',
+    );
+  });
+}
 class MyAppState extends State<MyApps> with TickerProviderStateMixin {
 
 
@@ -35,12 +54,14 @@ class MyAppState extends State<MyApps> with TickerProviderStateMixin {
   Curve _kScrollCurve = Curves.fastOutSlowIn;
   late myPageController _myPageController;
   RelayBean? _relayBeans ;
+  bool _isExpanded = false;
+  List<Item> _data = generateItems(10);
   @override
   void initState() {
     for (int i = 0; i < 20; i++) {
       listData.add(new ListItem("我是测试标题$i", Icons.cake));
     }
-  getTabData();
+  //getTabData();
     tc = new TabController(length: 2, vsync: this);
     _myPageController = myPageController();
     tc.addListener(() {
@@ -92,14 +113,50 @@ class MyAppState extends State<MyApps> with TickerProviderStateMixin {
       //PullAndPush(
       Scaffold(body:
 
-        CustomPaint(
-        size: Size(90, 90),
-    painter: TrianglePainter(
-    color: Colors.black,
-    position: RelativeRect.fromLTRB(100, 100, 100, 100),
-    size: Size(80, 80),
-    screenWidth: MediaQuery.of(context).size.width,
-    )));
+      SingleChildScrollView(
+        child:ExpansionPanelList(
+          elevation: 1,
+          expandedHeaderPadding: EdgeInsets.zero,
+          dividerColor: Colors.transparent,
+          animationDuration: Duration(milliseconds: 500),
+          children: _data.map<ExpansionPanel>((Item item) {
+            return ExpansionPanel(
+              headerBuilder: (BuildContext context, bool isExpanded) {
+                return ExpansionTileTheme(data: Theme.of(context).expansionTileTheme, child: ExpansionTile(
+                  title: Text('这是标题'),
+                  children: <Widget>[
+                    ListTile(
+                      title: Text('子内容'),
+                    ),
+                  ],
+                ),);
+              },
+              body: ListTile(
+                title: Text(item.expandedValue),
+                subtitle: Text('Additional content goes here'),
+              ),
+              isExpanded: item.isExpanded,
+              canTapOnHeader: true, // This disables tapping on the header to expand/collapse
+            );
+          }).toList(),
+          expansionCallback: (int index, bool isExpanded) {
+            setState(() {
+              _data[index].isExpanded = !isExpanded;
+            });
+          },
+        ),
+      ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+              for (var item in _data) {
+                item.isExpanded = _isExpanded;
+              }
+            });
+          },
+          child: Icon(Icons.ac_unit),
+        ),);
 
         // );
 //      DefaultTabController(

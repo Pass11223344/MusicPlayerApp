@@ -17,7 +17,9 @@ public enum TouchType {
     SEARCH_PAGE,//搜索
     FLUTTER_SONG,
     MY_PAGE,
+    HOME_PAGE,
     MSG_PAGE,
+    RANKING_PAGE,
 
 
 }

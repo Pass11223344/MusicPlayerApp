@@ -169,38 +169,7 @@ private final int LOGIN = 2;
 
             switch (msg.what){
 
-//                case STATUS :
-//                    String string = msg.obj.toString();
-//                    if (string!=null) {
-//
-//                        JSONObject jsonObject = null;
-//                        try {
-//                            jsonObject = new JSONObject(string);
-//                            if (jsonObject.has("data")) {
-//                                data = (JSONObject) jsonObject.get("data");
-//                                account = String.valueOf(data.get("account"));
-//                            }else {
-//                                account = String.valueOf(jsonObject.get("account"));
-//                            }
-//
-//                            if (account.equals("null")) {
-//                                Intent intent = new Intent(getContext(), LoginPage.class);
-//                                startActivity(intent);
-//                            }else if(json==null){
-//                                Log.d("TAG11111111111111111111111", "dispatchMessage: ssss1111");
-//
-//                                NetworkUtils.makeRequest(NetworkInfo.URL + "/msg/private",MsgFragment.handler,RES_ID,true,getContext());
-//
-//                            }
-//
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//
-//
-//                    }
-//
-//                    break;
+
                 case RES_ID:
                    String str = msg.obj.toString();
                     if (str!=null) {

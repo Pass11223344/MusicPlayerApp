@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_misic_module/bean/CommentInfoBean.dart';
 import 'package:flutter_misic_module/bean/VideoInfoBean.dart';
 import 'package:flutter_misic_module/main.dart';
 import 'package:flutter_misic_module/page/msgListPage.dart';
+import 'package:flutter_misic_module/util/Utils.dart';
 import 'package:get/get.dart';
 import 'package:player/favorite.dart';
 import 'package:player/player.dart';
@@ -20,23 +22,30 @@ class VideoPage extends StatefulWidget{
   State<StatefulWidget> createState() => VideoPageState();
 
 }
+
+
 class VideoPageState extends State<VideoPage>{
-  //final player  = Player();
-  double paddingH = 0.0;
-  double paddingW = 0.0;
+
+ // double paddingH = 0.0;
+  //double paddingW = 0.0;
   final myPageController _myPageController = Get.find<myPageController>();
-  ScrollPhysics scrollType = NeverScrollableScrollPhysics();
-  double? descriptionH = 0.0 ;
+//  ScrollPhysics scrollType = NeverScrollableScrollPhysics();
+ // double? descriptionH = 0.0 ;
  Size? screenSize = Size(0, 0) ;
   late PageController _pageController ;
   ScrollController _scrollController = ScrollController();
 // late List<Player> _players;
   int _currentPage = 0;
 
-  bool needHide = false;
+
 
   final List<String> Mp4List = [];
+@override
+  void didUpdateWidget(covariant VideoPage oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
 
+  }
   @override
   void initState() {
     super.initState();
@@ -44,11 +53,11 @@ class VideoPageState extends State<VideoPage>{
     _currentPage=widget.index;
   //  player.setCommonDataSource("assets/video/v3.mp4",autoPlay:true,type: SourceType.asset);
  // player.setLoop(0);
-    print("object99000ddddd${_myPageController.videoInfoBean.length}");
+
     getData(widget.index,true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       screenSize = MediaQuery.of(context).size;
-      descriptionH = screenSize!.height*0.08;
+      _myPageController.descriptionH = screenSize!.height*0.08;
       setState(() {});
     });
 
@@ -58,29 +67,39 @@ class VideoPageState extends State<VideoPage>{
       // 当前页面索引
       if (!_pageController.page!.isNaN && _pageController.page == _pageController.page!.floorToDouble()) {
         int currentPage = _pageController.page!.toInt();
+        Player? player ;
         if (currentPage != _currentPage) {
-      Player player =    _myPageController.getPlayer(_myPageController.videoInfoBean[_currentPage]!.url);
-          // 停止上一个页面的视频播放
-          if (player.value.duration.inMinutes>=3) {
+          if (_myPageController.videoInfoBean[_currentPage]!=null) {
+             player =    _myPageController.getPlayer(_myPageController.videoInfoBean[_currentPage]!.url);
 
-            player.pause();
+            // 停止上一个页面的视频播放
+            if (player!.value.duration.inMinutes>=3) {
 
-          }else{
-            player.seekTo(0);
-            player.pause();
+              player.pause();
+
+            }else{
+              player.seekTo(0);
+              player.pause();
+            }
+
           }
           setState(() {
-            player.isShowCover = true;
+            if (player!=null) {
+              player.isShowCover = true;
+            }
             _currentPage = currentPage;
           });
-        }
+          }
+
         if (_myPageController.videoInfoBean[currentPage]==null) {
-         await getData(currentPage, true);
+          print("object---------2");
+         await getData(currentPage, false);
         }else{
 
           if ( _myPageController.getPlayer(_myPageController.videoInfoBean[currentPage]!.url)==null) {
             _myPageController.createPlayer(_myPageController.videoInfoBean[currentPage]!.url, true, SourceType.nte);
           }else{
+            print("object---------1");
             _myPageController.getPlayer(_myPageController.videoInfoBean[currentPage]!.url)!.start();
           }
 
@@ -99,7 +118,7 @@ class VideoPageState extends State<VideoPage>{
     super.dispose();
    // player.stop();
    // player.release();
-    _myPageController.disposePlayer();
+
 
   }
 
@@ -111,126 +130,146 @@ class VideoPageState extends State<VideoPage>{
         appBar: AppBar(
           toolbarHeight: 0,
         ),
-        body:PageView.builder(
-          scrollDirection: Axis.vertical,
+        body:PopScope(
+          onPopInvoked: (_){
+            _myPageController.disposePlayer();
+            channel.invokeMethod("FoldOrUnfold",false);
+          },
+          child:  PageView.builder(
+            scrollDirection: Axis.vertical,
             controller: _pageController,
             itemCount: _myPageController.videoList.length,
             itemBuilder: (BuildContext context, int index){
+              return
+                Obx((){
+                  print("object---------此视频格式为：${_myPageController.videoList[index].resourceType!="MV"}");
                   return
-                    Obx((){
-                      return index>_myPageController.videoInfoBean.length||_myPageController.videoInfoBean[index]==null?
-                        Container(color: Colors.black,)
+                    _myPageController.videoList[index].resourceType=="MV"||_myPageController.videoList[index].resourceType=="MLOG"?
+                    index>_myPageController.videoInfoBean.length||_myPageController.videoInfoBean[index]==null?
+                    Container(color: Colors.black,child: const Center(child: Text("加载中......",style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),),)
                         :
-                      item(_myPageController.getPlayer(_myPageController.videoInfoBean[index]!.url),index);
-                  });
-        })
+                    item(_myPageController.getPlayer(_myPageController.videoInfoBean[index]!.url),index)
+
+                        :Container(color: Colors.black,child: const Center(child: Text("此视频无法播放......",style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold),),),)
+
+                 ;
+                });
+            }),)
+
+
       );
   }
 item(Player? player,int index){
     print("object---dssdsdsdsdsdsdsds---${player==null}");
     return Stack(
       children: [
-        AnimatedPadding(padding: EdgeInsets.only(bottom: paddingH,right: paddingW,left: paddingW), duration: Duration(milliseconds: 350),child:
+        Obx((){return AnimatedPadding(padding: EdgeInsets.only(bottom: _myPageController.paddingH,right: _myPageController.paddingW,left: _myPageController.paddingW), duration: Duration(milliseconds: 350),child:
         Container(
           constraints: BoxConstraints(maxWidth: screenSize!.width,maxHeight: screenSize!.height),
           child: favorite(
-            onDouble: (){
-              setState(() {
-                if(!_myPageController.videoInfoBean[index]!.liked)_myPageController.videoInfoBean[index]!.liked = true;
-              });
-              print("object双击了老铁666");
-            },
-            child:  player==null?Center(child:
-            AspectRatio(
-                aspectRatio:  _myPageController.videoInfoBean[index]?.videoAspectRatio ?? 16 / 9, // 默认宽高比
-                child: _myPageController.videoList[index].data.coverUrl==""?
-                Container(
-                  color: Colors.black,):getCover(_myPageController.videoList[index].data.coverUrl))
-            ):    videoView(cover: _myPageController.videoList[index].data.coverUrl,player: player,
-              changeProgress: (type){
-              switch(type){
-                case 'HideControl':
-                  setState(() {
-                    needHide = true;
-                  });
-                  break;
-                case 'startOrPause':
+              onDouble: (){
 
-                  break;
-                case 'ShowControl':
-                  setState(() {
-                    needHide = false;
-                  });
-                  break;
+              _myPageController.onDoubleFavorite(index);
 
-              }
+              },
+              child:  player==null?Center(child:
+              AspectRatio(
+                  aspectRatio:  _myPageController.videoInfoBean[index]?.videoAspectRatio ?? 16 / 9, // 默认宽高比
+                  child: _myPageController.videoList[index].data.coverUrl==""?
+                  Container(
+                    color: Colors.black,):getCover(_myPageController.videoList[index].data.coverUrl))
+              ):    videoView(cover: _myPageController.videoList[index].data.coverUrl,player: player,
+                changeProgress: (type){
+                  switch(type){
+                    case 'HideControl':
 
-            }, AspectRatio: (double videoAspectRatio) {
-              _myPageController.videoInfoBean[index]?.videoAspectRatio = videoAspectRatio;
-              },)),),),
-        Visibility(
-            visible: !needHide,
-            child: Stack(children: [
-              Container(),
-              Positioned(
-                  top: 10,
-                  left: 10,
-                  child: IconButton(onPressed: (){
-                    print("object我能点");
-                  }, icon: Icon(Icons.arrow_back_ios_new),)),
-              Positioned(
-                  right: 10,
-                  top:screenSize!.height / 2.0,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      getCircularImg(url: _myPageController.videoInfoBean[index]!.avatarUrl),
-                      SizedBox(height: 20,),
-                      Column(children: [
-                        IconButton(onPressed: (){
-                          print("object我也能点");
-                          setState(() {
-                            _myPageController.videoInfoBean[index]!.liked = !_myPageController.videoInfoBean[index]!.liked;
-                            _myPageController.videoInfoBean[index]!.likedCount+=1;
-                          });
-                        }, icon: _myPageController.videoInfoBean[index]!.liked?Icon(Icons.favorite,size: 40,color: Colors.red,):Icon(Icons.favorite_border_outlined,size: 40,)),
-                     Obx((){
-                       return   Text("${_myPageController.videoInfoBean[index]!.likedCount}");
+                      _myPageController.needHide = true;
 
-                     })
-                      ],),
-                      SizedBox(height: 20,),
-                      Column(children: [
-                        IconButton(onPressed: (){
-                          setState(() {
-                            paddingH =screenSize!.height*(2/3)-20;
-                            paddingW = 80.0;
-                            showSheet(1);
-                          });
-                        }, icon: Icon(Icons.mark_unread_chat_alt,size: 40,)),
-                        Obx((){
-                          return Text("${_myPageController.videoInfoBean[index]!.commentCount}");
+                      break;
+                    case 'startOrPause':
 
-                        })
-                      ],),
-                      SizedBox(height: 10,),
-                      GestureDetector(
-                        onTap: (){},
-                        child: Icon(Icons.more_horiz,size: 40,),),
-                      SizedBox(height: 25,),
-                   //   Container(width: 50,height: 50,color: Colors.blue,),
-                    ],
-                  )),
-              Positioned(
-                  left: 10,
-                  bottom: 55,
-                  child: Container(
+                      break;
+                    case 'ShowControl':
 
-                      constraints:descriptionH==screenSize!.height*0.5?
-                      BoxConstraints(maxHeight: descriptionH!):null,
-                      height: descriptionH==screenSize!.height*0.5?null:descriptionH,//0.5//0.08
+                      _myPageController.needHide = false;
+
+                      break;
+
+                  }
+
+                }, AspectRatio: (double videoAspectRatio) {
+                  _myPageController.videoInfoBean[index]?.videoAspectRatio = videoAspectRatio;
+                },)),),);})
+        ,
+        Obx((){
+          return _myPageController.needHide ?const SizedBox()
+          :Stack(children: [
+            Container(),
+            Positioned(
+                top: 10,
+                left: 10,
+                child: IconButton(onPressed: (){
+                  _myPageController.myPageIsShow = true;
+                  channel.invokeMethod("FoldOrUnfold",false);
+                  Navigator.pop(context);
+                }, icon: Icon(Icons.arrow_back_ios_new),)),
+            Positioned(
+                right: 10,
+                top:screenSize!.height / 2.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    getCircularImg(url: _myPageController.videoInfoBean[index]!.avatarUrl),
+                    SizedBox(height: 20,),
+                    Column(children: [
+                      Obx((){
+                        return  IconButton(onPressed: (){
+                        _myPageController.onClickFavorite(index);
+                        }, icon: _myPageController.videoInfoBean[index]!.liked?Icon(Icons.favorite,size: 40,color: Colors.red,):Icon(Icons.favorite_border_outlined,size: 40,));
+
+                      }),
+                      Obx((){
+                        return   Text("${_myPageController.videoInfoBean[index]!.likedCount}");
+
+                      })
+                    ],),
+                    SizedBox(height: 20,),
+                    Column(children: [
+                      IconButton(onPressed: (){
+
+                        _myPageController.paddingH =screenSize!.height*(2/3)-20;
+                        _myPageController.paddingW = 80.0;
+                          _myPageController.myPageIsShow = false;
+                        if (_myPageController.viewPageComment![_myPageController.videoInfoBean[index]!.id]==null) {
+                          getCommentDate(_myPageController.videoList[index].resourceType,_myPageController.videoInfoBean[index]!.id);
+                        }
+                          showSheet(index,_myPageController.videoInfoBean[index]!.id,_myPageController.videoList[index].resourceType);
+
+                      }, icon: Icon(Icons.mark_unread_chat_alt,size: 40,)),
+                      Obx((){
+                        return Text("${_myPageController.videoInfoBean[index]!.commentCount}");
+
+                      })
+                    ],),
+                    SizedBox(height: 10,),
+                    GestureDetector(
+                      onTap: (){},
+                      child: Icon(Icons.more_horiz,size: 40,),),
+                    SizedBox(height: 25,),
+                    //   Container(width: 50,height: 50,color: Colors.blue,),
+                  ],
+                )),
+            Positioned(
+                left: 10,
+                bottom: 55,
+                child: Obx((){
+                  return Container(
+
+                      constraints:_myPageController.descriptionH==screenSize!.height*0.5?
+                      BoxConstraints(maxHeight: _myPageController.descriptionH!):null,
+                      height: _myPageController.descriptionH==screenSize!.height*0.5?null:_myPageController.descriptionH,//0.5//0.08
                       width:screenSize!.width*0.8,
-                      child:descriptionH != screenSize!.height*0.5?
+                      child:_myPageController.descriptionH != screenSize!.height*0.5?
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -253,11 +292,11 @@ item(Player? player,int index){
                                   visible: calculateNumberOfLines("s",20)<calculateNumberOfLines(_myPageController.videoInfoBean[index]!.text,20),
                                   child: GestureDetector(
                                     onTap: (){
-                                      descriptionH = screenSize!.height*0.5;
+                                      _myPageController.descriptionH = screenSize!.height*0.5;
                                       if (calculateNumberOfLines(_myPageController.videoInfoBean[index]!.text,20)>screenSize!.height*0.5) {
-                                        scrollType = ClampingScrollPhysics();
+                                        _myPageController.scrollType = ClampingScrollPhysics();
                                       }
-                                      setState(() {});
+
                                     },
                                     child:Container(
 
@@ -269,7 +308,7 @@ item(Player? player,int index){
                       ):
                       SingleChildScrollView(
                         controller: _scrollController,
-                        physics: scrollType,
+                        physics: _myPageController.scrollType,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -280,15 +319,15 @@ item(Player? player,int index){
                                 child:
                                 RichText(text:
                                 TextSpan(
-                                  style: const TextStyle(color: Colors.white,fontSize: 20),
+                                    style: const TextStyle(color: Colors.white,fontSize: 20),
                                     children: [
                                       TextSpan(text: _myPageController.videoInfoBean[index]!.text
-                                         ),
+                                      ),
                                       TextSpan(text: "收起",style:const TextStyle(fontWeight: FontWeight.bold),
                                           recognizer: TapGestureRecognizer()..onTap=(){
-                                            descriptionH = screenSize!.height*0.08;
-                                            scrollType = NeverScrollableScrollPhysics();
-                                            setState(() {});
+                                            _myPageController.descriptionH = screenSize!.height*0.08;
+                                            _myPageController.scrollType = NeverScrollableScrollPhysics();
+
 
                                           }
                                       )
@@ -298,8 +337,11 @@ item(Player? player,int index){
                       )
 
 
-                  )),
-            ],))
+                  );
+                })),
+          ],);
+        })
+
 
 
 
@@ -324,8 +366,10 @@ double calculateNumberOfLines(String str,double? fontSize){
   }
 
 
-  showSheet( int index) async {
+  showSheet(int index,String id,String type) async {
     // _isOpen = true;
+    final ScrollController _scrollController = ScrollController();
+
     await  showMaterialModalBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
@@ -335,26 +379,39 @@ double calculateNumberOfLines(String str,double? fontSize){
       builder: (context) =>
       Container(
         height:  screenSize!.height*(2/3)-20,
+        padding: EdgeInsets.only(top: 20),
+        child: GetBuilder<myPageController>(
+          builder: (controller){
+            return controller.viewPageComment!.containsKey(id)?
+                CustomScrollView(
+                  controller: _scrollController,
+                  key: PageStorageKey<String>("listKey${id}IN"),
+                  slivers: [
 
-        child: SingleChildScrollView(
-        child:   PopScope(
-            onPopInvoked: (isPop) {
-              // _myPageController.isReplyComment = false;
-              // _focusNode.unfocus();
-            },
-            child:commentItem(children: [replyCommentItem()],)
+                    SliverList.builder(
 
+                        itemCount:controller.viewPageComment![id]!.comments.length,
+                        itemBuilder: (context,index){
+                          return commentItem(info:controller.viewPageComment![id]!.comments[index],
+                              id:id, type: type, getPoint: (){
+                            print("object----ffff--------------${_scrollController.offset}");
+                           return _scrollController.offset;
+                            }, );
+                    })
+                  ],
+                )
+                :Utils.loadingView(Alignment.topCenter);
+          },
 
-        ),
-      ),)
+        ))
 
 
     );
 
-    setState(() {
-      paddingH = 0.0;
-      paddingW = 0.0;
-    });
+
+      _myPageController.paddingH = 0.0;
+      _myPageController.paddingW = 0.0;
+
   }
   Widget getCover(String cover){
     if(cover.contains("assets/image/")){
@@ -379,8 +436,18 @@ double calculateNumberOfLines(String str,double? fontSize){
           dioRequest.executeGet(url: "/mv/detail",params: {"mvid":id}).then((value){
           var videoInfoBean = VideoInfoBean.fromJson(value, "mv");
           videoInfoBean.url = url;
+          if(!isFirst){
+            print("object----sdsds${_currentPage}-----}");
+            if(_myPageController.videoInfoBean[_currentPage]!=null){
+              _myPageController.insertVideoInfoBean(index, videoInfoBean,false);
+              return;
+            }
+          }
 
           _myPageController.insertVideoInfoBean(index, videoInfoBean,true);
+
+
+
           // if(player!=null){
           //   if(player.state!=FijkState.started) player.start();
           // }
@@ -388,16 +455,46 @@ double calculateNumberOfLines(String str,double? fontSize){
 
         });
       });
-    }else{
+    }else if(_myPageController.videoList[index].resourceType=="MLOG"){
       dioRequest.executeGet(url: "/mlog/url",params: {"id":id}).then((v){
         var videoInfoBean = VideoInfoBean.fromJson(v, "mlog");
+        if(!isFirst){
+          if(_myPageController.videoInfoBean[_currentPage]!=null){
+            _myPageController.insertVideoInfoBean(index, videoInfoBean,false);
+            return;
+          }
+        }
         _myPageController.insertVideoInfoBean(index, videoInfoBean,true);
+
+     //   _myPageController.insertVideoInfoBean(index, videoInfoBean,true);
         // if(player!=null){
         //   if(player.state!=FijkState.started) player.start();
         // }
       });
     }
 
+  }
+
+  void getCommentDate(String resourceType,String id) {
+  if (resourceType=="MV") {
+    dioRequest.executeGet(url: "/comment/new",params: {"id":id,"type":1,"pageSize":200}).then((value){
+        if (value!="error") {
+          _myPageController.addViewPageComment(id, CommentInfoBean.fromJson(value));
+          print("我都却dadjak${ _myPageController.viewPageComment![id]!.hasMore}");
+        }
+    });
+  }else if(resourceType=="MLOG"){
+    dioRequest.executeGet(url: "/mlog/to/video",params: {"id":id}).then((value){
+      if (value!="error") {
+        dioRequest.executeGet(url: "/comment/new",params: {"id":value,"type":5,"pageSize":200}).then((value){
+          if (value!="error") {
+            _myPageController.addViewPageComment(id, CommentInfoBean.fromJson(value));
+            print("我都却dadjak${ _myPageController.viewPageComment![id]!.hasMore}");
+          }
+        });
+      }
+    });
+  }
   }
 }
 
@@ -443,9 +540,12 @@ class getImgState extends State<getImg>{
 }
 
 class commentItem extends StatefulWidget{
- final List<Widget>? children;
 
-  const commentItem({super.key,   this.children = null});
+ final Comments info;
+ final String id;
+ final String type;
+ final Function  getPoint;
+  const commentItem({super.key, required this.info, required this.id, required this.type, required this.getPoint,});
 
   @override
   State<StatefulWidget> createState() =>commentItemState();
@@ -455,91 +555,114 @@ class commentItemState extends State<commentItem>{
   bool isOpen = false;
   bool openMoreReply = false;
   int onclickCount = 0;
+  CommentInfoBean? beReplay;
+  bool isLoading = false;
+  double _scrollPositionWhenTapped = 0.0;
 
+
+ bool haveMore(){
+   if(widget.info.replyCount!=0){
+     if (beReplay!=null) {
+       if(beReplay!.hasMore){
+         return true;
+       }else return false;
+     }else return  true;
+   }else{
+     return false;
+   }
+  }
   @override
 
   Widget build(BuildContext context) {
+   print("object这里是要创建Item${widget.info==null}");
     // TODO: implement build
-  return  Container(
+  return   Container(
+    width:MediaQuery.of(context).size.width ,
+    padding: EdgeInsets.only(top: 40,left: 10,right: 10),
+    child:Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
 
-      width:MediaQuery.of(context).size.width ,
-        padding: EdgeInsets.only(top: 40,left: 10,right: 10),
-      child:Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        getCircularImg(url: widget.info.user.avatarUrl),
+        const SizedBox(width: 10,),
+        Flexible(child:  Container(
+          width: MediaQuery.of(context).size.width*0.8,
+          child:  Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-        children: [
-          getCircularImg(url: "https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
-              "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
-              "webp&wxfrom=5&wx_lazy=1&wx_co=1"),
-          SizedBox(width: 10,),
-          Container(
-            width: MediaQuery.of(context).size.width*0.8,
-            child:  Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              Text(widget.info.user.nickname,style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
+              SizedBox(height: 8,),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                      text:
+                      TextSpan(
+                          style: TextStyle(color: Colors.black),
+                          children: [
+                            WidgetSpan(
+                                child: Text(
+                                    maxLines: isOpen?null:5,
+                                    overflow: isOpen?null:TextOverflow.ellipsis,
+                                    widget.info.content
+                                )),
+                            calculateNumberOfLines( widget.info.content,null)>calculateNumberOfLines("s",null)*5?
+                            TextSpan(style:const TextStyle(color: Colors.blue),text:isOpen?"收起":"展开",recognizer: TapGestureRecognizer()..onTap=(){
+                              isOpen = !isOpen;
+                              setState(() {});
+                            }):const WidgetSpan(child: Text("")),
+                          ]))
+                  ,
+                  // Visibility(child: Container(
+                  //   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
+                  //   child: getImg(Url:"https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
+                  //       "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
+                  //       "webp&wxfrom=5&wx_lazy=1&wx_co=1" ,),
+                  // ))
+                ],),
+              Row(children: [Text("${widget.info.timeStr} · ${widget.info.ipLocation.location}")],),
 
-                Text("这里是昵称",style: TextStyle(fontSize: 12),),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RichText(
+              beReplay!=null?  Visibility(
+                  visible: openMoreReply,
+                  child:Column(
+                      children: beReplay!.comments.asMap().entries.map((entry){
+                        var value = entry.value;
+                        var index = entry.key;
+                        return Padding(padding: EdgeInsets.symmetric(vertical: 8),child:  replyCommentItem( beReplied:value,parentId: value.commentId.toString(),),);
+                      }).toList()
 
-                        text:
-                        TextSpan(
-                            style: TextStyle(color: Colors.black),
-                            children: [
-                              WidgetSpan(
-                                  child: Text(
-                                      maxLines: isOpen?null:5,
-                                      overflow: isOpen?null:TextOverflow.ellipsis,
-                                      " part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                          "这里是内容超出最大行数将收起 "
-                                  )),
-                              calculateNumberOfLines("part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                  "这里是内容超出最大行数将收起 ",null)>calculateNumberOfLines("s",null)*5?
+                  )):const SizedBox(),
+               SizedBox(width: 10,height:openMoreReply?500:0 ,),
+              Visibility(
+                  visible: widget.info.replyCount!=0,
+                  child: Row(children: [
+                    Visibility(
+                      visible: haveMore(),
+                      child:  TextButton.icon(onPressed: (){
 
-                              TextSpan(text:"${isOpen?"收起":"展开"}",recognizer: TapGestureRecognizer()..onTap=(){
-                                     isOpen = !isOpen;
-                                     setState(() {
+                        if(isLoading)return;
+                        isLoading = true;
+                        openMoreReply = true;
+                        onclickCount+=1;
+                        widget.getPoint();
+                        if(beReplay!=null){
+                          print("objectwwww${beReplay==null}-----${beReplay!.hasMore}");
+                          if(beReplay!.hasMore){
+                            getMoreReplay(widget.info.commentId,widget.type,widget.id,beReplay!=null?beReplay!.comments[beReplay!.comments.length-1].time:null);
+                          }
+                        }else if(beReplay==null){
+                          getMoreReplay(widget.info.commentId,widget.type,widget.id,beReplay!=null?beReplay!.comments[beReplay!.comments.length-1].time:null);
+                        }
 
-                                     });
-                              }):WidgetSpan(child: Text("")),
-                            ]))
-                    ,
-                    Visibility(child: Container(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
-                      child: getImg(Url:"https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
-                          "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
-                          "webp&wxfrom=5&wx_lazy=1&wx_co=1" ,),
-                    ))
-                  ],),
-                Row(children: [Text("  07-17 · 湖北")],),
-                Visibility(
-                    visible: openMoreReply,
-                    child: widget.children==null?SizedBox():widget.children![0]),
-                SizedBox(width: 10,),
-                Row(children: [
-                  TextButton.icon(onPressed: (){
-                    openMoreReply = true;
-                    onclickCount+=1;
-                    setState(() {
+                        setState(() {
 
-                    });
-                  }, label: Icon(Icons.keyboard_arrow_down,color: Colors.grey,size: 30,),icon: Text("----${onclickCount==0?"展开648条回复":"展开更多回复"}",style: TextStyle(color: Colors.black),) ,),
+                        });
+                      }, label: Icon(Icons.keyboard_arrow_down,color: Colors.grey,size: 30,),icon: Text("----${isLoading?"加载中......": onclickCount==0?"展开${widget.info.replyCount}条回复":"展开更多回复"}",style: TextStyle(color: Colors.black),) ,),
+                    ),
 
-
-                  SizedBox(width: 20,),
-                  Visibility(
+                    SizedBox(width: 20,),
+                    Flexible(child: Visibility(
                       visible:openMoreReply ,
                       child:  TextButton.icon(onPressed: (){
                         openMoreReply = false;
@@ -547,20 +670,23 @@ class commentItemState extends State<commentItem>{
 
                         });
                       }, label:Icon(Icons.keyboard_arrow_up,color: Colors.grey,size: 30,),icon: Text("收起",style: TextStyle(color: Colors.black),) ,),
-                  )
+                    ))
 
 
 
-                ],)
 
-              ],
+                  ],))
 
-            ),
-          )
 
-        ],) ,
+            ],
 
-    );
+          ),
+        ))
+
+
+      ],) ,
+
+  );
   }
   double calculateNumberOfLines(String str,double? fontSize){
     TextPainter textPainter = TextPainter(
@@ -571,25 +697,76 @@ class commentItemState extends State<commentItem>{
     return textPainter.height;
 
   }
+
+  void getMoreReplay(int commentId,String resourceType,String id,int? timer) {
+    if (resourceType=="MV") {
+    var  params ={"parentCommentId":commentId,"type":1,"id":id};
+   if( timer!=null){
+     params["time"] =timer;
+   }
+      dioRequest.executeGet(url: "/comment/floor",params: params).then((value){
+        if (value!="error") {
+          var commentInfoBean = CommentInfoBean.fromJson(value);
+          if(beReplay!=null){
+            beReplay!.comments.addAll(commentInfoBean.comments);
+            beReplay!.hasMore = commentInfoBean.hasMore;
+          }else{
+            beReplay =commentInfoBean;
+          }
+
+          setState(() {
+            isLoading = false;
+          });
+
+        }
+      });
+    }else if(resourceType=="MLOG"){
+      dioRequest.executeGet(url: "/mlog/to/video",params: {"id":id}).then((value){
+        if (value!="error") {
+          var  params ={"parentCommentId":commentId,"type":5,"id":value};
+          if( timer!=null){
+            params["time"] =timer;
+          }
+          dioRequest.executeGet(url: "/comment/floor",params: params).then((value){
+            if (value!="error") {
+              var commentInfoBean = CommentInfoBean.fromJson(value);
+              if(beReplay!=null){
+                beReplay!.comments.addAll(commentInfoBean.comments);
+                beReplay!.hasMore = commentInfoBean.hasMore;
+              }else{
+                beReplay =commentInfoBean;
+              }
+              setState(() {
+                isLoading = false;
+              });
+              print("我都却dadjak${ beReplay!.hasMore}");
+            }
+          });
+        }
+      });
+    }
+
+  }
 }
 
-class replyCommentItem extends StatefulWidget{
+class replyCommentItem extends StatefulWidget {
 
-
-  const replyCommentItem({super.key});
+final Comments beReplied;
+final String parentId;
+  const replyCommentItem({super.key, required this.beReplied, required this.parentId});
 
   @override
   State<StatefulWidget> createState() =>replyCommentItemState();
 
 }
-class replyCommentItemState extends State<replyCommentItem>{
+class replyCommentItemState extends State<replyCommentItem> with AutomaticKeepAliveClientMixin{
   bool isOpen = false;
 
   @override
 
   Widget build(BuildContext context) {
     // TODO: implement build
-    return  Container(
+    return  SizedBox(
 
         width: MediaQuery.of(context).size.width*0.8,
 
@@ -597,67 +774,50 @@ class replyCommentItemState extends State<replyCommentItem>{
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-          getCircularImg(url: "https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
-              "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
-              "webp&wxfrom=5&wx_lazy=1&wx_co=1",size: 35,),
-          SizedBox(width: 10,),
-        Flexible(child:   Container(
+          getCircularImg(url: widget.beReplied.user.avatarUrl,size: 35,),
+          const SizedBox(width: 10,),
+        Flexible(child:   Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("${widget.beReplied.user.nickname } ${widget.parentId!=widget.beReplied.beReplied[0].user.userId?"> ${widget.beReplied.beReplied[0].user}":""}",style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8,),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
 
-          child:  Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+                    text:
+                    TextSpan(
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          WidgetSpan(
+                              child: Text(
+                                  maxLines: isOpen?null:5,
+                                  overflow: isOpen?null:TextOverflow.ellipsis,
+                                  widget.beReplied.content
+                              )),
+                          calculateNumberOfLines( widget.beReplied.content,null)>calculateNumberOfLines("s",null)*5?
 
-              Text("这里是昵称",style: TextStyle(fontSize: 12),),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
+                          TextSpan(text:isOpen?"收起":"展开",recognizer: TapGestureRecognizer()..onTap=(){
+                            isOpen = !isOpen;
+                            setState(() {
 
-                      text:
-                      TextSpan(
-                          style: TextStyle(color: Colors.black),
-                          children: [
-                            WidgetSpan(
-                                child: Text(
-                                    maxLines: isOpen?null:5,
-                                    overflow: isOpen?null:TextOverflow.ellipsis,
-                                    " part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                        "这里是内容超出最大行数将收起 "
-                                )),
-                            calculateNumberOfLines("part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起  part(这里是内容这里是内容超出最大行数将收"
-                                "这里是内容超出最大行数将收起 ",null)>calculateNumberOfLines("s",null)*5?
-
-                            TextSpan(text:"${isOpen?"收起":"展开"}",recognizer: TapGestureRecognizer()..onTap=(){
-                              isOpen = !isOpen;
-                              setState(() {
-
-                              });
-                            }):WidgetSpan(child: Text("")),
-                          ]))
-                  ,
-                  Visibility(child: Container(
-                    constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
-                    child: getImg(Url:"https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
-                        "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
-                        "webp&wxfrom=5&wx_lazy=1&wx_co=1" ,),
-                  ))
-                ],),
-              Row(children: [Text("  07-17 · 湖北")],),
+                            });
+                          }):const WidgetSpan(child: Text("")),
+                        ]))
+                ,
+                // Visibility(child: Container(
+                //   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
+                //   child: getImg(Url:"https://mmbiz.qpic.cn/mmbiz_jpg/Y4aCiavSOLBBeiaHAJbeYYPXkicicf"
+                //       "8UIIxw8Gicc6iah8fFtOmicFt1EmhNicHoWrCz5ylr0I2zGvUDaUZx2LAIQRR2og/640?wx_fmt=jpeg&tp="
+                //       "webp&wxfrom=5&wx_lazy=1&wx_co=1" ,),
+                // ))
+              ],),
+            Row(children: [Text("${widget.beReplied.timeStr} · ${widget.beReplied.ipLocation.location}")],),
 
 
-            ],
+          ],
 
-          ),
         ))
 
         ],) ,
@@ -673,4 +833,8 @@ class replyCommentItemState extends State<replyCommentItem>{
     return textPainter.height;
 
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
