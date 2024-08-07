@@ -3,7 +3,9 @@ package com.rikkatheworld.wangyiyun.adapter.home;
 import static com.bumptech.glide.Glide.with;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isOnClick;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
@@ -107,7 +109,10 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
         isOnClick = true;
         if (!app.touchType.equals(TouchType.CONCENTRATION)) {
             app.touchType = TouchType.CONCENTRATION;
-            ((MainActivity)context).setCurrentMode("");
+            if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
+                ((MainActivity)context).setCurrentMode("");
+            }
+
             if (concentrationBeanList==null) {
                 concentrationBeanList = new ArrayList<>();
             }

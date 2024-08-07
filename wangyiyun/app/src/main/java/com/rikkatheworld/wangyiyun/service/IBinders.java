@@ -236,14 +236,19 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+(isOnClick||switchSong));
+        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+(isOnClick)+switchSong);
         if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
             mediaPlayer.start();
         }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE||CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE){
+
+
             if (isOnClick||switchSong) {
                 isOnClick = false;
                 switchSong = false;
-            }else scrollPage();
+            }else {
+                Log.d("TAG------------------", "onCompletion: ");
+                scrollPage();
+            }
         } else {
             animationUtils.stopRotate("pause");
             playerPageAdapterAnimation.stopRotate("pause");

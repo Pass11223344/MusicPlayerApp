@@ -3,9 +3,11 @@ package com.rikkatheworld.wangyiyun.adapter.home;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
 
 
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.firstDownWithRecommend;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
@@ -137,7 +139,10 @@ public class RecommendableMusicItemAdapter extends RecyclerView.Adapter<Recommen
             if(bean.getSongId()!=playerInfo.getSongId()){
                 if (!app.touchType.equals(TouchType.RECOMMENDABLE_MUSIC)){
                     app.touchType = TouchType.RECOMMENDABLE_MUSIC;
-                    ((MainActivity)context).setCurrentMode("");
+                    if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
+                        ((MainActivity)context).setCurrentMode("");
+                    }
+
                     RecommendableMusicListBeans = new ArrayList<>();
                     list.forEach(innerList -> {
                         innerList.forEach(recommendableMusicsBean -> {

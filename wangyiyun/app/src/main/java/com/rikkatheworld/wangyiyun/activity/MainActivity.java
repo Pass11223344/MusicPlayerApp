@@ -587,7 +587,9 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         setCurrentPageItem = current -> {
             Log.d("TAG111111111111111", "initView: 我被调用");
 
-
+            if (isUpData==1) {
+                isUpData = 2;
+                playerPageAdapter.setData(playerInfo.getListBeans());}
           player_viewPage.setCurrentItem(current);
             if (animationUtils != null) {
                 animationUtils.stopRotate("cancel");
@@ -1202,7 +1204,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             playerInfo.setSongId(listBeans.getSongId());
             activityMainBinding.setPlayerInfo(playerInfo);
             setCurrentIdToFlutter(playerInfo.getSongId());
-
+//            isOnClick = false;
+//            switchSong = false;
             mLrcView.setTips(true);
             likeOrNot = likeOrNot(playerInfo.getSongId());
             boolean isIn = newLikeList.stream().anyMatch(num-> {
@@ -1326,8 +1329,8 @@ public void upData(long id){
         listBean.clear();
     }
     listBean.addAll(PlayerList);
-
-switchSong=false;
+    switchSong=false;
+    isOnClick = true;
     for (int i = 0; i < listBean.size(); i++) {
 
         if (listBean.get(i).getSongId()==id) {
@@ -1365,7 +1368,9 @@ switchSong=false;
             @Override
             public void run() {
                 if (position1 <= 100000 && position1 >= 0) {
-                    Log.d("TAGppppppppppppppp", "run: "+(position1 + 1));
+                    if (isUpData==1) {
+                        isUpData = 2;
+                        playerPageAdapter.setData(playerInfo.getListBeans());}
                     player_viewPage.getAdapter().notifyDataSetChanged();
                     player_viewPage.setCurrentItem(position1 + 1);
                 }
@@ -1624,7 +1629,10 @@ public void onCountUpdate(Map<?, ?> newData) {
     formatDate(newData);
             }
  public void formatDate(Map<?, ?> data){
-     setCurrentMode("");
+     if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
+          setCurrentMode("");
+     }
+
 switchSong = false;
      if (data!=null) {
          String str = String.valueOf(data.get("SongList"));

@@ -2,9 +2,11 @@ package com.rikkatheworld.wangyiyun.adapter.home;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SHEET;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SING_AND_ALBUMS;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isOnClick;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
@@ -122,7 +124,10 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
             isOnClick = true;
             oldSheetId = "";
             if (bean.getResourceType().equals("song")) {
-                ((MainActivity)context).setCurrentMode("");
+                if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
+                    ((MainActivity)context).setCurrentMode("");
+                }
+
                 List<ListBean> listBeans = new ArrayList<>();
                 if(Long.parseLong(bean.getResourceId())!= playerInfo.getSongId()){
                     if (!app.touchType.equals(TouchType.SING_AND_ALBUMS)){
@@ -183,6 +188,8 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
 
                                         }
                                     }
+                                    Log.d("TAG-------", "onBindViewHolder:当前的是随机播放 "+CURRENT_PLAY_MODE);
+
                                     if(CURRENT_PLAY_MODE == RANDOM_PLAY_MODE){
                                         isUpData=2;
                                         ((MainActivity)context).upData(Long.parseLong(bean.getResourceId()));

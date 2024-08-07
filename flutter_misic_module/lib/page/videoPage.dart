@@ -393,10 +393,7 @@ double calculateNumberOfLines(String str,double? fontSize){
                         itemCount:controller.viewPageComment![id]!.comments.length,
                         itemBuilder: (context,index){
                           return commentItem(info:controller.viewPageComment![id]!.comments[index],
-                              id:id, type: type, getPoint: (){
-                            print("object----ffff--------------${_scrollController.offset}");
-                           return _scrollController.offset;
-                            }, );
+                              id:id, type: type );
                     })
                   ],
                 )
@@ -544,8 +541,8 @@ class commentItem extends StatefulWidget{
  final Comments info;
  final String id;
  final String type;
- final Function  getPoint;
-  const commentItem({super.key, required this.info, required this.id, required this.type, required this.getPoint,});
+
+  const commentItem({super.key, required this.info, required this.id, required this.type});
 
   @override
   State<StatefulWidget> createState() =>commentItemState();
@@ -633,7 +630,7 @@ class commentItemState extends State<commentItem>{
                       }).toList()
 
                   )):const SizedBox(),
-               SizedBox(width: 10,height:openMoreReply?500:0 ,),
+               const SizedBox(width: 10),
               Visibility(
                   visible: widget.info.replyCount!=0,
                   child: Row(children: [
@@ -645,9 +642,9 @@ class commentItemState extends State<commentItem>{
                         isLoading = true;
                         openMoreReply = true;
                         onclickCount+=1;
-                        widget.getPoint();
+
                         if(beReplay!=null){
-                          print("objectwwww${beReplay==null}-----${beReplay!.hasMore}");
+
                           if(beReplay!.hasMore){
                             getMoreReplay(widget.info.commentId,widget.type,widget.id,beReplay!=null?beReplay!.comments[beReplay!.comments.length-1].time:null);
                           }
