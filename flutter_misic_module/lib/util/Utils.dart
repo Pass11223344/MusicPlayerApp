@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../main.dart';
 
@@ -246,11 +247,75 @@ static String formatDate(int timestamp ){
 
 
   }
+  static Map<String, String> getGenerationAndZodiac(int timestamp) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    int year = date.year;
+    int month = date.month;
+    int day = date.day;
+
+    // 判断“几零后”
+    String generation;
+    switch (year ~/ 10) {
+      case 195:
+        generation = "50后";
+        break;
+      case 196:
+        generation = "60后";
+        break;
+      case 197:
+        generation = "70后";
+        break;
+      case 198:
+        generation = "80后";
+        break;
+      case 199:
+        generation = "90后";
+        break;
+      case 2000:
+        generation = "00后";
+        break;
+      case 2010:
+        generation = "10后";
+        break;
+      default:
+        generation = "未知";
+        break;
+    }
+
+    // 星座日期范围
+    List<String> zodiacs = [
+      "摩羯座", "水瓶座", "双鱼座", "白羊座", "金牛座", "双子座",
+      "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座",
+      "摩羯座"
+    ];
+    List<int> startDays = [
+      120, 219, 321, 420, 521, 621,
+      723, 823, 923, 1023, 1122, 1222,
+      1231
+    ];
+
+    // 判断星座
+    String zodiac = "";
+    for (int i = 0; i < startDays.length - 1; i++) {
+      if (month == (startDays[i] ~/ 100) && day >= (startDays[i] % 100) ||
+          month == (startDays[i + 1] ~/ 100) && day <= (startDays[i + 1] % 100)) {
+        zodiac = zodiacs[i];
+        break;
+      }
+    }
+
+    // 返回包含“几零后”和星座的 Map
+    return {
+      'generation': generation,
+      'zodiac': zodiac,
+    };
+  }
 
 
 
 
-  static void handleDioError(DioException exception ) {
+
+ static void handleDioError(DioException exception ) {
     // 根据错误类型处理
     switch (exception.type) {
       case DioExceptionType.connectionTimeout:

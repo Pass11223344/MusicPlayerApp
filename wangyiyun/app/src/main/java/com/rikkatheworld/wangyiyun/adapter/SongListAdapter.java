@@ -35,7 +35,7 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.Holder
         this.context = context;
 
        // this.index = index;
-       // Log.d("kklifghdkjhgks", "getItemCount: "+index);
+      Log.d("kklifghdkjhgks", "getItemCount: fllldslfsfjlakjfal");
     }
 
     @NonNull
@@ -90,7 +90,6 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.Holder
 
     }
     public void upData(List<ListBean> list){
-        Log.d("TAG-------zoul走了", "upData: ");
         if (listBeans!=null) {
             listBeans.clear();
         }

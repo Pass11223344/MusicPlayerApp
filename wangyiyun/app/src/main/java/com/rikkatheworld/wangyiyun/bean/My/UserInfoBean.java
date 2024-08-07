@@ -12,6 +12,15 @@ public class UserInfoBean {
     private int follows;
     private int eventCount;
     private int userId;
+    private  int level;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public int getUserId() {
         return userId;

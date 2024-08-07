@@ -13,8 +13,10 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBA
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.animationUtils;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.isOnClick;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.scrollPage;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.switchSong;
 import static com.rikkatheworld.wangyiyun.adapter.PlayerPageAdapter.playerPageAdapterAnimation;
 
 import android.content.Context;
@@ -234,11 +236,14 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+CURRENT_PLAY_MODE);
+        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+(isOnClick||switchSong));
         if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
             mediaPlayer.start();
         }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE||CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE){
-            scrollPage();
+            if (isOnClick||switchSong) {
+                isOnClick = false;
+                switchSong = false;
+            }else scrollPage();
         } else {
             animationUtils.stopRotate("pause");
             playerPageAdapterAnimation.stopRotate("pause");

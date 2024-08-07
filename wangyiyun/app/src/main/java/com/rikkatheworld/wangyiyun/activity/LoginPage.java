@@ -103,7 +103,7 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
                             int code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
 
                             if (code==502||code==400) {
-                                Log.d("TAddddG", "code: "+code);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -111,7 +111,7 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
                                     }
                                 });
                             } else if (code==-460||code==1004) {
-                                Log.d("TAddddG", "code: "+code);
+
 
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -120,11 +120,11 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
                                     }
                                 });
                             } else {
-                                Log.d("TAddddG", "info: "+String.valueOf(jsonObject));
+
                                 if (jsonObject.has("token")) {
                                     token = String.valueOf(jsonObject.get("token"));
                                    // Spanned spanned = Html.fromHtml(token, Html.FROM_HTML_MODE_LEGACY);
-                                    Log.d("TAddddG", "token: "+token);
+
                                 }
                                 SharedPreferences share = getSharedPreferences("UserInfoData",MODE_PRIVATE);
 
@@ -132,7 +132,7 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
 
                                 edit.putString("token", String.valueOf(token));
                                 edit.putString("UserInfo",String.valueOf(jsonObject));
-
+                                Log.d("TAddddG", "code: "+code);
                               edit.commit();
 
                                 runOnUiThread(() -> {

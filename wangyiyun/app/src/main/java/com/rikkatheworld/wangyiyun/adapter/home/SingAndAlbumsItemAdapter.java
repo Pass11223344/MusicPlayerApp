@@ -126,13 +126,8 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                 List<ListBean> listBeans = new ArrayList<>();
                 if(Long.parseLong(bean.getResourceId())!= playerInfo.getSongId()){
                     if (!app.touchType.equals(TouchType.SING_AND_ALBUMS)){
-                        if (playerInfo.getListBeans()!=null) {
-                            playerInfo.getListBeans().clear();
-                        }
-                        playerInfo.getListBeans().clear();
                         app.touchType = TouchType.SING_AND_ALBUMS;
-                        playerInfo.setTitle("新歌新碟");
-                        activityMainBinding.setPlayerInfo(playerInfo);
+
                         SongList.forEach((bean1) ->{
                             if (!bean1.getResourceType().equals("song")) return;
                             ListBean listBean = new ListBean();
@@ -145,11 +140,17 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                             listBean.setSongName(bean1.getTitle());
                             listBeans.add(listBean);
                         });
+//                        if (playerInfo.getListBeans()!=null) {
+//                            playerInfo.getListBeans().clear();
+//                        }
+                        //  playerInfo.getListBeans().clear();
                         setList.setListInfo(listBeans);
+                        playerInfo.setTitle("新歌新碟");
+                        activityMainBinding.setPlayerInfo(playerInfo);
+
                     }
                     ((MainActivity) context).play(String.valueOf(bean.getResourceId()),
                             play -> {
-
                                 if (play!=null) {
                                     for (int i = 0; i < play.size(); i++) {
                                         UrlBeans urlBeans = play.get(i);
@@ -168,6 +169,8 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                                                     num+=1;
 
                                             }
+
+                                            Log.d("TAGaoaoaoaoa", "onBindViewHolder: 我走了当前点击"+currentPage);
                                             if ( num<=10) {
                                                 index =  num* 500+currentPage;
                                             }else if( num<=100){
@@ -183,7 +186,7 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                                     if(CURRENT_PLAY_MODE == RANDOM_PLAY_MODE){
                                         isUpData=2;
                                         ((MainActivity)context).upData(Long.parseLong(bean.getResourceId()));
-                                    }else setCurrentPageItem.setCurrentItem(index);
+                                    } else setCurrentPageItem.setCurrentItem(index);
                                 }
                             }
                     );

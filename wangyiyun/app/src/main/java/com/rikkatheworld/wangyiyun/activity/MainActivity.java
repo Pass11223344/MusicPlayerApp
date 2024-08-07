@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private static float stylusY;
 
     public static boolean isOnClick = false;
-    private boolean switchSong = false;
+    public static boolean switchSong = false;
 
     int p = 0;
     int p1 =0;
@@ -565,17 +566,26 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                     PlayerList = new ArrayList<>();
                 }
                 PlayerList.addAll(listBean);
-                playerPageAdapter.setData(PlayerList);
-                player_viewPage.setAdapter(playerPageAdapter);
                 playerInfo.setListBeans(listBean);
                 activityMainBinding.setPlayerInfo(playerInfo);
-                songListAdapter = new SongListAdapter(this);
-                player_song_list.setAdapter(songListAdapter);
+
+                playerPageAdapter.setData(PlayerList);
+                PagerAdapter pagerAdapter = player_viewPage.getAdapter();
+                RecyclerView.Adapter listAdapter = player_song_list.getAdapter();
+                if (pagerAdapter==null||listAdapter==null) {
+                    player_viewPage.setAdapter(playerPageAdapter);
+                    songListAdapter = new SongListAdapter(this);
+                    player_song_list.setAdapter(songListAdapter);
+                }else {
+                    songListAdapter.upData(listBean);
+                }
+
 
             }
 
         };
         setCurrentPageItem = current -> {
+            Log.d("TAG111111111111111", "initView: 我被调用");
 
 
           player_viewPage.setCurrentItem(current);
@@ -1105,7 +1115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     @Override
     public void onPageSelected(int position) {
-        Log.d("TAG11111111111122333", "onPageSelected: "+playerInfo.getListBeans().size());
+        Log.d("TAG11111111111122333", "onPageSelected: "+switchSong+isOnClick+CURRENT_PLAY_MODE+position);
         isScroll = true;
         if (instance.serviceBinder!=null) {
             instance.serviceBinder.playOrPause(STATE_PLAY);
@@ -1177,8 +1187,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
    //     long songId = playerInfo.getListBeans().get(position % playerInfo.getListBeans().size()).getSongId();
         if ((position1 > position || position1 < position)&&playerInfo.getSongId()!=currentId) {
             position1 = position;
-
-
             listBeans = playerInfo.getListBeans().get(position%playerInfo.getListBeans().size());
 
             Log.d("TAG111111111111", "currentPlay: "+listBeans.getImgUrl());
@@ -1194,8 +1202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             playerInfo.setSongId(listBeans.getSongId());
             activityMainBinding.setPlayerInfo(playerInfo);
             setCurrentIdToFlutter(playerInfo.getSongId());
-           isOnClick = false;
-            switchSong = false;
+
             mLrcView.setTips(true);
             likeOrNot = likeOrNot(playerInfo.getSongId());
             boolean isIn = newLikeList.stream().anyMatch(num-> {
@@ -1669,8 +1676,7 @@ switchSong = false;
                  }
 
                  play(songId,null);
-                 setList.setListInfo(Sheetlist);
-
+                setList.setListInfo(Sheetlist);
 
 
                  if ( Sheetlist.size()<=10) {

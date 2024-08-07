@@ -119,6 +119,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
 
               NestedScrollView(
                   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled){
+                    var generationAndZodiac = Utils.getGenerationAndZodiac(_myPageController.users!.birthday);
                     return [
                       SliverOverlapAbsorber(
                           handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
@@ -175,10 +176,11 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
                                           child:   Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
+
                                               _myPageController.users!.gender==1 ? Icon(Icons.male,size: 10,color: Colors.blue,)
                                                   :Icon(Icons.female,size: 10,color: Colors.pinkAccent,),
 
-                                              Text("90后\ 魔羯座\ ·\ 山东\ 泰安\ ·\ 村龄7年",style: TextStyle(fontSize: 10,color: Colors.white38),)
+                                              Text("${generationAndZodiac['generation']}\ ${generationAndZodiac['zodiac']}\ ·\ 村龄${_myPageController.users!.level}年",style: TextStyle(fontSize: 10,color: Colors.white38),)
                                             ],),
                                         ),
                                         Container(
@@ -651,12 +653,14 @@ return  Builder(builder: (context){
            pageController.cookie = json['token'];
 
             dioRequest.executeGet(url: "/user/detail",params: {"uid":userId}).then((value){
-              _myPageController.users = UserInfoBean.fromJson(value['profile']);
+              var userInfoBean = UserInfoBean.fromJson(value['profile']);
+              userInfoBean.level = value['level'];
+              _myPageController.users = userInfoBean;
 
            });
             dioRequest.executeGet(url: "/user/playlist",params: {"uid":userId}).then((value){
               _myPageController.myPageSongSheets =  (value as List<dynamic>).map((json)=>SongSheetList.fromJson(json)).toList();
-              print("object-----------ssssss${_myPageController.myPageSongSheets.length}");
+
             });
            getTabData();
            break;
@@ -668,20 +672,16 @@ return  Builder(builder: (context){
            bool  isBack = true;
          isBack =  await childKey.currentState?.isPop()??false;
 
-           print("--------------------------${ ModalRoute.of(context)?.settings.name}--------------------$isBack---${childKey.currentState==null}");
          if(isBack){
-           print("----------------------------------------------1");
            var   p= {"origin":"my_page"};
            await channel.invokeMethod("back",p);
             pageController.pageIsOk = false;
          }
            if (childKey.currentState==null) {
              if(!_myPageController.myPageIsShow){
-               print("----------------------------------------------2");
                _myPageController.myPageIsShow = true;
                Navigator.pop(context);
              }else  {
-               print("----------------------------------------------3");
                var   p= {"origin":"my_page2"};
                await channel.invokeMethod("back",p);
              }
@@ -701,14 +701,13 @@ return  Builder(builder: (context){
            switch(info['action']){
              case"saveImg":
                  Utils.downloadImage(info['info'],pageController.path).then((flag){
-                 print("object-------xxxxx-----${info['action']}---------${info['info']}");
-                 print("object-------xxxxx-----下载${flag?"成功":"失败"}");
+
                  childKey.currentState?.show(flag);
                });
                break;
              case"chooseImg":
                _imageFile = await Utils.chooseImage() as PickedFile?;
-               print("11111111111111object文件地址为：$_imageFile");
+
                break;
            }
          }

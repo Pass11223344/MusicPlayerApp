@@ -2,6 +2,8 @@
 
 
 
+import 'dart:convert';
+
 class UserInfoBean{
    String avatarUrl;
    String backgroundUrl;
@@ -14,6 +16,7 @@ class UserInfoBean{
    int follows;
    int eventCount;
    int userId;
+   int? level;
 
    UserInfoBean(
       this.avatarUrl,
@@ -30,6 +33,7 @@ class UserInfoBean{
 
    factory UserInfoBean.fromJson(Map<String,dynamic> json)=> _$UserInfoBeanFromJson(json);
 
+
    Map<String,dynamic> toJson(UserInfoBean u)=>
        <String,dynamic>{
           "avatarUrl":u.avatarUrl,
@@ -42,7 +46,8 @@ class UserInfoBean{
           "followeds":u.followeds,
           "follows":u.follows,
           "eventCount":u.eventCount,
-          "userId":u.userId
+          "userId":u.userId,
+         "level":u.level
        };
 
 

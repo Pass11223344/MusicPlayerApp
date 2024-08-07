@@ -663,6 +663,7 @@ public void hideFragment(){
                             ((MainActivity) getContext()).OpenSheet();
                             ((MainActivity) getContext())
                                     .play(String.valueOf(playerInfo.getListBeans().get(0).getSongId()),null);
+
                             setList.setListInfo(playerInfo.getListBeans());
 
                         }
