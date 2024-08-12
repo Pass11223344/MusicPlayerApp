@@ -6,6 +6,7 @@ import static androidx.core.content.ContextCompat.startForegroundService;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.mIPlayerViewChange;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -40,7 +41,7 @@ public class StartS {
 
         return lazyHolder.INSTANCE;
     }
-    public  void startS(Context context ){
+    public void startS(Context context ){
         this.context = context;
         intent = new Intent(context, musicService.class);
         if(serviceConnection==null) {

@@ -21,4 +21,5 @@ public class CustomToast {
         toast.setView(layout);
         toast.show();
     }
+
 }

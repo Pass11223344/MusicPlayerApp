@@ -1,5 +1,7 @@
 package com.rikkatheworld.wangyiyun.view;
 
+import static com.rikkatheworld.wangyiyun.fragment.MsgFragment.handler;
+
 import android.R.drawable;
 import android.content.Context;
 import android.graphics.Color;
@@ -42,6 +44,8 @@ public class RecommendSongSheetView extends RelativeLayout {
     private AsyncTimer pager_timer;
     private  HomeFragment.NavigationToSecond secondPage;
     private OnItem onItem;
+    private Runnable runnable;
+    private RecommendHandler handler;
 
     public RecommendSongSheetView(@NonNull Context context) {
 
@@ -61,7 +65,7 @@ public class RecommendSongSheetView extends RelativeLayout {
 
     public void initView(Context context, Object data,HomeFragment.NavigationToSecond secondPage) {
         this.secondPage = secondPage;
-        RecommendHandler handler = new RecommendHandler();
+        handler = new RecommendHandler();
         Point screen = Utils.getScreen(context);
         int x = screen.x;
         View grayBackground = new View(context);
@@ -112,7 +116,7 @@ public class RecommendSongSheetView extends RelativeLayout {
 
            addView(viewPager);
             pager_timer = new AsyncTimer();
-            Runnable runnable = new Runnable() {
+            runnable = new Runnable() {
                 @Override
                 public void run() {
 
@@ -124,7 +128,7 @@ public class RecommendSongSheetView extends RelativeLayout {
 
                 }
             };
-            pager_timer.startTimer(4000,4000,runnable);
+            pager_timer.startTimer(4000,4000, runnable);
            // viewPagerAdapter.notifyDataSetChanged();
             titleText.setText(list.get(viewPager.getCurrentItem()).getTitle());
             titleText.setOnClickListener(new OnClickListener() {
@@ -191,6 +195,28 @@ public class RecommendSongSheetView extends RelativeLayout {
             pager_timer.stopTimer();
             pager_timer = null;
         }
+
+    }
+    public void startTimer(){
+        Log.d("TAGooooaaaa", "startTimer: "+(runnable==null));
+        if (runnable==null) {
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+
+                    int currentItem = viewPager.getCurrentItem();
+                    Message message = new Message();
+                    message.what = currentItem;
+                    handler.sendMessage(message);
+
+                }
+            };
+        }
+        if (pager_timer==null) {
+            pager_timer = new AsyncTimer();
+            pager_timer.startTimer(4000,4000, runnable);
+
+        }else   pager_timer.startTimer(4000,4000, runnable);
 
     }
     public interface OnItem{

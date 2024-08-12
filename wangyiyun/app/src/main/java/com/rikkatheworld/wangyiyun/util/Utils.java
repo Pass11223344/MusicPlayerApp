@@ -4,7 +4,7 @@ package com.rikkatheworld.wangyiyun.util;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
-import static com.rikkatheworld.wangyiyun.activity.MainActivity.firstDownWithRecommend;
+
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isOnClick;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.oldSheetId;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;

@@ -871,7 +871,7 @@ var type ;
                               ListController.albumInfo!.album.blurPicUrl :
                               ListController.songSheet!.coverImgUrl;
                               // 按钮点击事件
-                             if(await Utils.requestPermission({"info":url})){
+                             if(await Utils.requestPermission({"info":url,"origin":"secondFragment"})){
                                pageController.path ??= await channel.invokeMethod("getPath");
                                Utils.downloadImage(url,pageController.path).then((flag){
                                  Utils.showTopSnackBar(context, "下载${flag?"成功":"失败"}");

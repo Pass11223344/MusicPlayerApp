@@ -32,11 +32,11 @@ public class recommendRecyclerAdapter extends RecyclerView.Adapter<recommendRecy
     private MyHolder holder;
 
 
-    public recommendRecyclerAdapter(Context context, List<Object> data, HomeFragment.NavigationToSecond secondPage){
+    public recommendRecyclerAdapter(Context context, List<Object> data, HomeFragment.NavigationToSecond secondPage,App app){
     this.data = data;
     this.context = context;
     this.secondPage = secondPage;
-        app = (App) context.getApplicationContext();
+        this.app =app ;
 
     }
     @NonNull
@@ -60,7 +60,7 @@ public class recommendRecyclerAdapter extends RecyclerView.Adapter<recommendRecy
         public void onClick(View v) {
             app.touchType = TouchType.RECOMMENDABLE_SHEET;
             app.page +=1;
-            Log.d("TAghghghG", "onClick:当前点击 "+bean.getResourceId());
+
            // secondPage.toSecond("这是点击了");
             //设置当前歌单
             ((MainActivity) context).setRecommendSheetId(bean.getResourceId());
@@ -86,11 +86,19 @@ public class recommendRecyclerAdapter extends RecyclerView.Adapter<recommendRecy
     }
 
    public void stop(){
-       if (holder.myView!=null) {
-           holder.myView.closeTimer();
-           holder.myView = null;
-       }
-
-
+        if(holder!=null){
+            if (holder.myView!=null) {
+                holder.myView.closeTimer();
+               // holder.myView = null;
+            }
+        }
    }
+    public void start(){
+        if(holder!=null){
+            if (holder.myView!=null) {
+                holder.myView.startTimer();
+                // holder.myView = null;
+            }
+        }
+    }
 }

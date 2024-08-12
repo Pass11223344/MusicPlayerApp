@@ -10,7 +10,8 @@ import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.LRC_ID;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.RES_ID;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.SONG_LIST;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.URL_ID;
-import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.homeHandler;
+import static com.rikkatheworld.wangyiyun.service.musicService.notifyBuilderManager;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,12 +31,15 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -47,6 +51,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -81,6 +86,7 @@ import com.rikkatheworld.wangyiyun.R;
 import com.rikkatheworld.wangyiyun.adapter.SongListAdapter;
 import com.rikkatheworld.wangyiyun.adapter.home.Bottom_navigationAdapter;
 import com.rikkatheworld.wangyiyun.adapter.PlayerPageAdapter;
+import com.rikkatheworld.wangyiyun.bean.MusicCacheBean;
 import com.rikkatheworld.wangyiyun.bean.UrlBeans;
 import com.rikkatheworld.wangyiyun.fragment.MsgFragment;
 import com.rikkatheworld.wangyiyun.fragment.MyFragment;
@@ -93,10 +99,14 @@ import com.rikkatheworld.wangyiyun.databinding.ActivityMainBinding;
 
 import com.rikkatheworld.wangyiyun.fragment.HomeFragment;
 import com.rikkatheworld.wangyiyun.service.IPlayerViewChange;
+import com.rikkatheworld.wangyiyun.util.FileUtils;
 import com.rikkatheworld.wangyiyun.util.LrcUtil;
+import com.rikkatheworld.wangyiyun.util.MediaSessionManager;
+import com.rikkatheworld.wangyiyun.util.MusicPlayerUtils;
 import com.rikkatheworld.wangyiyun.util.MyGsonUtil;
 import com.rikkatheworld.wangyiyun.util.NetworkInfo;
 import com.rikkatheworld.wangyiyun.util.NetworkUtils;
+import com.rikkatheworld.wangyiyun.util.NotifyBuilderManager;
 import com.rikkatheworld.wangyiyun.util.StartS;
 import com.rikkatheworld.wangyiyun.util.Utils;
 import com.rikkatheworld.wangyiyun.util.beginPlay;
@@ -141,6 +151,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static final int STATE_PLAY = 1;
     public static final int STATE_PAUSE = 2;
     public static final int STATE_STOP = 3;
+    public static boolean AUTO_PLAY = true;
+
 
     private final int STATUS = 4;
     public static int TOUCH_COUNT = 0;
@@ -168,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static beginPlay.TaskImage setImg;
     public static beginPlay.GetListInfo setList;
-    public static boolean firstDownWithRecommend = true;
+
     private List<ListBean> PlayerList;
     private ImageView ivPlayList;
     private View include_song_list;
@@ -200,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static final int SINGLE_PLAY_MODE = 0;
     public static final int SEQUENTIAL_MODE = 1;
     public static final int RANDOM_PLAY_MODE = 2;
-  //  public static final int UNLIMITED_PLAYBACK_MODE = 3;
+
     public static final int UNLIMITED_PLAYBACK_MODE = 3;
     public static final int SINGLE_PLAY_MODE_ONE = 4;
 
@@ -299,14 +311,20 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private float deltaX;
     private float deltaY;
     private boolean isScroll = false;
-   private String info ="";
+   private Map<?, ?> info ;
+    private String filePath;
+    private String fileName = "songdata.ser";
+    private HomeFragment.HomeHandler homeHandler;
+    private boolean isFirstScroll = true;
+    private float currentPosition;
+    private MusicCacheBean musicCacheBean;
+    public static setCallback callback;
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         myFragment.onActivityResult(requestCode,resultCode,data);
-
-
     }
 
 
@@ -316,18 +334,26 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
+
         DataModel.getInstance().addObserver(this);
         activity = this;
         animationUtils = new AnimationUtil();
         app = (App) this.getApplication();
+
+        if (savedInstanceState!=null) {
+            String fileName = savedInstanceState.getString("data");
+            app.HomeData = FileUtils.readStringFromFile(this,fileName);
+        }
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         playerInfo = new PlayerInfo();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-
+  //      notifyBuilderManager = new NotifyBuilderManager();
 
 
         initView();
+
         homeFragment.setNavigationToSecond(new HomeFragment.NavigationToSecond() {
             @Override
             public void toSecond(String type,String id) {
@@ -335,18 +361,20 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 showMyFragment(type,id);
             }
         });
+
     }
+
 
 
 
     @SuppressLint("ClickableViewAccessibility")
     private void initView() {
-        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
+        Log.d("TAGddddddddddddllllllllsss", "initView: sssssssssssss");
 
         app.touchType = TouchType.HOME_PAGE;
-
          bottom_view = findViewById(R.id.bottom_navigation);
         dlMainDrawer = findViewById(R.id.DL_main_drawer);
+        dlMainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         fl_sidebar = findViewById(R.id.Fl_sidebar);
         reMainContent = findViewById(R.id.RE_main_content);
         bottom_view.setOnItemSelectedListener(this);
@@ -359,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(2);
         homeFragment = (HomeFragment) viewPager.getAdapter().instantiateItem(viewPager, 0);
+         homeHandler =   homeFragment.getHomeHandler();
         myFragment = (MyFragment) viewPager.getAdapter().instantiateItem(viewPager, 1);
         msgFragment = (MsgFragment) viewPager.getAdapter().instantiateItem(viewPager, 2);
 
@@ -372,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         main_play = player_control.findViewById(R.id.IV_play_btn);
         dlMainDrawer = findViewById(R.id.DL_main_drawer);
         fl_sidebar = findViewById(R.id.Fl_sidebar);
+
         reMainContent =findViewById(R.id.RE_main_content);
         bottomSheet = findViewById(R.id.bottom_sheet);
         lin_player = player_control.findViewById(R.id.lin_player);
@@ -604,27 +634,94 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
             this.songLists = songList;
         });
+        callback = () -> new MediaSessionCompat.Callback() {
 
+            @Override
+            public void onPlay() {
+                setPlay();
+                //具体自己实现
+                Log.d("MediaSessionManager", "onPlay: ");
+            }
+
+            @Override
+            public void onPause() {
+                setStop();
+                Log.d("MediaSessionManager", "onPause: ");
+            }
+
+            @Override
+            public void onSkipToNext() {
+                switchSong = true;
+                next_song.setClickable(false);
+
+                if (isUpData==1) {
+                    isUpData = 2;
+                    playerPageAdapter.setData(playerInfo.getListBeans());
+                    if (pIndex ==0) {
+                        player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()+1 ,false);
+                        pIndex = 1;
+                    }else {
+                        player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()+1 ,false);
+                        pIndex = 0;
+                    }
+                }else {
+                    player_viewPage.setCurrentItem(position1 + 1);
+
+                }
+                Log.d("MediaSessionManager", "onSkipToNext: ");
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                switchSong = true;
+                previous_song.setClickable(false);
+
+
+                if (isUpData==1) {
+                    isUpData = 2;
+                    playerPageAdapter.setData(playerInfo.getListBeans());
+                    if (pIndex ==0) {
+                        player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()-1 ,false);
+                        pIndex = 1;
+                    }else {
+                        player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()-1 ,false);
+                        pIndex = 0;
+                    }
+
+                }else {
+                    player_viewPage.setCurrentItem(position1 - 1);
+
+                }
+
+                Log.d("MediaSessionManager", "onSkipToPrevious: ");
+            }
+
+            @Override
+            public void onStop() {
+                Log.d("MediaSessionManager", "onStop: ");
+            }
+
+            @Override
+            public void onSeekTo(long pos) {
+                instance.serviceBinder.seek2((int) pos);
+                Log.d("MediaSessionManager", "onSeekTo: "+pos);
+            }
+        };
 
         lin_player.setOnClickListener(this);
 
+        Log.d("TAG", "initView: ");
 
 
-
-        SharedPreferences userInfoData = getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
-        String string = userInfoData.getString("UserInfo","");
-        if (!string.equals("")|| !TextUtils.isEmpty(string)&&playerInfo.getUserInfoBean()==null) {
-            try {
-                JSONObject info = new JSONObject(string);
-                String profile = String.valueOf(info.get("profile"));
-                userInfo = (UserInfoBean) MyGsonUtil.getInstance().press(profile, "userInfo", this).get(0);
-                playerInfo.setUserInfoBean(userInfo);
-                activityMainBinding.setPlayerInfo(playerInfo);
-
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
+        player_rootView = include_player.findViewById(R.id.player_rootView);
+        player_rootView.setPadding(0, statusBarHeight, 0, 0);
+        ViewGroup.LayoutParams layoutParams = player_rootView.getLayoutParams();
+        layoutParams.height = screenPoint.y + statusBarHeight;
+        player_rootView.setLayoutParams(layoutParams);
+        if (userInfo!=null) {
+            loadNetWork("playlist",null,0);
         }
+        restoreData();
     }
 
     public void loadNetWork(String requestFlag, long[] SongId, long sheetId) {
@@ -693,34 +790,60 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         } else {
             app.touchType = TouchType.MSG_PAGE;
             viewPager.setCurrentItem(2, false);
+            msgFragment.onRefresh();
 
         }
 
         return false;
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
-        HomeFragment.GHandler handler = homeFragment.getHandler();
-        handler.initGHandler();
-        Message message = new Message();
-        message.obj = app.HomeData;
-        message.what = RES_ID;
-        homeHandler.sendMessage(message);
+        Log.d("TAGpppppppppssss", "onStart: ");
+
     }
 
     @Override
     protected void onResume() {
 
         super.onResume();
+        SharedPreferences userInfoData = getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
+        String string = userInfoData.getString("UserInfo","");
+        if ((!string.equals("")|| !TextUtils.isEmpty(string))&&playerInfo.getUserInfoBean()==null) {
+            try {
+                JSONObject info = new JSONObject(string);
+                String profile = String.valueOf(info.get("profile"));
+                userInfo = (UserInfoBean) MyGsonUtil.getInstance().press(profile, "userInfo", app).get(0);
+                ContentValues values = new ContentValues();
+                Cursor query = getContentResolver().query(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser/" + userInfo.getUserId()), null, null, null, null);
+                values.put("userId",userInfo.getUserId());
+                values.put("avatarUrl",userInfo.getAvatarUrl());
+                values.put("backgroundUrl",userInfo.getBackgroundUrl());
+                values.put("nickname",userInfo.getNickname());
+                values.put("birthday",userInfo.getBirthday());
+                values.put("province",userInfo.getProvince());
+                values.put("gender",userInfo.getGender());
+                values.put("city",userInfo.getCity());
+                values.put("followeds",userInfo.getFolloweds());
+                values.put("follows",userInfo.getFollows());
+                values.put("eventCount",userInfo.getEventCount());
+                values.put("level",userInfo.getLevel());
 
+                if (query.getCount()==0) {
+                    getContentResolver().insert(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser"),values);
+                }else {
+                    getContentResolver().update(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser/" + userInfo.getUserId()),values,null,null);
+                }
 
-        player_rootView = include_player.findViewById(R.id.player_rootView);
-        player_rootView.setPadding(0, statusBarHeight, 0, 0);
-        ViewGroup.LayoutParams layoutParams = player_rootView.getLayoutParams();
-        layoutParams.height = screenPoint.y + statusBarHeight;
-        player_rootView.setLayoutParams(layoutParams);
+                playerInfo.setUserInfoBean(userInfo);
+                activityMainBinding.setPlayerInfo(playerInfo);
+
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         getLrcString = (Lrc,tLrc) -> {
             if (Lrc.equals("") || TextUtils.isEmpty(Lrc)) {
@@ -742,26 +865,43 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             }
 
         };
-        if (userInfo!=null) {
-            loadNetWork("playlist",null,0);
-        }
 
 
 
     }
 
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d("TAG--------ahaha", "onSaveInstanceState: ");
+        FileUtils.writeStringToFile(this,"homeData.text",app.HomeData);
+
+        outState.putString("data","homeData.text");
+        super.onSaveInstanceState(outState);
+
+    }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+
+
+       filePath = getApplicationContext().getFilesDir() + "/"+fileName;
+        if (playerInfo.getListBeans()!=null) {
+           MusicCacheBean bean = new MusicCacheBean(position1%playerInfo.getListBeans().size(),
+                   instance.serviceBinder.getCurrentPosition(),playerInfo.getCurrentPosition(),
+           playerInfo.getDurationNum(),playerInfo.getDuration(),CURRENT_PLAY_MODE,playerInfo.getListBeans());
+            MusicPlayerUtils.serializeList(bean,filePath);
+        }
+
         DataModel.getInstance().removeObserver(this);
         if (instance != null&&instance.serviceConnection!=null) {
           unbindService(instance.serviceConnection);
             stopService(instance.intent);
             instance.serviceBinder.stopPlay();
         }
+        notifyBuilderManager.cancelNotification();
 
+        super.onDestroy();
     }
 
 
@@ -873,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         } else if (id == R.id.player_previous_song) {
         //上一曲
-
+            AUTO_PLAY =true;
             switchSong = true;
             previous_song.setClickable(false);
             //instance.serviceBinder.playOrPause(STATE_PLAY);
@@ -898,15 +1038,24 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
 
         } else if (id == R.id.player_play || id == R.id.IV_play_btn) {
+            Log.d("TAGoepeorpror", "onClick: "+currentPosition);
+            if (!AUTO_PLAY) {
+                notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
+                        playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
+                instance.serviceBinder.seekTo((int) currentPosition);
+            }
+            AUTO_PLAY =true;
             playerOrStop();
         } else if (id == R.id.player_next_song) {//下一曲
 
+            AUTO_PLAY =true;
             switchSong = true;
 //            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
 //                playerPageAdapter.setData(playerInfo.getListBeans());
 //                songListAdapter.upData(playerInfo.getListBeans());
 //            }
 //            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&playerInfo.getListBeans().size()-1==getCurrentPagerIdx())return;
+            switchSong = true;
             next_song.setClickable(false);
 
                 if (isUpData==1) {
@@ -999,12 +1148,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         int state ;
         if (playerInfo.isPlayOrPause()) {
             state = STATE_PLAY;
-            animationUtils.stopRotate("pause");
-            playerPageAdapterAnimation.stopRotate("pause");
+
             instance.serviceBinder.playOrPause(state);
             playerInfo.setPlayOrPause(!playerInfo.isPlayOrPause());
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
             activityMainBinding.setPlayerInfo(playerInfo);
+            animationUtils.stopRotate("pause");
+            playerPageAdapterAnimation.stopRotate("pause");
         }
 
 
@@ -1065,6 +1215,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static void beginService(Context context) {
         instance.startS(context);
+
         mLrcView.setStartS(instance);
     }
 
@@ -1122,6 +1273,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         if (instance.serviceBinder!=null) {
             instance.serviceBinder.playOrPause(STATE_PLAY);
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            animationUtils.stopRotate("pause");
+            playerPageAdapterAnimation.stopRotate("pause");
         }
         if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
             if (playerInfo.getListBeans().size()-1==position) {
@@ -1134,6 +1287,10 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
            // player_viewPage.setCurrentItem(position1+1);
         }
             if(!isOnClick&&!switchSong){
+                if(isFirstScroll){
+                    isFirstScroll=   false;
+                }else AUTO_PLAY = true;
+
                 if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){
                     isUpData = 2;
                     playerPageAdapter.setData(playerInfo.getListBeans());
@@ -1185,9 +1342,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     private void currentPlay(int position) {
         ListBean listBeans;
-
+        Log.d("TAG111111111111", "currentPlay: "+((position1 > position || position1 < position)&&playerInfo.getSongId()!=currentId));
    //     long songId = playerInfo.getListBeans().get(position % playerInfo.getListBeans().size()).getSongId();
         if ((position1 > position || position1 < position)&&playerInfo.getSongId()!=currentId) {
+
+
             position1 = position;
             listBeans = playerInfo.getListBeans().get(position%playerInfo.getListBeans().size());
 
@@ -1197,9 +1356,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             String name = Utils.getString(listBeans);
             playerInfo.setSongName(listBeans.getSongName());
             playerInfo.setImgUrl(listBeans.getImgUrl());
-            playerInfo.setCurrentPosition("00:00");
-            player_seekBar.setProgress(0);
-            playerInfo.setPlayOrPause(true);
+            if(AUTO_PLAY&&instance.serviceBinder!=null){
+                notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
+                        playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
+            }
+            if (AUTO_PLAY) {
+
+                playerInfo.setCurrentPosition("00:00");
+                player_seekBar.setProgress(0);
+                playerInfo.setPlayOrPause(true);
+            }
             playerInfo.setSingerName(name);
             playerInfo.setSongId(listBeans.getSongId());
             activityMainBinding.setPlayerInfo(playerInfo);
@@ -1225,10 +1391,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     }
 
 public void setCurrentIdToFlutter(long id){
-        assert  msgFragment!=null;
+
+    if (msgFragment!=null&&msgFragment.msgBindings!=null) {
         msgFragment.msgBindings.channel.invokeMethod("currentId",id);
-    assert  myFragment!=null;
+    }
+    if (myFragment!=null&&myFragment.myBindings!=null) {
         myFragment.myBindings.channel.invokeMethod("currentId",id);
+    }
    if ( homeFragment.searchFragment!=null){
        homeFragment.searchFragment.searchBindings.channel.invokeMethod("currentId",id);
    }
@@ -1371,7 +1540,7 @@ public void upData(long id){
                     if (isUpData==1) {
                         isUpData = 2;
                         playerPageAdapter.setData(playerInfo.getListBeans());}
-                    player_viewPage.getAdapter().notifyDataSetChanged();
+                   // player_viewPage.getAdapter().notifyDataSetChanged();
                     player_viewPage.setCurrentItem(position1 + 1);
                 }
             }
@@ -1515,26 +1684,14 @@ public void upData(long id){
 
 
 
-    public  interface GetLrcString {
-        void setLrc(String Lrc, String tLrc);
-    }
-    public interface ShowLrcInfoView {
-        void ShowLrcInfoView(boolean showOrHide);
-    }
 
-    public interface jumpTo {
-        void toPosition();
-    }
-
-    public interface UpImg{
-        void upImg(List<ListBean> list);
-    }
     public int getCurrentPagerIdx(){
 
         return player_viewPage.getCurrentItem();
     }
 public void  play(String id,SetCurrentMp3 setCurrentMp3){
     currentId = Long.parseLong(id);
+
 
     boolean isHave = false;
     if (songList!=null&&songList.size()>0) {
@@ -1596,6 +1753,11 @@ public void  play(String id,SetCurrentMp3 setCurrentMp3){
                             instance.serviceBinder.setMusicSource(urlBeans.get(0).getUrl());
                         previous_song.setClickable(true);
                         next_song.setClickable(true);
+                            if(!AUTO_PLAY){
+                                setStop();
+                            }
+
+
                 //    animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
                     loadNetWork("lyric",null,0);
                         }
@@ -1626,7 +1788,7 @@ public interface SetCurrentMp3{
 public void onCountUpdate(Map<?, ?> newData) {
 
        this.newData = newData;
-    formatDate(newData);
+         formatDate(newData);
             }
  public void formatDate(Map<?, ?> data){
      if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
@@ -1787,7 +1949,7 @@ switchSong = false;
             behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             return;
         }
-        if(app.touchType == TouchType.MY_PAGE&&!app.isOpenFence){
+        if(app.touchType == TouchType.MY_PAGE&&!app.isOpenFence ){
             myFragment.myBindings.channel.invokeMethod("back","");
             return;
         }
@@ -1796,10 +1958,12 @@ switchSong = false;
             homeFragment.searchFragment.getBack().back();
             return;
         }
-        if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.RANKING_PAGE||app.touchType==TouchType.EXCLUSIVE_SCENE
-        ||app.touchType==TouchType.MUSIC_RADAR||app.touchType==TouchType.SING_AND_ALBUMS){
-            secondFragment.getBack().back();
-            return;
+        if(secondFragment!=null){
+            if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.RANKING_PAGE||app.touchType==TouchType.EXCLUSIVE_SCENE
+                    ||app.touchType==TouchType.MUSIC_RADAR||app.touchType==TouchType.SING_AND_ALBUMS){
+                secondFragment.getBack().back();
+                return;
+            }
         }
         if (app.page>0){
             Log.d("TAGwotmzoulzhe", "attach: 3");
@@ -1916,7 +2080,7 @@ public void hide(){
     public void show(){
         animationUtil.showView(player_control);
     }
-public void requestPermission(String info){
+public void requestPermission(Map<?, ?> info){
         this.info = info;
     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
         String[] strings = {Manifest.permission.READ_MEDIA_AUDIO,
@@ -1972,12 +2136,17 @@ public void requestPermission(String info){
                                 String downloadsPath = downloadsDir.getAbsolutePath();
                                 Map<String,Object> result = new HashMap<>();
                                 result.put("isSuccess",true);
-                                result.put("action", info.isEmpty() ?"chooseImg":"saveImg");
-                                result.put("info",info);
+                                result.put("action", String.valueOf(info.get("info")).equals("") ?"chooseImg":"saveImg");
+                                result.put("info",String.valueOf(info.get("info")));
                                 result.put("path",downloadsPath);
-                                if (myFragment==null) {
-                                    secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
-                                }else  myFragment.myBindings.channel.invokeMethod("RequestResults",result);
+
+
+                                Log.d("TAG----------aaaaaass", "onRequestPermissionsResult: ---"+(String.valueOf(info.get("origin"))));
+                                if (String.valueOf(info.get("origin")).equals("myFragment")) {
+                                    myFragment.myBindings.channel.invokeMethod("RequestResults", result);
+
+                                }else secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
+
 
 
                             }
@@ -2000,5 +2169,67 @@ public void requestPermission(String info){
     }
    public void upImage(String path){
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://"+path)));
+    }
+    public void restoreData(){
+        filePath = getApplicationContext().getFilesDir() + "/"+fileName;
+
+        File file = new File(filePath);
+        if (file.exists()) {
+            AUTO_PLAY = false;
+            musicCacheBean = MusicPlayerUtils.deserializeList(filePath);
+            playerInfo.setDuration(musicCacheBean.getDuration());
+            playerInfo.setCurrentPosition(musicCacheBean.getStrProgress());
+            playerInfo.setListBeans(musicCacheBean.getPlayList());
+            activityMainBinding.setPlayerInfo(playerInfo);
+            CURRENT_PLAY_MODE = musicCacheBean.getPlayMode();
+            int index = musicCacheBean.getIndex();
+            int num = musicCacheBean.getPlayList().size();
+            if ( num<=10) {
+                index =  num* 500+index;
+            }else if( num<=1000){
+                index =  num* 50+index;
+            }else if( num<=4000) {
+                index = num * 5 + index;
+            }
+
+            currentPosition = (musicCacheBean.getProgress() * 1.0f / musicCacheBean.getDurationNum() * 100);
+            Log.d("TAGjdjdjfjfjgjg", "restoreData: "+ currentPosition +"----");
+            player_seekBar.setProgress((int) currentPosition);
+            setList.setListInfo(musicCacheBean.getPlayList());
+            player_viewPage.setCurrentItem(index);
+            switch (CURRENT_PLAY_MODE){
+
+                case SINGLE_PLAY_MODE:
+                    play_module.setImageDrawable(getDrawable(playMode[0]));
+                    break;
+                case SEQUENTIAL_MODE:
+                    play_module.setImageDrawable(getDrawable(playMode[1]));
+                    break;
+                case RANDOM_PLAY_MODE:
+                    play_module.setImageDrawable(getDrawable(playMode[2]));
+                    break;
+                case UNLIMITED_PLAYBACK_MODE:
+                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
+                    break;
+                case SINGLE_PLAY_MODE_ONE:
+                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
+                    break;
+            }
+        }
+
+    }
+    public  interface GetLrcString {
+        void setLrc(String Lrc, String tLrc);
+    }
+    public interface ShowLrcInfoView {
+        void ShowLrcInfoView(boolean showOrHide);
+    }
+
+    public interface jumpTo {
+        void toPosition();
+    }
+
+    public  interface setCallback{
+        MediaSessionCompat.Callback callback( );
     }
 }

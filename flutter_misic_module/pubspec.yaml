@@ -52,7 +52,7 @@ dependencies:
     sdk: flutter
   intl: any
   image_picker: ^1.1.2
-
+  wakelock_plus: ^1.2.7
   image_picker_android: ^0.8.12+3
   palette_generator: ^0.3.3+4
   modal_bottom_sheet: ^3.0.0
@@ -82,7 +82,7 @@ flutter:
   # like this:
   assets:
      - images/
-     - assets/video/
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -6,8 +6,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
-import static com.rikkatheworld.wangyiyun.activity.MainActivity.firstDownWithRecommend;
+
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isOnClick;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 
@@ -56,11 +57,12 @@ public class EngineBindings {
         channel.setMethodCallHandler((call, result) -> {
             switch (call.method) {
                 case "sendSongList":
+                    AUTO_PLAY = true;
                     Log.d("TAG1111111aaaaaaaaaa11111", "1111111111111111111111111111");
                     isOnClick = true;
-                    firstDownWithRecommend = true;
+
                     DataModel.getInstance().set((Map<?, ?>) call.arguments);
-                   app.touchType = TouchType.FLUTTER_SONG;
+               //    app.touchType = TouchType.FLUTTER_SONG;
                     playerInfo.setTitle(String.valueOf(((Map<?, ?>) call.arguments).get("title")));
                     activityMainBinding.setPlayerInfo(playerInfo);
                     result.success(null);
@@ -120,8 +122,9 @@ public class EngineBindings {
                     result.success(null);
                     break;
                 case "sendAlbum":
+                    AUTO_PLAY = true;
                     isOnClick = true;
-                    firstDownWithRecommend = true;
+
                     DataModel.getInstance().set((Map<?, ?>) call.arguments);
                     playerInfo.setTitle(String.valueOf(((Map<?, ?>) call.arguments).get("title")));
                     activityMainBinding.setPlayerInfo(playerInfo);
@@ -131,7 +134,7 @@ public class EngineBindings {
                 case  "requestPermission":
                     Map<?, ?> info = ((Map<?, ?>) call.arguments);
                     String str = String.valueOf(info.get("info"));
-                    activity.requestPermission(str);
+                    activity.requestPermission(info);
                     result.success(null);
                     break;
                 case "getPath":
@@ -178,7 +181,7 @@ public class EngineBindings {
                         activity.hide();
                     }else {
                         activity.showView();
-                        activity.setPlay();
+
                     }
                     result.success(null);
                     break;

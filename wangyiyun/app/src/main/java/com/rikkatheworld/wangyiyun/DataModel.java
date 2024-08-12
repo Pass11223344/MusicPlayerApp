@@ -16,7 +16,6 @@ public class DataModel{
 
     public static DataModel getInstance(){
          if (dataModel==null) {
-
              return dataModel = new DataModel();
          }
              return dataModel;

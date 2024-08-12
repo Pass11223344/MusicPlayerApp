@@ -8,7 +8,7 @@ import 'package:flutter_misic_module/page/traceCommentPage.dart';
 
 import '../main.dart';
 import '../page/VideoPage.dart';
-import '../page/drawerPage.dart';
+
 import '../page/msgListPage.dart';
 import '../page/musicCloudDiskPage.dart';
 import '../page/myPage.dart';
@@ -21,7 +21,7 @@ import '../util/Utils.dart';
 Map route = {
   "main/msgList":(context,{arguments})=>msgListPage(),
   "main/myPage":(context)=> myPage(),
- "main/drawer":(context)=>drawerPage(),
+
   "main/songListPage":(context,{arguments})=>mySongListPage(data: arguments,key: myPageState.childKey,),
   "main/songListPage2":(context,{arguments})=>songListPage(data: arguments,key: MyAppState.childKey,),
   "main/chatPage":(context,{arguments})=>chatPage(data: arguments),
@@ -42,10 +42,10 @@ final Function? FunctionPage = route[name];
     if (FunctionPage!=null) {
       if (settings.arguments!=null) {
 
-        final Route materialPageRoute = CustomPageRoute(builder:(context)=> FunctionPage(context,arguments:settings.arguments), settings: settings);
+        final Route materialPageRoute = MaterialPageRoute(builder:(context)=> FunctionPage(context,arguments:settings.arguments), settings: settings);
           return materialPageRoute;
     }else{
-        final  Route materialPageRoute = CustomPageRoute(builder:(context)=> FunctionPage(context), settings: settings);
+        final  Route materialPageRoute = MaterialPageRoute(builder:(context)=> FunctionPage(context), settings: settings);
           return materialPageRoute;
   }
 }

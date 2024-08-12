@@ -1,5 +1,6 @@
 package com.rikkatheworld.wangyiyun.service;
 
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SEQUENTIAL_MODE;
@@ -35,22 +36,24 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
+import static com.rikkatheworld.wangyiyun.service.musicService.notifyBuilderManager;
 
 public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
     private final Context context;
     private MediaPlayer mediaPlayer;
+    private  boolean isFirstPlayer =true;
 
 
     private IPlayerViewChange mViewChange;
     private Timer timer;
     private TTask tTask;
     private getCurrentPosition currentPosition;
-    private long CurrentPosition;
+    private long CurrentPosition=0;
     private int duration;
 
     @Override
     public long getCurrentPosition() {
-        return isPlaying()? mediaPlayer.getCurrentPosition():CurrentPosition;
+        return mediaPlayer!=null? mediaPlayer.getCurrentPosition():CurrentPosition;
     }
 
     public void setCurrentPosition(long currentPosition) {
@@ -65,8 +68,6 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
     private void initPlayer() {
         Log.d("TAGrrrrrrrrrrrrrrrrrr", "onSeekComplete: ");
         mediaPlayer = new MediaPlayer();
-
-
     }
 
     @Override
@@ -79,8 +80,8 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
             initPlayer();
         }
 
-             mediaPlayer.reset();
-            mediaPlayer.setAudioAttributes(
+        mediaPlayer.reset();
+        mediaPlayer.setAudioAttributes(
                      new AudioAttributes.Builder()
         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
         .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -106,23 +107,26 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
     }
     @Override
     public void playOrPause(int State) {
+        if (AUTO_PLAY) {
+            if(State== STATE_STOP){
+                mediaPlayer.start();
 
+                //  starTime();
 
-        if(State== STATE_STOP){
-            mediaPlayer.start();
-          //  starTime();
+            }else if(State ==STATE_PLAY){
+                mediaPlayer.pause();
+                stopTime();
+                notifyBuilderManager.updateNotification(false,mediaPlayer.getCurrentPosition());
 
-        }else if(State ==STATE_PLAY){
-            mediaPlayer.pause();
-            stopTime();
-
-            Log.d("State..", String.valueOf(State));
-        } else if (State == STATE_PAUSE) {
-            mediaPlayer.start();
-
-            starTime();
-            Log.d("State..", String.valueOf(State));
+                Log.d("State..", String.valueOf(State));
+            } else if (State == STATE_PAUSE) {
+                mediaPlayer.start();
+                starTime();
+                Log.d("State..", String.valueOf(State));
+            }
         }
+
+
 
     }
 
@@ -161,6 +165,7 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
         this.mViewChange = null;
     }
     private void starTime(){
+        stopTime();
         if (timer==null) {
             timer = new Timer();
         }
@@ -185,30 +190,28 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
     public void onPrepared(MediaPlayer mp) {
 
         playOrPause(STATE_STOP);
-        if (mp != null&&mp.isPlaying()) {
+        if (mp != null) {
 
             duration = mp.getDuration();
+            playerInfo.setDurationNum(this.duration);
             String duration = Utils.getTime(this.duration);
             playerInfo.setDuration(duration);
+
             activityMainBinding.setPlayerInfo(playerInfo);
+
             starTime();
             currentPosition = () -> {
-                if ( mViewChange != null) {
+                if ( mViewChange != null&&AUTO_PLAY) {
 
                     long CurrentPosition = mp.getCurrentPosition();
+                    notifyBuilderManager.updateNotification(true,CurrentPosition);
                     setCurrentPosition(CurrentPosition);
                     float currentPosition = (CurrentPosition * 1.0f / this.duration * 100);
                     mViewChange.onSeekChange((int) currentPosition);
                     String Position = Utils.getTime((int) CurrentPosition);
                     playerInfo.setCurrentPosition(Position);
                     activityMainBinding.setPlayerInfo(playerInfo);
-                   // mediaPlayer.is
 
-//                    if (duration.equals(Position)) {
-//
-//
-//
-//                    }
 
             }
 
@@ -236,12 +239,17 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+(isOnClick)+switchSong);
+        Log.d("TAG-------当前模式为单曲循环", "onPrepared: 播放完毕"+(isOnClick)+switchSong+"---"+CURRENT_PLAY_MODE);
         if (CURRENT_PLAY_MODE==SINGLE_PLAY_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
             mediaPlayer.start();
         }else if(CURRENT_PLAY_MODE==SEQUENTIAL_MODE||CURRENT_PLAY_MODE==RANDOM_PLAY_MODE||CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE){
 
-
+            if (isFirstPlayer&&!AUTO_PLAY) {
+                isFirstPlayer = false;
+                isOnClick = false;
+                switchSong = false;
+                scrollPage();
+            }else
             if (isOnClick||switchSong) {
                 isOnClick = false;
                 switchSong = false;

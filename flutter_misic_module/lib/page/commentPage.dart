@@ -118,6 +118,7 @@ class commentPageState extends State<commentPage>
       body: Stack(
         children: [
           Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               automaticallyImplyLeading: false,
               titleSpacing: 10,
@@ -387,6 +388,7 @@ class commentPageState extends State<commentPage>
                                           },
                                           child:
                                           CustomScrollView(
+
                                             slivers: [
                                               SliverOverlapInjector(
                                                   handle: NestedScrollView
@@ -416,7 +418,7 @@ class commentPageState extends State<commentPage>
                                               ,
                                               SliverToBoxAdapter(
                                                 child: Obx((){return
-                                                  commentController.numPage!=2
+                                                  commentController.numPage!=2&&commentController.commentInfo!.hasMore
                                                       ?Utils.loadingView(Alignment.center)
                                                       :const SizedBox();
                                                 }),
@@ -936,7 +938,7 @@ getData() async {
           child: Row(
             children: [
               Expanded(
-                  flex: 11,
+                  flex: 10,
                   child: GestureDetector(
                     child: Container(
                       width: double.infinity,
@@ -949,7 +951,6 @@ getData() async {
                       child: TextField(
                         focusNode: _focusNode,
                         controller: _textController,
-
                         maxLines: 6,
                         decoration:  InputDecoration(
                             hintText: hintText,
@@ -971,9 +972,7 @@ getData() async {
                     child: Obx(() => TextButton(
                           onPressed:
                               commentController.text.trim() == "" ? null : () {
-                            print("点击了------------");
-                            print("发送消息为${commentController.text}--歌曲Id:${ commentInfo?['Id']}---isReply${isReply}-----${currentIndex}");
-                            print("you---${commentController.commentInfo!.comments[currentIndex].commentId}");
+
 
                             // if(isReply){
                               //sendOrRemoveComment(2, 0, commentInfo?['Id'], commentController.text, commentController.commentInfo!.comments[currentIndex].commentId, currentIndex);

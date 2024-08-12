@@ -2,7 +2,8 @@ package com.rikkatheworld.wangyiyun.activity;
 
 public enum TouchType {
     DEFAULT,//默认无类型
-    OTHER,
+
+    NORMAL,
 
     CONCENTRATION,//最后一段的歌曲
 

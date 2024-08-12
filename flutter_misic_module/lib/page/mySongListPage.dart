@@ -864,8 +864,11 @@ class mySongListPageState extends State<mySongListPage>{
                               var url = ListController.albumInfo!=null ?
                               ListController.albumInfo!.album.blurPicUrl :
                               ListController.songSheet!.coverImgUrl;
+                              print("object权限的获取-------");
+
+
                               // 按钮点击事件
-                              if(await Utils.requestPermission({"info":url})){
+                              if(await Utils.requestPermission({"info":url,"origin":"myFragment"})){
                                 pageController.path ??= await channel.invokeMethod("getPath");
                                 Utils.downloadImage(url,pageController.path).then((flag){
                                   Utils.showTopSnackBar(context, "下载${flag?"成功":"失败"}");

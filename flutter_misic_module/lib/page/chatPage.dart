@@ -199,7 +199,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
     }
 
   void getData() async {
-
+    print("objectqqqqqqqqqqq${widget.data['id']}");
    var data = await dioRequest.executeGet(url: "/msg/private/history",params: {"uid":widget.data['id']});
 
     var list = (data as List<dynamic>).map((json)=>MsgBean.fromJson(json)).toList();
@@ -211,7 +211,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
   }
 
    _listItem(int index) {
-     print("objectqqqqqqqqqqq${controller.msgList[index].msg}");
+
   var json = jsonDecode(controller.msgList[index].msg );
 
   Widget widget ;

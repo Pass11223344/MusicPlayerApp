@@ -1,6 +1,7 @@
 package com.rikkatheworld.wangyiyun.AnimationPage;
 
 
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.instance;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
 
@@ -69,13 +70,19 @@ public class AnimationUtil {
     public  void Rotate(View view){
         this.view = view;
 
-        rotateAnimation =   ObjectAnimator.ofFloat(view,"rotation",0,360);
-        rotateAnimation.setDuration(20000); // 动画持续时间20000毫秒
-        rotateAnimation.setInterpolator(new LinearInterpolator());
-        rotateAnimation.setRepeatMode(ObjectAnimator.RESTART);
-        rotateAnimation.setRepeatCount(ObjectAnimator.INFINITE);
-        // view.startAnimation(rotateAnimation);
+            rotateAnimation =   ObjectAnimator.ofFloat(view,"rotation",0,360);
+            rotateAnimation.setDuration(20000); // 动画持续时间20000毫秒
+            rotateAnimation.setInterpolator(new LinearInterpolator());
+            rotateAnimation.setRepeatMode(ObjectAnimator.RESTART);
+            rotateAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+            // view.startAnimation(rotateAnimation);
         rotateAnimation.start();
+        Log.d("TAGidididdi", "Rotate: "+AUTO_PLAY);
+        if (!AUTO_PLAY) {
+            view.setRotation(0);
+           stopRotate("pause");
+        }
+
 
     }
     public void showView(View view){
@@ -114,7 +121,7 @@ public  void stopRotate(String flag){
 
 public  void proceedRotate(){
 
-    if (rotateAnimation!=null) {
+    if (rotateAnimation!=null&&AUTO_PLAY) {
         rotateAnimation.resume();
     }
 

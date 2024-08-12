@@ -2,9 +2,11 @@ package com.rikkatheworld.wangyiyun.bean.My;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class UserSongListBean {
+public class UserSongListBean  implements Serializable {
+    private static final long serialVersionUID = 1L;
     private  String imgUrl,songName;
     private long songId;
     private List<Ar> singerInfo;
@@ -94,7 +96,8 @@ public class UserSongListBean {
 
 
     }
-    public  class Ar {
+    public  class Ar implements Serializable {
+        private static final long serialVersionUID = 1L;
         public  long id;
         public String name;
 

@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.gson.Gson;
 import com.rikkatheworld.wangyiyun.App;
@@ -66,6 +67,8 @@ private final int LOGIN = 2;
     private boolean isPrepare;
     private boolean isFirstLoad   = true;
     private App app;
+    private SharedPreferences userInfoData;
+    private FragmentActivity activity;
 
     @Nullable
     @Override
@@ -77,27 +80,20 @@ private final int LOGIN = 2;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("TAGggggggggggghhhhh", "onActivityCreated:我已运行222 ");
 
+        Log.d("TAGggggggggggghhhhh", "onActivityCreated:我已运行222 ");
         getMsgBindings();
         //onRefresh();
         app = (App) getActivity().getApplicationContext();
-    }
-
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        Log.d("TAGggggggggggghhhhh", "onActivityCreated:我已运行2 ");
-
-//        if (hidden && isResumed()){
-//
-//        }
+        userInfoData = getContext().getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
+        activity = getActivity();
     }
 
 
 
-    private void onRefresh() {
+
+
+    public void onRefresh() {
 
         if (isFirstLoad) {
             initView();
@@ -110,13 +106,6 @@ private final int LOGIN = 2;
         if (handler==null) {
             handler = new MsgHandler();
         }
-
-//        FrameLayout msg_rootView = getView().findViewById(R.id.msg_rootView);
-//        int px = Utils.getStatusBarHeight(getContext());
-//            msg_rootView.setPadding(0, px, 0, 0);
-
-
-
 
 
     }
@@ -131,8 +120,8 @@ private final int LOGIN = 2;
     public void onResume() {
         super.onResume();
 
-            onRefresh();
 
+        //  onRefresh();
         Log.d("TssssAG", "onStart: -------");
     }
 
@@ -145,7 +134,6 @@ private final int LOGIN = 2;
     public void LoadData() {
         try {
             NetworkUtils.makeRequest(NetworkInfo.URL + "/msg/private",MsgFragment.handler,RES_ID,true,getContext());
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,18 +162,18 @@ private final int LOGIN = 2;
                    String str = msg.obj.toString();
                     if (str!=null) {
 
-                        List<NotificationListBean> notificationInfo = MsgGsonUtil.getInstance().press(str, "NotificationInfo",getActivity());
+                        List<NotificationListBean> notificationInfo = MsgGsonUtil.getInstance().press(str, "NotificationInfo",app);
 
                         Gson gson = new Gson();
                         json = gson.toJson(notificationInfo);
-                        SharedPreferences userInfoData = getContext().getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
+
                         String string1 = userInfoData.getString("token","");
                         String string = userInfoData.getString("UserInfo","");
                         if (!string.equals("")|| !TextUtils.isEmpty(string)&&  playerInfo.getUserInfoBean()==null) {
                             try {
                                 JSONObject info = new JSONObject(string);
                                 String profile = String.valueOf(info.get("profile"));
-                                UserInfoBean userInfo = (UserInfoBean) MyGsonUtil.getInstance().press(profile, "userInfo", getActivity()).get(0);
+                                UserInfoBean userInfo = (UserInfoBean) MyGsonUtil.getInstance().press(profile, "userInfo", app).get(0);
                                 playerInfo.setUserInfoBean(userInfo);
                                 activityMainBinding.setPlayerInfo(playerInfo);
 
@@ -193,7 +181,7 @@ private final int LOGIN = 2;
                                 throw new RuntimeException(e);
                             }
                         }
-                        Log.d("TAG11111111111111111111111", "dispatchMessage: "+string1);
+
                         app.Cookie = string1;
                         if (json!=null){
                             FlutterEngineCache.getInstance().put(MSG_ENGINE_ID,msgBindings.engine);
@@ -206,7 +194,7 @@ private final int LOGIN = 2;
                             map.put("token" ,string1);
                             map.put("userId",playerInfo.getUserInfoBean().getUserId());
                             msgBindings.channel.invokeMethod("to_msgPage", map);
-                            getActivity().getSupportFragmentManager()
+                            activity.getSupportFragmentManager()
                                     .beginTransaction()
                                     .add(R.id.FV_msg_list,msgflutterFragment)
                                     .commit();

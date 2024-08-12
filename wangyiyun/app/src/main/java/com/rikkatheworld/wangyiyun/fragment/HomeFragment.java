@@ -48,6 +48,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
@@ -99,12 +100,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class HomeFragment extends Fragment implements ViewPager.OnPageChangeListener, View.OnTouchListener, View.OnClickListener {
+public class HomeFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, ViewPager.OnPageChangeListener {
 
 
 
 
-    public static HomeHandler homeHandler;
+    public  HomeHandler homeHandler;
     public static String moduleTitle;
     public static String radarTitle;
     public static String tvExclusiveSheetTitle;
@@ -127,7 +128,7 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     public static final int SONG_LIST = 7;
     public static final int SONGS = 8;
     private RecyclerView horizontalRecycler;
-    private AsyncTimer asyncTimer_banner;
+   // private AsyncTimer asyncTimer_banner;
     private Runnable banner_runnable;
     private ViewPager singLessAlbum;
     private SinglesAndAlbumsAdapter singlesAndAlbumsAdapter;
@@ -184,18 +185,31 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
     private int currentNumber;
     private View load_page;
     private RelativeLayout home_root;
+    private int countItem = 0;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        Log.d(",.,.,.TAG", "onAttach: ");
+
 
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+     //   homeHandler = new HomeHandler();
+        banner_runnable = () -> {
 
-
-
-
+            Vp_banner.setCurrentItem(countItem++,true);
+            homeHandler.postDelayed(banner_runnable,5000);
+        };
+    }
+  public HomeHandler  getHomeHandler(){
+      if (homeHandler==null) {
+          homeHandler = new HomeHandler()  ;
+      }
+        return homeHandler;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -206,11 +220,13 @@ public class HomeFragment extends Fragment implements ViewPager.OnPageChangeList
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+        Log.d("TAGpppppaaaaaa", "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
 
         initView();
         app = (App) getContext().getApplicationContext();
+
+        new DataProcessingTask().execute(app.HomeData);
 
 
 
@@ -229,6 +245,7 @@ public void hideFragment(){
             .commit();
 }
     private void initView() {
+
         EditText search_btn = getView().findViewById(R.id.search_btn);
         fragmentManager = getActivity().getSupportFragmentManager();
         // 开始事务
@@ -294,23 +311,8 @@ public void hideFragment(){
         Vp_banner.setOnTouchListener(this);
        // singLessAlbum.setOffscreenPageLimit(1);
        re_home.setPadding(0,px,0,0);
-
-
-
-
-        asyncTimer_banner = new AsyncTimer();
-        banner_runnable = () -> {
-            int countItem = Vp_banner.getCurrentItem();
-            countItem++;
-            Message message = new Message();
-            message.what = AUTO_PAGER;
-            message.obj = countItem;
-            homeHandler.sendMessage(message);
-        };
-
-        DrawerLayout drawerLayout = getActivity().findViewById(R.id.DL_main_drawer);
+       DrawerLayout drawerLayout = getActivity().findViewById(R.id.DL_main_drawer);
         img_menu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-
 
 
     }
@@ -337,38 +339,6 @@ public void hideFragment(){
         }
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        int currentItem = Vp_banner.getCurrentItem() % banner_beanList.size();
-        for (int i = 0; i < banner_beanList.size(); i++) {
-            View childAt = lin_point.getChildAt(i);
-            LinearLayout.LayoutParams params;
-
-            if (currentItem == i) {
-                params = new LinearLayout.LayoutParams(20, 20);
-                params.leftMargin = 25;
-                childAt.setBackground(getResources().getDrawable(R.drawable.current_point, getActivity().getTheme()));
-            } else {
-                params = new LinearLayout.LayoutParams(15, 15);
-                params.leftMargin = 25;
-                childAt.setBackground(getResources().getDrawable(R.drawable.other_point, getActivity().getTheme()));
-            }
-            childAt.setLayoutParams(params);
-        }
-
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -376,13 +346,21 @@ public void hideFragment(){
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_DOWN:
-                asyncTimer_banner.stopTimer();
 
+                homeHandler.removeCallbacks(banner_runnable);
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
+               // asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
+                if (banner_runnable==null) {
+                    banner_runnable = () -> {
 
+                        Vp_banner.setCurrentItem(  countItem++);
+                        homeHandler.postDelayed(banner_runnable,5000);
+
+                    };
+                }
+                homeHandler.post(banner_runnable);
                 break;
         }
 
@@ -488,6 +466,38 @@ public void hideFragment(){
         }
     }
 
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        countItem = position;
+        int currentItem = Vp_banner.getCurrentItem() % banner_beanList.size();
+        for (int i = 0; i < banner_beanList.size(); i++) {
+            View childAt = lin_point.getChildAt(i);
+            LinearLayout.LayoutParams params;
+            if (currentItem == i) {
+                params = new LinearLayout.LayoutParams(20, 20);
+                params.leftMargin = 25;
+
+                childAt.setBackground(getResources().getDrawable(R.drawable.current_point, getActivity().getTheme()));
+            } else {
+                params = new LinearLayout.LayoutParams(15, 15);
+                params.leftMargin = 25;
+                childAt.setBackground(getResources().getDrawable(R.drawable.other_point, getActivity().getTheme()));
+            }
+            childAt.setLayoutParams(params);
+        }
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
     public   class HomeHandler extends Handler {
 
         private List<ExclusiveMusicBean> exclusiveMusic;
@@ -499,13 +509,20 @@ public void hideFragment(){
             int what = msg.what;
             switch (what) {
                 case RES_ID:
+
                     String s = msg.obj.toString();
+
+
                     new DataProcessingTask().execute(s);
 
                     break;
                 case AUTO_PAGER:
+                    Log.d("TAG----------zzccc-----------", "onViewCreated: "+(msg.obj)+"00000s"+Vp_banner.getCurrentItem());
+
                     Vp_banner.setCurrentItem((Integer) msg.obj);
+// 在数据变更后调用
                     bannerAdapter.notifyDataSetChanged();
+
                     break;
                 case URL_ID:
 
@@ -541,12 +558,7 @@ public void hideFragment(){
                             if (!jsonObject.has("lrc")) {
                                 return ;
                             }
-//                            if (jsonObject.has("ytlrc")){
-//                                JSONObject tlyric = (JSONObject) jsonObject.get("ytlrc");
-//                                if (tlyric.has("lyric")) {
-//                                    translateLyric = String.valueOf(tlyric.get("lyric"));
-//                                }
-//                            } else
+
                             if (jsonObject.has("tlyric")) {
                                 JSONObject tlyric = (JSONObject) jsonObject.get("tlyric");
 
@@ -556,13 +568,7 @@ public void hideFragment(){
                             }
                             JSONObject lrc = (JSONObject) jsonObject.get("lrc");
                             String lyric = String.valueOf(lrc.get("lyric"));
-//                            if (jsonObject.has("yrc")){
-//                                JSONObject lrcTime = (JSONObject) jsonObject.get("yrc");
-//                                if (lrcTime.has("lyric")) {
-//                                    lyricT = String.valueOf(lrcTime.get("lyric"));
-//                                }
-//
-//                            }
+
 
                             getLrcString.setLrc(lyric,translateLyric);
 
@@ -571,22 +577,7 @@ public void hideFragment(){
                         }
                     }
                     break;
-             //   case SONG_SHEET_ID:
-             //       if (msg.obj!=null) {
-//                        try {
-//                            String obj =  msg.obj.toString();
-//                            JSONObject object = new JSONObject(obj);
-//                            String o = object.getString("playlist");
-//                            sheetList = (List<UserSheetBean>) MyGsonUtil.getInstance().press(o, "sheetList", getActivity());
-//                           Bundle bundle = new Bundle();
-//                           bundle.putParcelableArrayList("sheetList", (ArrayList<? extends Parcelable>) sheetList);
-//                            setArguments(bundle);
-//                        } catch (JSONException e) {
-//                            throw new RuntimeException(e);
-//                        }
-               //     }
 
-               //     break;
                 case ADD_OR_REMOVE:
 
                     LoadNetWorkCall.DOCall("getSongList",sheetList.get(0).getSheetId());
@@ -598,7 +589,7 @@ public void hideFragment(){
                         try {
                             JSONObject object = new JSONObject(obj);
                             String o = String.valueOf(object.get("songs"));
-                            List<UserSongListBean> getSongList = (List<UserSongListBean>) MyGsonUtil.getInstance().press(o, "getSongList", getActivity());
+                            List<UserSongListBean> getSongList = (List<UserSongListBean>) MyGsonUtil.getInstance().press(o, "getSongList",app);
                             songLists.setSongList(getSongList);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -709,16 +700,43 @@ public void hideFragment(){
     }
     @SuppressLint("ClickableViewAccessibility")
     private void Draw_recommended_sheet() {
-        recommendRecyclerAdapter = new recommendRecyclerAdapter(getContext(), recommended_playlists,secondPage);
+        recommendRecyclerAdapter = new recommendRecyclerAdapter(getContext(), recommended_playlists,secondPage,app);
         horizontalRecycler.setAdapter(recommendRecyclerAdapter);
 
 
     }
 
+
     @Override
     public void onPause() {
+
         super.onPause();
 
+//        if (asyncTimer_banner!=null) {
+//            asyncTimer_banner.stopTimer();
+//        }
+        homeHandler.removeCallbacks(banner_runnable);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("TAG----------qqqqqqq", "onResume: ");
+        if (banner_runnable==null) {
+            banner_runnable = () -> {
+               // countItem = Vp_banner.getCurrentItem();
+                Vp_banner.setCurrentItem(  countItem++);
+                homeHandler.postDelayed(banner_runnable,5000);
+
+            };
+        }
+        homeHandler.post(banner_runnable);
+
+
+
+//        if (asyncTimer_banner!=null) {
+//            asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
+//        }
     }
 
     @Override
@@ -726,12 +744,9 @@ public void hideFragment(){
         super.onDestroy();
         if (recommendRecyclerAdapter != null) {
             recommendRecyclerAdapter.stop();
-            recommendRecyclerAdapter = null;
         }
-        if (asyncTimer_banner!=null) {
-            asyncTimer_banner.stopTimer();
-            asyncTimer_banner=null;
-        }
+
+        homeHandler.removeCallbacks(banner_runnable);
 
     }
     public  void setDataFromAdapter(dataFromAdapter dataFromAdapter){
@@ -761,7 +776,7 @@ public void hideFragment(){
     public GHandler getHandler( ){
        GHandler gHandler = () -> {
 
-         homeHandler = new HomeHandler();
+
 
        };
    return gHandler;
@@ -825,16 +840,22 @@ public void hideFragment(){
 
                 bannerAdapter.setData(banner_beanList);
                 Draw_recommended_sheet();
-                Vp_banner.setAdapter(bannerAdapter);
                 if (lin_point.getChildAt(0)==null) {
                     insertPoint();
                 }
-                Vp_banner.setCurrentItem(10000 / 2);
-                asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
+                Vp_banner.setAdapter(bannerAdapter);
+                Vp_banner.setCurrentItem(10000 / 2,false);
+                countItem = Vp_banner.getCurrentItem();
+
 
             }
-            load_page.setVisibility(View.GONE);
-            home_root.setVisibility(View.VISIBLE);
+
+            if (load_page.getVisibility()!= View.GONE) {
+                load_page.setVisibility(View.GONE);
+                home_root.setVisibility(View.VISIBLE);
+            }
+
+
             
         }
 
@@ -858,4 +879,5 @@ public void hideFragment(){
         }
 
     }
+
 }

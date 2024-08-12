@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
@@ -41,16 +42,9 @@ public class BannerAdapter extends PagerAdapter {
     }
 
 
-
     @Override
     public int getCount() {
         return 10000;
-    }
-
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return object == view;
-
     }
 
     @NonNull
@@ -63,14 +57,11 @@ public class BannerAdapter extends PagerAdapter {
         Glide.with(context)
                 .load(bean.getPic())
                 .error(R.drawable.img_background)
-
                 .apply(RequestOptions.bitmapTransform(new CenterCrop())
                         .override(Target.SIZE_ORIGINAL) // 使用原始图片尺寸
                         .transform(new MarginTransformation(40, 25)))
                 .into(imageView);
-        if (imageView.getParent() instanceof ViewGroup) {
-            ((ViewGroup) imageView.getParent()).removeView(imageView);
-        }
+
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -100,6 +91,11 @@ public class BannerAdapter extends PagerAdapter {
         return imageView;
     }
 
+    @Override
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+        return view==object;
+    }
+
     public void setData(List<BannerBean> list) {
 
         this.list = list;
@@ -107,10 +103,12 @@ public class BannerAdapter extends PagerAdapter {
 
         notifyDataSetChanged();
     }
-
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
 
         container.removeView((View) object);
     }
+
+
+
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:flutter_misic_module/page/VideoPage.dart';
-import 'package:flutter_misic_module/page/eg.dart';
+
 import 'package:flutter_misic_module/page/rankingListPage.dart';
 
 import 'package:flutter_misic_module/util/Utils.dart';
@@ -204,7 +203,7 @@ getPage() {
         "commentCount":2,
         "likedCount":4
       };
-      return  MyApps();
+
      // _initializeGlobalController();
    //  return  rankingListPage();
       //return  Player_page();
@@ -257,8 +256,9 @@ channel.setMethodCallHandler((call) async {
             switch(info['action']){
               case"saveImg":
                 pageController.path ??= info['path'];
+                print("object-------xxxxx-----${info['action']}---------${info['info']}");
                 Utils.downloadImage(info['info'],pageController.path).then((flag){
-                  print("object-------xxxxx-----${info['action']}---------${info['info']}");
+
 
                   childKey.currentState?.show(flag);
 
@@ -269,6 +269,9 @@ channel.setMethodCallHandler((call) async {
                 break;
             }
           }
+          break;
+        case"currentId":
+          pageController.currentSongId =call.arguments;
           break;
 
 

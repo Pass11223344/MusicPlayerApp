@@ -4,7 +4,7 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MOD
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
-import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_RECOMMEND_SHEET;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.TO_SING_AND_ALBUMS;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
@@ -121,6 +121,7 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                 .into(holder.imageView);
 
         holder.lin_item.setOnClickListener(v -> {
+            AUTO_PLAY = true;
             isOnClick = true;
             oldSheetId = "";
             if (bean.getResourceType().equals("song")) {
@@ -132,7 +133,6 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                 if(Long.parseLong(bean.getResourceId())!= playerInfo.getSongId()){
                     if (!app.touchType.equals(TouchType.SING_AND_ALBUMS)){
                         app.touchType = TouchType.SING_AND_ALBUMS;
-
                         SongList.forEach((bean1) ->{
                             if (!bean1.getResourceType().equals("song")) return;
                             ListBean listBean = new ListBean();
@@ -178,13 +178,14 @@ public class SingAndAlbumsItemAdapter extends RecyclerView.Adapter<SingAndAlbums
                                             Log.d("TAGaoaoaoaoa", "onBindViewHolder: 我走了当前点击"+currentPage);
                                             if ( num<=10) {
                                                 index =  num* 500+currentPage;
-                                            }else if( num<=100){
-                                                index =  num* 50+currentPage;
                                             }else if( num<=1000){
+                                                index =  num* 50+currentPage;
+                                            }else if( num<=4000){
                                                 index = num* 5+currentPage;
-                                            }else {
-                                                index = currentPage;
+                                            }else if(num<=50000){
+                                                index = num+currentPage;
                                             }
+
 
                                         }
                                     }

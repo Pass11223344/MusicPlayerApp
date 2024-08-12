@@ -3,7 +3,7 @@ package com.rikkatheworld.wangyiyun.util;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class AsyncTimer {
+public class AsyncTimer  {
     private Timer timer;
     private TimerTask task;
 

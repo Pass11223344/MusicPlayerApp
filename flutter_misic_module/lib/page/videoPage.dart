@@ -12,6 +12,7 @@ import 'package:player/favorite.dart';
 import 'package:player/player.dart';
 import 'package:player/videoView.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'myPageController.dart';
 class VideoPage extends StatefulWidget{
 
@@ -24,7 +25,7 @@ class VideoPage extends StatefulWidget{
 }
 
 
-class VideoPageState extends State<VideoPage>{
+class VideoPageState extends State<VideoPage> with WidgetsBindingObserver{
 
  // double paddingH = 0.0;
   //double paddingW = 0.0;
@@ -49,6 +50,7 @@ class VideoPageState extends State<VideoPage>{
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addObserver(this);
     _pageController = PageController(initialPage: widget.index);
     _currentPage=widget.index;
   //  player.setCommonDataSource("assets/video/v3.mp4",autoPlay:true,type: SourceType.asset);
@@ -112,10 +114,21 @@ class VideoPageState extends State<VideoPage>{
       }
     });
   }
-
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      WakelockPlus.toggle(enable: false);
+      _myPageController.getPlayer(_myPageController.videoInfoBean[_currentPage]!.url)!.pause();
+    } else if (state == AppLifecycleState.resumed) {
+      WakelockPlus.toggle(enable: true);
+      _myPageController.getPlayer(_myPageController.videoInfoBean[_currentPage]!.url)!.start();
+    }
+  }
   @override
   void dispose() {
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.toggle(enable: false);
    // player.stop();
    // player.release();
 
@@ -132,6 +145,7 @@ class VideoPageState extends State<VideoPage>{
         ),
         body:PopScope(
           onPopInvoked: (_){
+            WakelockPlus.toggle(enable: false);
             _myPageController.disposePlayer();
             channel.invokeMethod("FoldOrUnfold",false);
           },
@@ -142,7 +156,6 @@ class VideoPageState extends State<VideoPage>{
             itemBuilder: (BuildContext context, int index){
               return
                 Obx((){
-                  print("object---------此视频格式为：${_myPageController.videoList[index].resourceType!="MV"}");
                   return
                     _myPageController.videoList[index].resourceType=="MV"||_myPageController.videoList[index].resourceType=="MLOG"?
                     index>_myPageController.videoInfoBean.length||_myPageController.videoInfoBean[index]==null?
@@ -160,7 +173,7 @@ class VideoPageState extends State<VideoPage>{
       );
   }
 item(Player? player,int index){
-    print("object---dssdsdsdsdsdsdsds---${player==null}");
+
     return Stack(
       children: [
         Obx((){return AnimatedPadding(padding: EdgeInsets.only(bottom: _myPageController.paddingH,right: _myPageController.paddingW,left: _myPageController.paddingW), duration: Duration(milliseconds: 350),child:
@@ -186,8 +199,11 @@ item(Player? player,int index){
                       _myPageController.needHide = true;
 
                       break;
-                    case 'startOrPause':
-
+                    case 'start':
+                      WakelockPlus.toggle(enable: true);
+                      break;
+                    case 'pause':
+                      WakelockPlus.toggle(enable: false);
                       break;
                     case 'ShowControl':
 
@@ -229,7 +245,7 @@ item(Player? player,int index){
 
                       }),
                       Obx((){
-                        return   Text("${_myPageController.videoInfoBean[index]!.likedCount}");
+                        return   Text("${_myPageController.videoInfoBean[index]!.likedCount}",style: TextStyle(color: Colors.white));
 
                       })
                     ],),
@@ -243,18 +259,18 @@ item(Player? player,int index){
                         if (_myPageController.viewPageComment![_myPageController.videoInfoBean[index]!.id]==null) {
                           getCommentDate(_myPageController.videoList[index].resourceType,_myPageController.videoInfoBean[index]!.id);
                         }
-                          showSheet(index,_myPageController.videoInfoBean[index]!.id,_myPageController.videoList[index].resourceType);
+                          showSheet(index,_myPageController.videoInfoBean[index]!.id,_myPageController.videoList[index].resourceType,context);
 
-                      }, icon: Icon(Icons.mark_unread_chat_alt,size: 40,)),
+                      }, icon: Icon(Icons.mark_unread_chat_alt,size: 40,color: Colors.white,)),
                       Obx((){
-                        return Text("${_myPageController.videoInfoBean[index]!.commentCount}");
+                        return Text("${_myPageController.videoInfoBean[index]!.commentCount}",style: TextStyle(color: Colors.white),);
 
                       })
                     ],),
                     SizedBox(height: 10,),
-                    GestureDetector(
-                      onTap: (){},
-                      child: Icon(Icons.more_horiz,size: 40,),),
+                    // GestureDetector(
+                    //   onTap: (){},
+                    //   child: Icon(Icons.more_horiz,size: 40,),),
                     SizedBox(height: 25,),
                     //   Container(width: 50,height: 50,color: Colors.blue,),
                   ],
@@ -366,11 +382,12 @@ double calculateNumberOfLines(String str,double? fontSize){
   }
 
 
-  showSheet(int index,String id,String type) async {
+  showSheet(int index,String id,String type,BuildContext context) async {
     // _isOpen = true;
-    final ScrollController _scrollController = ScrollController();
+
 
     await  showMaterialModalBottomSheet(
+
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
@@ -379,33 +396,41 @@ double calculateNumberOfLines(String str,double? fontSize){
       builder: (context) =>
       Container(
         height:  screenSize!.height*(2/3)-20,
-        padding: EdgeInsets.only(top: 20),
-        child: GetBuilder<myPageController>(
-          builder: (controller){
-            return controller.viewPageComment!.containsKey(id)?
-                CustomScrollView(
-                  controller: _scrollController,
-                  key: PageStorageKey<String>("listKey${id}IN"),
-                  slivers: [
+        padding: EdgeInsets.only(top: 15),
+        child: Column(
+          children: [
+            AppBar(
+              backgroundColor: Colors.white,
+              toolbarHeight: 20,
+              automaticallyImplyLeading: false,
+              scrolledUnderElevation: 0.0,
+              title: Text("评论"),centerTitle: true,),
+           Flexible(child:  GetBuilder<myPageController>(
+             builder: (controller){
+               return controller.viewPageComment!.containsKey(id)?
+               CustomScrollView(
 
-                    SliverList.builder(
+                 key: PageStorageKey<String>("listKey${id}IN"),
+                 slivers: [
 
-                        itemCount:controller.viewPageComment![id]!.comments.length,
-                        itemBuilder: (context,index){
-                          return commentItem(info:controller.viewPageComment![id]!.comments[index],
-                              id:id, type: type );
-                    })
-                  ],
-                )
-                :Utils.loadingView(Alignment.topCenter);
-          },
+                   SliverList.builder(
 
+                       itemCount:controller.viewPageComment![id]!.comments.length,
+                       itemBuilder: (context,index){
+                         return commentItem(info:controller.viewPageComment![id]!.comments[index],
+                             id:id, type: type );
+                       })
+                 ],
+               )
+                   :Utils.loadingView(Alignment.topCenter);
+             },
+
+           ))
+          ],
         ))
-
-
     );
 
-
+      _myPageController.myPageIsShow=false;
       _myPageController.paddingH = 0.0;
       _myPageController.paddingW = 0.0;
 
@@ -558,6 +583,9 @@ class commentItemState extends State<commentItem>{
 
 
  bool haveMore(){
+   if (!openMoreReply) {
+  return true;
+}
    if(widget.info.replyCount!=0){
      if (beReplay!=null) {
        if(beReplay!.hasMore){
@@ -626,7 +654,8 @@ class commentItemState extends State<commentItem>{
                       children: beReplay!.comments.asMap().entries.map((entry){
                         var value = entry.value;
                         var index = entry.key;
-                        return Padding(padding: EdgeInsets.symmetric(vertical: 8),child:  replyCommentItem( beReplied:value,parentId: value.commentId.toString(),),);
+                        return Padding(padding: EdgeInsets.symmetric(vertical: 8),child:
+                        replyCommentItem( beReplied:value,parentId: widget.info.commentId),);
                       }).toList()
 
                   )):const SizedBox(),
@@ -638,19 +667,24 @@ class commentItemState extends State<commentItem>{
                       visible: haveMore(),
                       child:  TextButton.icon(onPressed: (){
 
-                        if(isLoading)return;
-                        isLoading = true;
-                        openMoreReply = true;
-                        onclickCount+=1;
 
+                        if (onclickCount>0) {
+                          openMoreReply = true;
+                        }
                         if(beReplay!=null){
-
                           if(beReplay!.hasMore){
+                            if(isLoading)return;
+                            isLoading = true;
+                            onclickCount+=1;
                             getMoreReplay(widget.info.commentId,widget.type,widget.id,beReplay!=null?beReplay!.comments[beReplay!.comments.length-1].time:null);
                           }
                         }else if(beReplay==null){
+                          if(isLoading)return;
+                          isLoading = true;
+                          onclickCount+=1;
                           getMoreReplay(widget.info.commentId,widget.type,widget.id,beReplay!=null?beReplay!.comments[beReplay!.comments.length-1].time:null);
                         }
+
 
                         setState(() {
 
@@ -690,7 +724,7 @@ class commentItemState extends State<commentItem>{
       text: TextSpan(text: str, style: TextStyle(fontSize: fontSize)),
       textDirection: TextDirection.ltr,
     )
-      ..layout(maxWidth: MediaQuery.of(context).size.width*0.5);
+      ..layout(maxWidth: MediaQuery.of(context).size.width*0.4);
     return textPainter.height;
 
   }
@@ -713,6 +747,8 @@ class commentItemState extends State<commentItem>{
 
           setState(() {
             isLoading = false;
+            if(onclickCount<2)openMoreReply = true;
+
           });
 
         }
@@ -735,6 +771,7 @@ class commentItemState extends State<commentItem>{
               }
               setState(() {
                 isLoading = false;
+                if(onclickCount<2)openMoreReply = true;
               });
               print("我都却dadjak${ beReplay!.hasMore}");
             }
@@ -749,7 +786,7 @@ class commentItemState extends State<commentItem>{
 class replyCommentItem extends StatefulWidget {
 
 final Comments beReplied;
-final String parentId;
+final int parentId;
   const replyCommentItem({super.key, required this.beReplied, required this.parentId});
 
   @override
@@ -763,6 +800,7 @@ class replyCommentItemState extends State<replyCommentItem> with AutomaticKeepAl
 
   Widget build(BuildContext context) {
     // TODO: implement build
+    print("object-----拿的id是${widget.parentId}----huifuid${widget.beReplied.beReplied[0].beRepliedCommentId}");
     return  SizedBox(
 
         width: MediaQuery.of(context).size.width*0.8,
@@ -776,7 +814,7 @@ class replyCommentItemState extends State<replyCommentItem> with AutomaticKeepAl
         Flexible(child:   Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${widget.beReplied.user.nickname } ${widget.parentId!=widget.beReplied.beReplied[0].user.userId?"> ${widget.beReplied.beReplied[0].user}":""}",style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
+            Text("${widget.beReplied.user.nickname } ${widget.parentId!=widget.beReplied.beReplied[0].beRepliedCommentId?"> ${widget.beReplied.beReplied[0].user.nickname}":""}",style: const TextStyle(fontSize: 14,fontWeight: FontWeight.bold)),
             const SizedBox(height: 8,),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -794,8 +832,7 @@ class replyCommentItemState extends State<replyCommentItem> with AutomaticKeepAl
                                   widget.beReplied.content
                               )),
                           calculateNumberOfLines( widget.beReplied.content,null)>calculateNumberOfLines("s",null)*5?
-
-                          TextSpan(text:isOpen?"收起":"展开",recognizer: TapGestureRecognizer()..onTap=(){
+                          TextSpan( style: TextStyle(color: Colors.black),text:isOpen?"收起":"展开",recognizer: TapGestureRecognizer()..onTap=(){
                             isOpen = !isOpen;
                             setState(() {
 
@@ -826,7 +863,7 @@ class replyCommentItemState extends State<replyCommentItem> with AutomaticKeepAl
       text: TextSpan(text: str, style: TextStyle(fontSize: fontSize)),
       textDirection: TextDirection.ltr,
     )
-      ..layout(maxWidth: MediaQuery.of(context).size.width*0.5);
+      ..layout(maxWidth: MediaQuery.of(context).size.width*0.4);
     return textPainter.height;
 
   }

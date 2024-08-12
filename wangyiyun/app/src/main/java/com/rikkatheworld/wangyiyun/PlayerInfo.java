@@ -25,6 +25,8 @@ public class PlayerInfo extends BaseObservable {
     @Bindable
     private String duration;
     @Bindable
+    private long durationNum;
+    @Bindable
     private String currentPosition;
 
 
@@ -128,7 +130,11 @@ public class PlayerInfo extends BaseObservable {
         this.duration = duration;
         notifyPropertyChanged(BR.duration);
     }
-
+    public void setDurationNum(long duration) {
+        this.durationNum = duration;
+        notifyPropertyChanged(BR.durationNum);
+    }
+    public long getDurationNum(){return durationNum;}
     public String getCurrentPosition() {
         return currentPosition;
 

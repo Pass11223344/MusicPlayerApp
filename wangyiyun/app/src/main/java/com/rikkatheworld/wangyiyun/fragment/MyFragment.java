@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 
+import com.rikkatheworld.wangyiyun.App;
 import com.rikkatheworld.wangyiyun.EngineBindings;
 import com.rikkatheworld.wangyiyun.R;
 import com.rikkatheworld.wangyiyun.activity.MainActivity;
@@ -61,6 +62,7 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
     private boolean isFirst = true;
     public FlutterFragment myflutterFragment;
     private Map<String, Object> map;
+    private App app;
 
 
     @Nullable
@@ -82,7 +84,7 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getMyBindings();
-
+        app = (App) getActivity().getApplicationContext();
        // initView();
 
     }
@@ -155,7 +157,7 @@ public class MyFragment extends Fragment implements EngineBindings.EngineBinding
                         try {
                             JSONObject object = new JSONObject(obj);
                             String o = object.getString("playlist");
-                            List<UserSheetBean> sheetList = (List<UserSheetBean>) MyGsonUtil.getInstance().press(o, "sheetList", getActivity());
+                            List<UserSheetBean> sheetList = (List<UserSheetBean>) MyGsonUtil.getInstance().press(o, "sheetList", app);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }

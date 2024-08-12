@@ -146,6 +146,7 @@ public class PlayerPageAdapter extends PagerAdapter {
             if (playerPageAdapterAnimation != null) {
                 playerPageAdapterAnimation.stopRotate("cancel");
             }
+
             playerPageAdapterAnimation.Rotate(imgView);
             playerPageAdapterAnimation.stopRotate("pause");
             position1 = position;

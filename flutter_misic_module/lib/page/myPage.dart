@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,11 +6,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_misic_module/bean/RelayBean.dart';
-
-import 'package:flutter_misic_module/page/songListPage.dart';
-
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sqflite/sqflite.dart';
 
 
 import '../bean/SongSheetList.dart';
@@ -58,6 +54,7 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
     super.initState();
     getSheetList();
 
+
  // Get.put(myPageController());
     _tabController = TabController(length: 3, vsync: this);
     _tabControllerWithMusicTab = TabController(length: 2, vsync: this);
@@ -69,6 +66,15 @@ class myPageState extends State<myPage> with TickerProviderStateMixin{
 
 
   }
+   Future<Database> _initDatabase() async {
+     var path = await getDatabasesPath();
+     String file = path+'/music_db';
+     var database = await openDatabase(file, version: 1);
+
+     List<Map<String, dynamic>> query = await database.query("user_table",where: "userId = ?",whereArgs: [pageController.userId]);
+
+     return await openDatabase(path, version: 1);
+   }
   void _onTabChanged() {
       print("object----${_tabController.index}");
       _myPageController.selectedIndex = _tabController.index;
@@ -652,9 +658,29 @@ return  Builder(builder: (context){
            pageController.userId = userId;
            pageController.cookie = json['token'];
 
+           var path = await getDatabasesPath();
+           String file = path+'/music_db';
+           var database = await openDatabase(file, version: 1);
+
+           List<Map<String, dynamic>> query = await database.query("user_table",where: "userId = ?",whereArgs: [pageController.userId]);
+           var range = query[0];
+
+           _myPageController.users =UserInfoBean( range["avatarUrl"],
+               range["backgroundUrl"],
+               range["nickname"],
+               range["birthday"],
+               range["province"],
+               range["gender"],
+               range["city"],
+               range["followeds"],
+               range["follows"],
+               range["eventCount"],
+               range["userId"]);
             dioRequest.executeGet(url: "/user/detail",params: {"uid":userId}).then((value){
               var userInfoBean = UserInfoBean.fromJson(value['profile']);
               userInfoBean.level = value['level'];
+             //  print("9999ssdjdjfflfldslslslslsls${_myPageController.users!=null}------${_myPageController.users==userInfoBean}");
+             // if( _myPageController.users!=null&&_myPageController.users==userInfoBean)return;
               _myPageController.users = userInfoBean;
 
            });
@@ -667,7 +693,6 @@ return  Builder(builder: (context){
 
          case"back":
 
-           bool isTrue = false;
 
            bool  isBack = true;
          isBack =  await childKey.currentState?.isPop()??false;
@@ -692,14 +717,15 @@ return  Builder(builder: (context){
 
            break;
          case"currentId":
-
+          pageController.currentSongId =call.arguments;
            break;
          case "RequestResults":
          var info = call.arguments;
          if(info['isSuccess']){
-
+           print("object-------xxxxx-----${info['action']}---------${info['info']}");
            switch(info['action']){
              case"saveImg":
+               pageController.path ??= info['path'];
                  Utils.downloadImage(info['info'],pageController.path).then((flag){
 
                  childKey.currentState?.show(flag);

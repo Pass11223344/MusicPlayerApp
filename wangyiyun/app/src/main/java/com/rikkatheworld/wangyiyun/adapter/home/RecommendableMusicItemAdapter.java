@@ -1,6 +1,7 @@
 package com.rikkatheworld.wangyiyun.adapter.home;
 
 
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
@@ -9,7 +10,7 @@ import static com.rikkatheworld.wangyiyun.activity.MainActivity.TOUCH_COUNT;
 
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.UNLIMITED_PLAYBACK_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
-import static com.rikkatheworld.wangyiyun.activity.MainActivity.firstDownWithRecommend;
+
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.isUpData;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.oldSheetId;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
@@ -133,6 +134,7 @@ public class RecommendableMusicItemAdapter extends RecyclerView.Adapter<Recommen
 
 
         holder.lin_item.setOnClickListener(v -> {
+            AUTO_PLAY = true;
             isOnClick = true;
             oldSheetId = "";
 
@@ -185,9 +187,9 @@ public class RecommendableMusicItemAdapter extends RecyclerView.Adapter<Recommen
                                          }
                                          if ( num<=10) {
                                              index =  num* 499+currentPage;
-                                         }else if( num<=100){
-                                             index =  num* 49+currentPage;
                                          }else if( num<=1000){
+                                             index =  num* 49+currentPage;
+                                         }else if( num<=4000){
                                              index = num* 4+currentPage;
                                          }else if(num<=50000){
                                              index = num+currentPage;

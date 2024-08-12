@@ -1,6 +1,7 @@
 package com.rikkatheworld.wangyiyun.adapter.home;
 
 import static com.bumptech.glide.Glide.with;
+import static com.rikkatheworld.wangyiyun.activity.MainActivity.AUTO_PLAY;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.RANDOM_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
@@ -106,6 +107,7 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
     }
 
     private void OnClickItem(ConcentrationBean bean,int position) {
+        AUTO_PLAY = true;
         isOnClick = true;
         if (!app.touchType.equals(TouchType.CONCENTRATION)) {
             app.touchType = TouchType.CONCENTRATION;
@@ -145,16 +147,17 @@ public class ConcentrationAdapter extends RecyclerView.Adapter<ConcentrationAdap
                         if (urlBean.getId() == bean.getSongId()||TOUCH_COUNT==1) {
                             int num = list.size();
                             int currentPage = position;
-
                             if ( num<=10) {
-                                index =  num* 488+currentPage;
-                            }else if( num<=100){
-                                index =  num* 48+currentPage;
+                                index =  num* 498+currentPage;
                             }else if( num<=1000){
+                                index =  num* 48+currentPage;
+                            }else if( num<=4000){
                                 index = num* 6+currentPage;
-                            }else {
-                                index = currentPage;
+                            }else if(num<=50000){
+                                index = num+currentPage;
                             }
+
+
 
                         }
                     }

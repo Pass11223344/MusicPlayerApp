@@ -165,12 +165,14 @@ static String formatDate(int timestamp ){
    // var status = await [ Permission.photos.status, Permission.videos.status, Permission.audio.status];
    int sdk =  await  _getAndroidVersionCode() as int;
    PermissionStatus status ;
+
+   print("object--${sdk>=33}-已获取${await Permission.photos.status}-----${await Permission.videos.status}----${await Permission.audio.status}");
    if (sdk>=33) {
-     if(await Permission.photos.status.isGranted&&
-         await  Permission.videos.status.isGranted&& await Permission.audio.status.isGranted){
-       print("object---已获取");
+     if(await Permission.photos.status.isLimited&&
+         await  Permission.videos.status.isLimited&& await Permission.audio.status.isGranted){
        return true;
      }else{
+
        await channel.invokeMethod("requestPermission",arguments);
        return false;
      }
@@ -203,12 +205,14 @@ static String formatDate(int timestamp ){
   static Future<bool> downloadImage(String url,String path) async {
     final imgPath = '$path/yinYunApp/imgs';
 
-    print("object-----------------------${path}--------------${ImageSource.gallery.toString()}");
+    print("object-------${url}----------------${path}--------------${ImageSource.gallery.toString()}");
 
     if (!Directory(imgPath).existsSync()) {
       Directory(imgPath).createSync(recursive: true);
     }
-    var fileName  = url.split('/').last;
+    final RegExp regex = RegExp(r'/([^/?]+\.jpg)');
+    final match = regex.firstMatch(url);
+    var fileName  = match?.group(1);
     print('Image downloaded and saved to$imgPath/$fileName');
     //if(await requestPermission({"saveImg":url})){
 
@@ -217,7 +221,7 @@ static String formatDate(int timestamp ){
         return true;
       }
       try {
-        var  response = await dio.download(url, "$imgPath/$fileName",
+        await dio.download(url, "$imgPath/$fileName",
             onReceiveProgress: (count, total) {
               print("已经下载: $count/$total");
             });
@@ -389,40 +393,7 @@ static String formatDate(int timestamp ){
 
 
 
-class CustomPageRoute<T> extends MaterialPageRoute<T> {
-  CustomPageRoute({required WidgetBuilder builder, required RouteSettings settings})
-      : super(builder: builder, settings: settings);
-  @override
-  // TODO: implement transitionDuration
-  Duration get transitionDuration => const Duration(milliseconds: 200);
-    @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
-    // TODO: implement buildTransitions
-      return FadeTransition(
-  opacity: Tween<double>(
-    begin: 0.0,
-    end: 1.0,
-  ).animate(
-    CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeInOut,
-    ),
-  ),
-  child: SlideTransition(
-    position: Tween<Offset>(
-      begin: const Offset(0.0, 0.8), // 80% of the screen height
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: animation,
-        curve: Curves.decelerate,
-      ),
-    ),
-    child: child,
-  ),
-);
-  }
-}
+
 
 
 

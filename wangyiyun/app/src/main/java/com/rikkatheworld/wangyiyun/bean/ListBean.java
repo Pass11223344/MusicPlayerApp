@@ -3,9 +3,11 @@ package com.rikkatheworld.wangyiyun.bean;
 import com.google.gson.annotations.SerializedName;
 import com.rikkatheworld.wangyiyun.bean.My.UserSongListBean;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ListBean {
+public class ListBean  implements Serializable {
+    private static final long serialVersionUID = 1L;
   private  String imgUrl,songName;
   private long songId;
  private List<UserSongListBean.Ar> singerInfo;

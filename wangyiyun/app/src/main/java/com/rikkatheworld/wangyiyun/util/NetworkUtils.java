@@ -37,6 +37,7 @@ public class NetworkUtils {
 
     public static void makeRequest(String url, Handler handler, int id, boolean flag, Context context){
 
+
         okHttpClient = new OkHttpClient
                 .Builder()
                 .addInterceptor(new AuthInterceptor())

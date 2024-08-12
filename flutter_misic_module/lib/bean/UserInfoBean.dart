@@ -2,7 +2,7 @@
 
 
 
-import 'dart:convert';
+
 
 class UserInfoBean{
    String avatarUrl;
@@ -49,6 +49,27 @@ class UserInfoBean{
           "userId":u.userId,
          "level":u.level
        };
+   @override
+   bool operator ==(Object other) {
+     other as UserInfoBean;
+
+     return identical(this, other) ||
+         (other is UserInfoBean &&
+             userId == other.userId &&
+             runtimeType == other.runtimeType &&
+             avatarUrl == other.avatarUrl &&
+             backgroundUrl == other.backgroundUrl &&
+             nickname == other.nickname &&
+             birthday == other.birthday &&
+             province == other.province &&
+             gender == other.gender &&
+             city == other.city &&
+             followeds == other.followeds &&
+             follows == other.follows &&
+             eventCount == other.eventCount &&
+             level == other.level
+         );
+   }
 
 
 }

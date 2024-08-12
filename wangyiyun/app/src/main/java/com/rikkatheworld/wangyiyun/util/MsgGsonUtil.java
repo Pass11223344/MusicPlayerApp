@@ -24,8 +24,8 @@ public static MsgGsonUtil getInstance(){
     }
     return msgGsonUtil;
 }
-    public static List press(String str,String code, Activity activity){
-        App app = (App)activity.getApplication();
+    public static List press(String str,String code, App app){
+
         Gson gson = app.gson;
             switch (code){
                 case "NotificationInfo":

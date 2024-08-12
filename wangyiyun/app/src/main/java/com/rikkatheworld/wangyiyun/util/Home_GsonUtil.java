@@ -1,8 +1,7 @@
 package com.rikkatheworld.wangyiyun.util;
 
 
-import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.URL_ID;
-import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.homeHandler;
+
 
 import android.content.Context;
 import android.util.Log;
@@ -141,9 +140,7 @@ public class Home_GsonUtil {
                             String creatives = String.valueOf(jsonObject.get("creatives"));
                             String title, picUrl, transName, singerName = "";
                             String[] split = creatives.split(",");
-                            for (int i1 = 0; i1 < split.length; i1++) {
-                                Log.d("TAGeeeeeeeeeee", "press: "+split[i1]);
-                            }
+
                             SinglesAndAlbumsBean.Data[] json = gson.fromJson(creatives, SinglesAndAlbumsBean.Data[].class);
                             List<List<SinglesAndAlbumsBean>> singLess_albumsList = new ArrayList<>();
                             List<SinglesAndAlbumsBean> list;
