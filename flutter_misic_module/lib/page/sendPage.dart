@@ -47,7 +47,7 @@ class sengPageState extends State<sengPage>{
      ),
      body: PopScope(
        onPopInvoked: (isPop){
-         channel.invokeMethod("hideOrShowView",true);
+         channel.invokeMethod("hideOrShowView",false);
        },
        child:Padding(
          padding: EdgeInsets.symmetric(horizontal: 10),

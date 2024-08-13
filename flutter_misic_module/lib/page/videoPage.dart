@@ -141,6 +141,7 @@ class VideoPageState extends State<VideoPage> with WidgetsBindingObserver{
       Scaffold(
       backgroundColor: Colors.black,
         appBar: AppBar(
+          backgroundColor: Colors.black,
           toolbarHeight: 0,
         ),
         body:PopScope(

@@ -582,6 +582,7 @@ return  Builder(builder: (context){
             onTap: (){
               Events e = _myPageController.events[index];
               navigatorComment(e, imageUrl, title, creatorName, context,index);
+              channel.invokeMethod("hideOrShowView",true);
             },
             child:pageThreeItem(_myPageController.events[index],
                 "$imageUrl", "$title", creatorName,index) ,);
