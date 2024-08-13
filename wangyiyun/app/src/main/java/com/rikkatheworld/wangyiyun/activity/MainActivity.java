@@ -636,10 +636,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         });
         callback = () -> new MediaSessionCompat.Callback() {
 
+
             @Override
             public void onPlay() {
                 setPlay();
-                //具体自己实现
+
                 Log.d("MediaSessionManager", "onPlay: ");
             }
 
@@ -710,7 +711,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         lin_player.setOnClickListener(this);
 
-        Log.d("TAG", "initView: ");
+
 
 
         player_rootView = include_player.findViewById(R.id.player_rootView);
@@ -721,7 +722,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         if (userInfo!=null) {
             loadNetWork("playlist",null,0);
         }
-        restoreData();
+      restoreData();
     }
 
     public void loadNetWork(String requestFlag, long[] SongId, long sheetId) {
@@ -1038,7 +1039,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
 
         } else if (id == R.id.player_play || id == R.id.IV_play_btn) {
-            Log.d("TAGoepeorpror", "onClick: "+currentPosition);
+
             if (!AUTO_PLAY) {
                 notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
                         playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
@@ -1049,7 +1050,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         } else if (id == R.id.player_next_song) {//下一曲
 
             AUTO_PLAY =true;
-            switchSong = true;
+
 //            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
 //                playerPageAdapter.setData(playerInfo.getListBeans());
 //                songListAdapter.upData(playerInfo.getListBeans());
@@ -1206,6 +1207,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             int progress = seekBar.getProgress();
 
             if (instance.serviceBinder != null) {
+                currentPosition = progress;
+                Log.d("TAGpppppcurrentPositionpppp", "onStopTrackingTouch: "+currentPosition);
                 instance.serviceBinder.seekTo(progress);
 
             }
@@ -1350,16 +1353,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             position1 = position;
             listBeans = playerInfo.getListBeans().get(position%playerInfo.getListBeans().size());
 
-            Log.d("TAG111111111111", "currentPlay: "+listBeans.getImgUrl());
+            Log.d("TAG111111111111", "currentPlay: "+listBeans.getImgUrl()+(AUTO_PLAY&&instance!=null)+"-----"+AUTO_PLAY);
             songListAdapter.setIndex(position);
             setImg.setImg(listBeans.getImgUrl());
             String name = Utils.getString(listBeans);
             playerInfo.setSongName(listBeans.getSongName());
             playerInfo.setImgUrl(listBeans.getImgUrl());
-            if(AUTO_PLAY&&instance.serviceBinder!=null){
-                notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
-                        playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
-            }
+
             if (AUTO_PLAY) {
 
                 playerInfo.setCurrentPosition("00:00");
@@ -2141,7 +2141,6 @@ public void requestPermission(Map<?, ?> info){
                                 result.put("path",downloadsPath);
 
 
-                                Log.d("TAG----------aaaaaass", "onRequestPermissionsResult: ---"+(String.valueOf(info.get("origin"))));
                                 if (String.valueOf(info.get("origin")).equals("myFragment")) {
                                     myFragment.myBindings.channel.invokeMethod("RequestResults", result);
 
@@ -2193,7 +2192,7 @@ public void requestPermission(Map<?, ?> info){
             }
 
             currentPosition = (musicCacheBean.getProgress() * 1.0f / musicCacheBean.getDurationNum() * 100);
-            Log.d("TAGjdjdjfjfjgjg", "restoreData: "+ currentPosition +"----");
+            Log.d("TAGjdjdjfjfjgjg", "restoreData: "+ currentPosition +"----"+musicCacheBean.getProgress());
             player_seekBar.setProgress((int) currentPosition);
             setList.setListInfo(musicCacheBean.getPlayList());
             player_viewPage.setCurrentItem(index);

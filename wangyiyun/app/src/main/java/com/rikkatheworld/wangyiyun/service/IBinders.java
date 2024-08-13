@@ -117,7 +117,6 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
                 mediaPlayer.pause();
                 stopTime();
                 notifyBuilderManager.updateNotification(false,mediaPlayer.getCurrentPosition());
-
                 Log.d("State..", String.valueOf(State));
             } else if (State == STATE_PAUSE) {
                 mediaPlayer.start();
@@ -196,9 +195,11 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
             playerInfo.setDurationNum(this.duration);
             String duration = Utils.getTime(this.duration);
             playerInfo.setDuration(duration);
-
             activityMainBinding.setPlayerInfo(playerInfo);
-
+            if(AUTO_PLAY){
+                notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
+                        playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
+            }
             starTime();
             currentPosition = () -> {
                 if ( mViewChange != null&&AUTO_PLAY) {

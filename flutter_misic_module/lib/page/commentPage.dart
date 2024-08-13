@@ -938,7 +938,7 @@ getData() async {
           child: Row(
             children: [
               Expanded(
-                  flex: 10,
+                  flex: 8,
                   child: GestureDetector(
                     child: Container(
                       width: double.infinity,

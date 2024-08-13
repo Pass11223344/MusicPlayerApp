@@ -116,7 +116,7 @@ public class EngineBindings {
                         }
                     }else {
                         Log.d("TAGwotmzoulzhe", "attach: 1");
-                      //  app.page-=1;
+                        app.page-=1;
                         activity.showView();
                     }
                     result.success(null);
@@ -133,7 +133,7 @@ public class EngineBindings {
                     break;
                 case  "requestPermission":
                     Map<?, ?> info = ((Map<?, ?>) call.arguments);
-                    String str = String.valueOf(info.get("info"));
+
                     activity.requestPermission(info);
                     result.success(null);
                     break;

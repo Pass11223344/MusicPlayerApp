@@ -73,6 +73,7 @@
             android:theme="@style/Theme.Wangyiyun"/>
         <activity
             android:name=".activity.MainActivity"
+            android:launchMode="singleTop"
             android:exported="true">
 
         </activity>

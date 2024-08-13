@@ -90,7 +90,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
     return Obx((){
       return  controller.pageIsOk ? Scaffold(
 
-          backgroundColor: Colors.white70,
+          backgroundColor:  Color(0xFFFCFCFC),
           appBar: AppBar(
             scrolledUnderElevation: 0.0,
             toolbarHeight: 38,
@@ -103,8 +103,6 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
             },
             child:  Stack(
               children: [
-
-
                 Container(
 
                   width: double.infinity,
@@ -138,7 +136,7 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
                   height:50,
                   alignment: Alignment.center,
                   width: mediaQuery.size.width-20,
-                  color: Colors.white,
+
                   child: Row(
                     children: [
                       Expanded(
@@ -151,7 +149,6 @@ class chatPageState extends State<chatPage>  with WidgetsBindingObserver{
                                 borderRadius: BorderRadius.circular(25)),
                             child: TextField(
                               maxLines: 6,
-
                               controller: _textController,
                               decoration: const InputDecoration(
                                   hintText: "发送消息",

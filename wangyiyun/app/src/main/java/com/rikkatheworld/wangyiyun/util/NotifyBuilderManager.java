@@ -33,6 +33,7 @@ public class NotifyBuilderManager {
     public static final String ACTION_NEXT = "com.idujing.play.notify.next";// 下一首
     public static final String ACTION_PREV = "com.idujing.play.notify.prev";// 上一首
     public static final String ACTION_PLAY_PAUSE = "com.idujing.play.notify.play_state";// 播放暂停广播
+    public static final String ACTION_BACK_APP = "com.idujing.play.notify.back_app";// 返回软件
     private static final int NOTIFICATION_ID = 0x123;
     private Service mContext;
     private Notification mNotification;
@@ -42,6 +43,7 @@ public class NotifyBuilderManager {
     private PendingIntent mPendingPlay;
     private PendingIntent mPendingPre;
     private PendingIntent mPendingNext;
+    private PendingIntent mPendingBack;
     private boolean isRunningForeground = false;
 
     public boolean isRunningForeground() {
@@ -60,40 +62,41 @@ public class NotifyBuilderManager {
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         Class<?> clazz = null;
         try {
-            clazz = Class.forName("com.rikkatheworld.wangyiyun.service.IBinders");
+            clazz = Class.forName("com.rikkatheworld.wangyiyun.activity.MainActivity");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         // 适配12.0及以上
-        int flag;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flag = PendingIntent.FLAG_IMMUTABLE;
-        } else {
-            flag = PendingIntent.FLAG_UPDATE_CURRENT;
-        }
+        int flag =   PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            flag = PendingIntent.FLAG_IMMUTABLE;
+//        } else {
+//            flag = PendingIntent.FLAG_UPDATE_CURRENT;
+//        }
         //绑定事件通过创建的具体广播去接收即可。
         Intent infoIntent = new Intent(mContext, clazz);
-        PendingIntent pendingInfo = PendingIntent.getActivity(mContext, 0, infoIntent, flag);
-        Intent preIntent = new Intent();
-        preIntent.setAction(ACTION_PREV);
-        mPendingPre = PendingIntent.getBroadcast(mContext, 1, preIntent, flag);
-        Intent playIntent = new Intent();
-        playIntent.setAction(ACTION_PLAY_PAUSE);
-        mPendingPlay = PendingIntent.getBroadcast(mContext, 2, playIntent, flag);
-        Intent nextIntent = new Intent();
-        nextIntent.setAction(ACTION_NEXT);
-        mPendingNext = PendingIntent.getBroadcast(mContext, 3, nextIntent, PendingIntent.FLAG_IMMUTABLE);
+       infoIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingInfo =  PendingIntent.getActivity(mContext, 0, infoIntent,flag );
+//        Intent preIntent = new Intent();
+//        preIntent.setAction(ACTION_PREV);
+//        mPendingPre = PendingIntent.getBroadcast(mContext, 1, preIntent, flag);
+//        Intent playIntent = new Intent();
+//        playIntent.setAction(ACTION_PLAY_PAUSE);
+//        mPendingPlay = PendingIntent.getBroadcast(mContext, 2, playIntent, flag);
+//        Intent nextIntent = new Intent();
+//        nextIntent.setAction(ACTION_NEXT);
+//        mPendingNext = PendingIntent.getBroadcast(mContext, 3, nextIntent, flag);
+
 
 
         androidx.media.app.NotificationCompat.MediaStyle style = new androidx.media.app.NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(0, 1, 2)
+                //.setShowActionsInCompactView(1, 2,3)
                 .setMediaSession(mSessionManager.getMediaSession());
         mNotificationBuilder = new NotificationCompat.Builder(mContext, initChannelId())
                 .setSmallIcon(R.drawable.zhou)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(pendingInfo)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-
                 .setStyle(style);
         isRunningForeground = true;
     }
@@ -187,10 +190,7 @@ public class NotifyBuilderManager {
 
         mSessionManager.upDataMetaData(isPlay,position);
         if (mNotificationBuilder != null) {
-            mNotification = mNotificationBuilder.
-
-
-                    build();
+            mNotification = mNotificationBuilder.build();
             mContext.startForeground(NOTIFICATION_ID, mNotification);
             mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         }
