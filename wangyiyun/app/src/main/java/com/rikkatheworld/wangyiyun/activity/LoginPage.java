@@ -37,12 +37,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class LoginPage extends AppCompatActivity implements  View.OnClickListener {
+public class LoginPage extends AppCompatActivity implements View.OnClickListener {
 
     private EditText ed_account;
     private EditText ed_password;
     private Button btn_login;
     private final int RES_ID = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,22 +66,21 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
         ed_password = findViewById(R.id.ed_password);
         btn_login = findViewById(R.id.btn_login);
 
-          btn_login.setOnClickListener(this);
+        btn_login.setOnClickListener(this);
     }
-
 
 
     @Override
     public void onClick(View v) {
         String password = ed_password.getText().toString().trim();
         String account = ed_account.getText().toString().trim();
-        if (!account.equals("")&&!password.equals("")) {
+        if (!account.equals("") && !password.equals("")) {
 
-         OkHttpClient   okHttpClient = new OkHttpClient();
+            OkHttpClient okHttpClient = new OkHttpClient();
 
 
             Request request = new Request.Builder()
-                    .url(NetworkInfo.URL + "/login/cellphone?phone="+account+"&password="+password)
+                    .url(NetworkInfo.URL + "/login/cellphone?phone=" + account + "&password=" + password)
                     .get()
                     .build();
 
@@ -95,55 +95,53 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if (response.body()!=null) {
+                    if (response.body() != null) {
                         String string = response.body().string();
 
                         try {
                             JSONObject jsonObject = new JSONObject(string);
                             int code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
 
-                            if (code==502||code==400) {
+                            if (code == 502 || code == 400) {
 
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        CustomToast.showToast(v.getContext(),"账号或密码错误");
+                                        CustomToast.showToast(v.getContext(), "账号或密码错误");
                                     }
                                 });
-                            } else if (code==-460||code==1004) {
+                            } else if (code == -460 || code == 1004) {
 
 
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        CustomToast.showToast(v.getContext(),"网络拥挤或存在风险，稍后再试");
+                                        CustomToast.showToast(v.getContext(), "网络拥挤或存在风险，稍后再试");
                                     }
                                 });
                             } else {
 
                                 if (jsonObject.has("token")) {
                                     token = String.valueOf(jsonObject.get("token"));
-                                   // Spanned spanned = Html.fromHtml(token, Html.FROM_HTML_MODE_LEGACY);
+                                    // Spanned spanned = Html.fromHtml(token, Html.FROM_HTML_MODE_LEGACY);
 
                                 }
-                                SharedPreferences share = getSharedPreferences("UserInfoData",MODE_PRIVATE);
+                                SharedPreferences share = getSharedPreferences("UserInfoData", MODE_PRIVATE);
 
                                 SharedPreferences.Editor edit = share.edit();//编辑文件
 
                                 edit.putString("token", String.valueOf(token));
-                                edit.putString("UserInfo",String.valueOf(jsonObject));
-                                Log.d("TAddddG", "code: "+code);
-                              edit.commit();
+                                edit.putString("UserInfo", String.valueOf(jsonObject));
+                                Log.d("TAddddG", "code: " + code);
+                                edit.commit();
 
                                 runOnUiThread(() -> {
-                                    if (token!=null) {
+                                    if (token != null) {
                                         onBackPressed();
                                     }
                                 });
-                                  //  finish();
+                                //  finish();
                             }
-
-
 
 
                         } catch (JSONException e) {
@@ -154,10 +152,10 @@ public class LoginPage extends AppCompatActivity implements  View.OnClickListene
                     }
                 }
             });
-           // NetworkUtils.makeRequest(NetworkInfo.URL + "/login/cellphone?phone="+account+"&password="+password, handler, STATUS);
+            // NetworkUtils.makeRequest(NetworkInfo.URL + "/login/cellphone?phone="+account+"&password="+password, handler, STATUS);
 
-        }else {
-            CustomToast.showToast(this,"请填写完整");
+        } else {
+            CustomToast.showToast(this, "请填写完整");
         }
     }
 

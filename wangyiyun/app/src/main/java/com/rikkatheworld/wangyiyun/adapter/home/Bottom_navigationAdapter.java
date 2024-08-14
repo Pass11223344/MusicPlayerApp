@@ -13,6 +13,7 @@ import com.rikkatheworld.wangyiyun.fragment.MsgFragment;
 import com.rikkatheworld.wangyiyun.fragment.MyFragment;
 
 import io.flutter.embedding.android.FlutterFragment;
+
 //三个主页面
 public class Bottom_navigationAdapter extends FragmentStatePagerAdapter {
 
@@ -22,31 +23,30 @@ public class Bottom_navigationAdapter extends FragmentStatePagerAdapter {
     private MsgFragment msgFragment;
 
     public Bottom_navigationAdapter(@NonNull FragmentManager fm) {
-        super(fm,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position){
+        switch (position) {
             case 0:
-                if (homeFragment==null) {
+                if (homeFragment == null) {
                     homeFragment = new HomeFragment();
                 }
                 return homeFragment;
 
             case 1:
-                if (myFragment==null) {
+                if (myFragment == null) {
                     myFragment = new MyFragment();
                 }
                 int id = myFragment.getId();
 
 
-
-                return  myFragment;
+                return myFragment;
 
             case 2:
-                if (msgFragment==null) {
+                if (msgFragment == null) {
                     msgFragment = new MsgFragment();
 
 
@@ -64,6 +64,7 @@ public class Bottom_navigationAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return 3;
     }
+
     @Override
     public int getItemPosition(@NonNull Object object) {
         return POSITION_NONE;

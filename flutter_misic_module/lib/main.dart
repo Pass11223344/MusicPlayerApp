@@ -28,54 +28,60 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:get/get.dart';
 
-
 @pragma('vm:entry-point')
 void msgMain() {
   _initializeGlobalController();
-  runZonedGuarded(()=>runApp(const MyApp(pageTitle: "to_msgPage")), (error,stack){
+  runZonedGuarded(() => runApp(const MyApp(pageTitle: "to_msgPage")),
+      (error, stack) {
     print("Error caught：$error");
     print("Stack trace：$stack");
   });
 }
 
-
 @pragma("vm:entry-point")
- MyPage() {
+MyPage() {
   _initializeGlobalController();
   Get.lazyPut(() => myPageController());
 
-  runZonedGuarded(()=>runApp( MyApp(pageTitle: "to_myPage")), (error,stack){
+  runZonedGuarded(() => runApp(MyApp(pageTitle: "to_myPage")), (error, stack) {
     print("Error caught：$error");
-    print("Stack trace：$stack");});
+    print("Stack trace：$stack");
+  });
 }
 
 @pragma("vm:entry-point")
 void CommentPage() {
- _initializeGlobalController();
-  runZonedGuarded(()=>runApp(const MyApp(pageTitle: "to_commentPage")), (error,stack){
+  _initializeGlobalController();
+  runZonedGuarded(() => runApp(const MyApp(pageTitle: "to_commentPage")),
+      (error, stack) {
     print("Error caught：$error");
     print("Stack trace：$stack");
   });
 }
+
 @pragma("vm:entry-point")
 void OtherPage() {
- _initializeGlobalController();
-  runZonedGuarded(()=>runApp(const MyApp(pageTitle: "to_other_page")), (error,stack){
+  _initializeGlobalController();
+  runZonedGuarded(() => runApp(const MyApp(pageTitle: "to_other_page")),
+      (error, stack) {
     print("Error caught：$error");
     print("Stack trace：$stack");
   });
 }
+
 @pragma("vm:entry-point")
 void SearchPage() {
   _initializeGlobalController();
-  runZonedGuarded(()=>runApp(const MyApp(pageTitle: "to_search")), (error,stack){
+  runZonedGuarded(() => runApp(const MyApp(pageTitle: "to_search")),
+      (error, stack) {
     print("Error caught：$error");
     print("Stack trace：$stack");
   });
 }
- final MethodChannel channel = MethodChannel("from_flutter");
+
+final MethodChannel channel = MethodChannel("from_flutter");
 final DioRequest dioRequest = DioRequest();
- final  ImagePicker picker = ImagePicker();
+final ImagePicker picker = ImagePicker();
 //final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void _initializeGlobalController() {
   final ImagePickerPlatform imagePickerImplementation =
@@ -85,10 +91,8 @@ void _initializeGlobalController() {
   }
   if (!Get.isRegistered<PageControllers>()) {
     Get.lazyPut(() => PageControllers());
-
   }
 }
-
 
 void main() {
   final ImagePickerPlatform imagePickerImplementation =
@@ -98,18 +102,21 @@ void main() {
   }
   _initializeGlobalController();
   runZonedGuarded(() {
-
-    runApp(const MyApp(pageTitle: "",));} , (error, stack) {
+    runApp(const MyApp(
+      pageTitle: "",
+    ));
+  }, (error, stack) {
     print("Error caught：$error");
     print("Stack trace：$stack");
   });
 }
 
 class MyApp extends StatefulWidget {
-
   const MyApp({super.key, required this.pageTitle});
+
   final String pageTitle;
-  static CancelToken cancelToken =CancelToken();
+  static CancelToken cancelToken = CancelToken();
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -118,12 +125,12 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  var datas;
 
-var datas ;
-static final  GlobalKey<songListPageState> childKey = GlobalKey<songListPageState>();
+  static final GlobalKey<songListPageState> childKey =
+      GlobalKey<songListPageState>();
 
-final PageControllers pageController = Get.find<PageControllers>();
-
+  final PageControllers pageController = Get.find<PageControllers>();
 
   @override
   void initState() {
@@ -148,97 +155,92 @@ final PageControllers pageController = Get.find<PageControllers>();
     // });
   }
 
-
   @override
   Widget build(BuildContext context) {
-
-
-    return  GetMaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: onGenerateRoute,
-            theme: ThemeData(primarySwatch: Colors.deepOrange),
-            home:   getPage()
-
-        );
-
+    return GetMaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        debugShowCheckedModeBanner: false,
+        onGenerateRoute: onGenerateRoute,
+        theme: ThemeData(primarySwatch: Colors.deepOrange),
+        home: getPage());
   }
 
-getPage() {
-  switch(widget.pageTitle){
-    case "to_msgPage":
-      return const msgListPage();
-    case "to_myPage":
-      return myPage();
-    case "to_commentPage":
-      return commentPage();
-    case "to_other_page":
-  // pageController.cookie = datas['token'];
-      switch(datas['type']){
-        case "to_recommend_song_sheet":
-        case "to_exclusive_scene_song_sheet":
-        case "to_music_radar_song_sheet":
-        case "to_sing_and_albums":
-        case"to_recommend_song":
-        case "to_sheet":
-         return  songListPage(data: datas,key: childKey);
-        case "to_albums":
-          return WebPage(url: datas['id']);
-        case"to_ranking":
-          return rankingListPage();
-      }
-    case "to_search":
-      return  searchPage();
-    default:
-      var params = {
-        "avatarUrl":"http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
-        "name":"aaa"  ,
-        "show_time&place":"oooo",
-        "msg":"e.message!.msg",
-        "img":"http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
-        "title":"title",
-        "creatorName":"creatorName",
-        "id":"A_EV_2_29945262900_287870880",
-        "commentCount":2,
-        "likedCount":4
-      };
+  getPage() {
+    switch (widget.pageTitle) {
+      case "to_msgPage":
+        return const msgListPage();
+      case "to_myPage":
+        return myPage();
+      case "to_commentPage":
+        return commentPage();
+      case "to_other_page":
+        // pageController.cookie = datas['token'];
+        switch (datas['type']) {
+          case "to_recommend_song_sheet":
+          case "to_exclusive_scene_song_sheet":
+          case "to_music_radar_song_sheet":
+          case "to_sing_and_albums":
+          case "to_recommend_song":
+          case "to_sheet":
+            return songListPage(data: datas, key: childKey);
+          case "to_albums":
+            return WebPage(url: datas['id']);
+          case "to_ranking":
+            return rankingListPage();
+        }
+      case "to_search":
+        return searchPage();
+      default:
+        var params = {
+          "avatarUrl":
+              "http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
+          "name": "aaa",
+          "show_time&place": "oooo",
+          "msg": "e.message!.msg",
+          "img":
+              "http://p1.music.126.net/B7xVHm277qqxnYn2_A40Gg==/109951166258221220.jpg",
+          "title": "title",
+          "creatorName": "creatorName",
+          "id": "A_EV_2_29945262900_287870880",
+          "commentCount": 2,
+          "likedCount": 4
+        };
 
-     // _initializeGlobalController();
-   //  return  rankingListPage();
+      // _initializeGlobalController();
+      //  return  rankingListPage();
       //return  Player_page();
-   //  return  purchasedPage();
-    //  return  ss();
-    //return  PopupRoutePage();
+      //  return  purchasedPage();
+      //  return  ss();
+      //return  PopupRoutePage();
       //return  traceCommentPage(params: params);
+    }
   }
-}
 
   void receiveDataFromAndroid() {
-channel.setMethodCallHandler((call) async {
-  print("object1111111111111111111122222222222222${childKey.currentState==null}");
-      switch(call.method){
+    channel.setMethodCallHandler((call) async {
+      print(
+          "object1111111111111111111122222222222222${childKey.currentState == null}");
+      switch (call.method) {
         case "pressPage":
-          bool  isBack = true;
+          bool isBack = true;
 
-          if (childKey.currentState==null) {
-            var p = {"origin":"other_page"};
-            await channel.invokeMethod("back",p);
+          if (childKey.currentState == null) {
+            var p = {"origin": "other_page"};
+            await channel.invokeMethod("back", p);
             return;
           }
-          if( pageController.pageIsOk){
-            channel.invokeMethod("loadComplete",true);
-          }else{
-            channel.invokeMethod("loadComplete",false);
+          if (pageController.pageIsOk) {
+            channel.invokeMethod("loadComplete", true);
+          } else {
+            channel.invokeMethod("loadComplete", false);
             songListPageState.cancelRequest();
-
           }
 
-          isBack =  await childKey.currentState?.isPop()??false;
+          isBack = await childKey.currentState?.isPop() ?? false;
 
           break;
         case "to_other_page":
-
           final data = call.arguments;
           if (data != null) {
             setState(() {
@@ -246,23 +248,19 @@ channel.setMethodCallHandler((call) async {
             });
             pageController.cookie = datas['token'];
             pageController.userId = datas['userId'];
-
           }
           break;
         case "RequestResults":
           var info = call.arguments;
-          if(info['isSuccess']){
-
-            switch(info['action']){
-              case"saveImg":
+          if (info['isSuccess']) {
+            switch (info['action']) {
+              case "saveImg":
                 pageController.path ??= info['path'];
-                print("object-------xxxxx-----${info['action']}---------${info['info']}");
-                Utils.downloadImage(info['info'],pageController.path).then((flag){
-
-
+                print(
+                    "object-------xxxxx-----${info['action']}---------${info['info']}");
+                Utils.downloadImage(info['info'], pageController.path)
+                    .then((flag) {
                   childKey.currentState?.show(flag);
-
-
                 });
                 break;
 
@@ -270,41 +268,30 @@ channel.setMethodCallHandler((call) async {
             }
           }
           break;
-        case"currentId":
-          pageController.currentSongId =call.arguments;
+        case "currentId":
+          pageController.currentSongId = call.arguments;
           break;
-
-
-      }});
+      }
+    });
   }
-
-
-
-
-
-
-
 }
 
-
-
-
-class MyInheritedWidget  extends InheritedWidget {
+class MyInheritedWidget extends InheritedWidget {
   final BuildContext context;
 
-  MyInheritedWidget ({required this.context, required Widget child}) : super(child: child);
+  MyInheritedWidget({required this.context, required Widget child})
+      : super(child: child);
 
-  static MyInheritedWidget ? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<MyInheritedWidget >();
+  static MyInheritedWidget? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<MyInheritedWidget>();
   }
 
   @override
-  bool updateShouldNotify(MyInheritedWidget  oldWidget) {
-
+  bool updateShouldNotify(MyInheritedWidget oldWidget) {
     return context != oldWidget.context;
   }
-
 }
+
 class MyPageBindings extends Bindings {
   @override
   void dependencies() {

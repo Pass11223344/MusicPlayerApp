@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_misic_module/NetWork/DioRequest.dart';
@@ -36,19 +34,20 @@ class traceCommentState extends State<traceCommentPage>
   //final  _myPageController = Get.find<myPageController>();
   ScrollController _scrollController = ScrollController();
 
-late TextEditingController _textController ;
-late TextEditingController _replyTextController ;
+  late TextEditingController _textController;
+
+  late TextEditingController _replyTextController;
+
   String hintText = "发送消息";
   String replyHintText = "发送消息";
   bool isReply = false;
   final List<String> actions = [
     '复制',
     '删除',
-
   ];
   KeyboardVisibilityController keyboardVisibilityController =
       KeyboardVisibilityController();
-   final myPageController _myPageController =Get.find<myPageController>();
+  final myPageController _myPageController = Get.find<myPageController>();
 
   final FocusNode _focusNode = FocusNode();
   final FocusNode _replyFocusNode = FocusNode();
@@ -57,15 +56,14 @@ late TextEditingController _replyTextController ;
   void initState() {
     // TODO: implement initState
     super.initState();
-  //  Get.put(myPageController());
+    //  Get.put(myPageController());
     _textController = TextEditingController();
     _replyTextController = TextEditingController();
     tabController = TabController(length: 2, vsync: this);
-  //  _myPageController = Get.find<myPageController>();
+    //  _myPageController = Get.find<myPageController>();
     keyboardVisibilityController.onChange.listen((bool visible) {
       if (visible) {
       } else {
-
         // 键盘隐藏时的处理逻辑
         _focusNode.unfocus();
         _replyFocusNode.unfocus();
@@ -80,12 +78,13 @@ late TextEditingController _replyTextController ;
     });
   }
 
-@override
+  @override
   void didUpdateWidget(covariant traceCommentPage oldWidget) {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     getData(widget.params['id']);
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -97,7 +96,7 @@ late TextEditingController _replyTextController ;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    var list = widget.params['latestLikedUsers']as List<LatestLikedUsers>;
+    var list = widget.params['latestLikedUsers'] as List<LatestLikedUsers>;
     return Scaffold(
         appBar: AppBar(
           scrolledUnderElevation: 0.0,
@@ -108,15 +107,14 @@ late TextEditingController _replyTextController ;
           centerTitle: true,
           title: const Text("动态"),
         ),
-        body:
-        PopScope(
-          onPopInvoked: (isPop){
-            if(!_myPageController.isReplyComment){
-              var p= {"origin":"my_page"};
-              channel.invokeMethod("back",p);
+        body: PopScope(
+          onPopInvoked: (isPop) {
+            if (!_myPageController.isReplyComment) {
+              var p = {"origin": "my_page"};
+              channel.invokeMethod("back", p);
             }
           },
-          child:Container(
+          child: Container(
             padding: const EdgeInsets.only(left: 10, right: 10),
             color: Colors.white,
             child: NestedScrollView(
@@ -136,12 +134,8 @@ late TextEditingController _replyTextController ;
                         unselectedLabelColor: const Color(0xff77767c),
                         controller: tabController,
                         tabs: const [
-                          Tab(
-                              text:
-                              "评论 "),
-                          Tab(
-                              text:
-                              "点赞 "),
+                          Tab(text: "评论 "),
+                          Tab(text: "点赞 "),
                         ],
                       ))),
                   Obx(() {
@@ -163,125 +157,146 @@ late TextEditingController _replyTextController ;
                   }),
                 ];
               },
-              body:
-
-              TabBarView(
+              body: TabBarView(
                 controller: tabController,
                 children: [
-                  Obx((){
-                    return _myPageController.isTraceComment?  Stack(
-                      children: [
-                        CustomScrollView(
-                          // controller: _scrollController,
-                          slivers: [
-                            SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  childCount:_myPageController.itemCount,
+                  Obx(() {
+                    return _myPageController.isTraceComment
+                        ? Stack(
+                            children: [
+                              CustomScrollView(
+                                // controller: _scrollController,
+                                slivers: [
+                                  SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                          childCount: _myPageController
+                                              .itemCount, (context, index) {
+                                    var comment = _myPageController
+                                        .traceCommentInfo!.comments[index];
 
-                                        (context, index) {
-                                      var comment = _myPageController
-                                          .traceCommentInfo!.comments[index];
-
-                                      return  comment.parentCommentId == 0
-                                              ? getCommentListItem(comment)
-                                              : const SizedBox(
+                                    return comment.parentCommentId == 0
+                                        ? getCommentListItem(comment)
+                                        : const SizedBox(
                                             height: 0,
                                             width: 0,
                                           );
-                                    })),
-                            SliverToBoxAdapter(child: SizedBox(height: 50,),),
-                          ],
-                        ),
-
-                        Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              height: 50,
-                              alignment: Alignment.center,
-                              width: size.width - 20,
-                              color: Colors.white,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex: 8,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 14, bottom: 2),
-                                        padding: EdgeInsets.all(8),
-                                        child: TextField(
-                                          focusNode: _focusNode,
-                                          maxLines: 4,
-                                          controller: _textController,
-                                          decoration: InputDecoration(
-                                              hintText: hintText,
-                                              isCollapsed: true,
-                                              contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 6),
-                                              hintStyle: const TextStyle(
-                                                  color: Colors.grey),
-                                              border: InputBorder.none),
-                                        ),
-                                      )),
-                                  Expanded(
-                                      flex: 2,
-                                      child: GestureDetector(
-                                          onTap: () async {
-                                            String text = _textController.text.trim();
-                                            if (text.isEmpty) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text('输入框不能为空！'),
-                                                  duration: Duration(seconds: 1), // 设置显示时间
-                                                  backgroundColor: Colors.black12, // 设置背景色
-                                                ),
-                                              );
-                                              return;
-                                            }
-                                            _myPageController.isTraceComment = false;
-
-                                            if(isReply){
-                                              sendOrRemoveComment(2, widget.params['id'], _textController.text, _myPageController.currentCommentId );
-                                            }else{
-                                              sendOrRemoveComment(1, widget.params['id'], _textController.text ,0);
-
-                                            }
-                                            isReply = false;
-                                            _focusNode.unfocus();
-                                            _textController.clear();
-                                          },
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: Text("发送"),
-                                          )))
+                                  })),
+                                  SliverToBoxAdapter(
+                                    child: SizedBox(
+                                      height: 50,
+                                    ),
+                                  ),
                                 ],
                               ),
-                            )),
-                      ],
-                    ):Utils.loadingView(Alignment.center);
+                              Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    height: 50,
+                                    alignment: Alignment.center,
+                                    width: size.width - 20,
+                                    color: Colors.white,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                            flex: 8,
+                                            child: Container(
+                                              margin: const EdgeInsets.only(
+                                                  left: 14, bottom: 2),
+                                              padding: EdgeInsets.all(8),
+                                              child: TextField(
+                                                focusNode: _focusNode,
+                                                maxLines: 4,
+                                                controller: _textController,
+                                                decoration: InputDecoration(
+                                                    hintText: hintText,
+                                                    isCollapsed: true,
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                            .symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 6),
+                                                    hintStyle: const TextStyle(
+                                                        color: Colors.grey),
+                                                    border: InputBorder.none),
+                                              ),
+                                            )),
+                                        Expanded(
+                                            flex: 2,
+                                            child: GestureDetector(
+                                                onTap: () async {
+                                                  String text = _textController
+                                                      .text
+                                                      .trim();
+                                                  if (text.isEmpty) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content:
+                                                            Text('输入框不能为空！'),
+                                                        duration: Duration(
+                                                            seconds:
+                                                                1), // 设置显示时间
+                                                        backgroundColor: Colors
+                                                            .black12, // 设置背景色
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+                                                  _myPageController
+                                                      .isTraceComment = false;
+
+                                                  if (isReply) {
+                                                    sendOrRemoveComment(
+                                                        2,
+                                                        widget.params['id'],
+                                                        _textController.text,
+                                                        _myPageController
+                                                            .currentCommentId);
+                                                  } else {
+                                                    sendOrRemoveComment(
+                                                        1,
+                                                        widget.params['id'],
+                                                        _textController.text,
+                                                        0);
+                                                  }
+                                                  isReply = false;
+                                                  _focusNode.unfocus();
+                                                  _textController.clear();
+                                                },
+                                                child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text("发送"),
+                                                )))
+                                      ],
+                                    ),
+                                  )),
+                            ],
+                          )
+                        : Utils.loadingView(Alignment.center);
                   }),
                   CustomScrollView(
                     slivers: [
                       SliverFixedExtentList.builder(
-                          itemCount:list.length ,
-                          itemBuilder: (context,index){
+                          itemCount: list.length,
+                          itemBuilder: (context, index) {
                             return ListTile(
-                              leading: Icon(Icons.account_circle,color: Colors.deepOrange,),
+                              leading: Icon(
+                                Icons.account_circle,
+                                color: Colors.deepOrange,
+                              ),
                               title: Text("用户: ${list[index].s}"),
                             );
-                      }, itemExtent: 60)
+                          },
+                          itemExtent: 60)
                     ],
                   )
-
                 ],
               ),
             ),
-          ) ,
-        )
-        );
+          ),
+        ));
   }
-
-
 
   expandedItem(Map event) {
     // "avatarUrl":e.user.avatarUrl,
@@ -352,103 +367,110 @@ late TextEditingController _replyTextController ;
   }
 
   getCommentListItem(Comments event) {
-    return
-      Container(
-          padding: const EdgeInsets.only(top: 15, left: 10),
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              getCircularImg(url: event.user.avatarUrl),
-              const SizedBox(
-                width: 8,
-              ),
-              Container(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  width: MediaQuery.of(context).size.width - 100,
-                  decoration: const BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: Colors.grey, width: 0.8))),
-                  child:
-                  WPopupMenu(
-                      onValueChanged: (int value) {
+    return Container(
+        padding: const EdgeInsets.only(top: 15, left: 10),
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            getCircularImg(url: event.user.avatarUrl),
+            const SizedBox(
+              width: 8,
+            ),
+            Container(
+                padding: const EdgeInsets.only(bottom: 10),
+                width: MediaQuery.of(context).size.width - 100,
+                decoration: const BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(color: Colors.grey, width: 0.8))),
+                child: WPopupMenu(
+                    onValueChanged: (int value) {
+                      switch (value) {
+                        case 0:
+                          Utils.copyTextToClipboard(event.content, context);
+                          break;
+                        case 1:
+                          Comments commentsToRemove = _myPageController
+                              .traceCommentInfo!.comments
+                              .firstWhere((comment) =>
+                                  comment.commentId == event.commentId);
 
-                        switch(value){
-                          case 0:
-                            Utils.copyTextToClipboard(event.content, context);
-                            break;
-                          case 1:
-                            Comments commentsToRemove = _myPageController.traceCommentInfo!.comments.firstWhere((comment) => comment.commentId == event.commentId);
-
-                            if (commentsToRemove != null) {
-                              _myPageController.traceCommentInfo!.comments.remove(commentsToRemove);
-                              _myPageController.itemCount = _myPageController.traceCommentInfo!.comments.length;
-                              sendOrRemoveComment(0,widget.params['id'],"",event.commentId);
-                              _myPageController.relayInfo!.events[widget.params['index'] as int].info.commentCount -=1;
-                              Utils.showTopSnackBar(context, "已删除");
-                              // 如果需要，可以在这里添加一些删除操作的反馈
-                            } else {
-                              // 或者如果没找到用户，可以打印一个消息
-                              print('User with ID 323230 not found.');
-                            }
-                            break;
-                        }
-                      },
-                      pressType: PressType.longPress,
-                      actions: actions,
-                      key: null,
-                      child:
-                      InkWell(
-                          onTap: () {
-                            isReply = true;
-                            _focusNode.requestFocus();
-                            hintText = "回复: ${event.user.nickname}";
-                            _myPageController.currentCommentId = event.commentId;
-                          },
-
-                          child:
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(event.user.nickname),
-                      Text("${event.timeStr}  ${event.ipLocation.location}"),
-
-                    Container(
-                        padding: const EdgeInsets.only(top: 10, left: 4),
-                        child: Text(event.content),
-                      ),
-                      Obx((){
-                        return  Visibility(
-                          visible: _myPageController.maps['${event.commentId}']![0] !=
-                              0,
-                          child: InkWell(
-                            onTap: () {
-                              showSheet(event);
-                              _myPageController.isReplyComment = true;
-                              _myPageController.currentReplyComment =   _myPageController.maps['${event.commentId}']![0];
-                              channel.invokeMethod("addPage",{"id":-2});
-                            },
-                            child: Container(
-                                padding: const EdgeInsets.only(top: 15, left: 4),
-                                child: Text(
-                                  "${_myPageController.maps['${event.commentId}']![0]}条回复>",
-                                  style: const TextStyle(
-                                      color: Colors.blueAccent, fontSize: 10),
-                                )),
-                          ),
-                        );
-                      })
-
-                    ])
-                  )))
-            ],
-          )
-        );
-
+                          if (commentsToRemove != null) {
+                            _myPageController.traceCommentInfo!.comments
+                                .remove(commentsToRemove);
+                            _myPageController.itemCount = _myPageController
+                                .traceCommentInfo!.comments.length;
+                            sendOrRemoveComment(
+                                0, widget.params['id'], "", event.commentId);
+                            _myPageController
+                                .relayInfo!
+                                .events[widget.params['index'] as int]
+                                .info
+                                .commentCount -= 1;
+                            Utils.showTopSnackBar(context, "已删除");
+                            // 如果需要，可以在这里添加一些删除操作的反馈
+                          } else {
+                            // 或者如果没找到用户，可以打印一个消息
+                            print('User with ID 323230 not found.');
+                          }
+                          break;
+                      }
+                    },
+                    pressType: PressType.longPress,
+                    actions: actions,
+                    key: null,
+                    child: InkWell(
+                        onTap: () {
+                          isReply = true;
+                          _focusNode.requestFocus();
+                          hintText = "回复: ${event.user.nickname}";
+                          _myPageController.currentCommentId = event.commentId;
+                        },
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(event.user.nickname),
+                              Text(
+                                  "${event.timeStr}  ${event.ipLocation.location}"),
+                              Container(
+                                padding:
+                                    const EdgeInsets.only(top: 10, left: 4),
+                                child: Text(event.content),
+                              ),
+                              Obx(() {
+                                return Visibility(
+                                  visible: _myPageController
+                                          .maps['${event.commentId}']![0] !=
+                                      0,
+                                  child: InkWell(
+                                    onTap: () {
+                                      showSheet(event);
+                                      _myPageController.isReplyComment = true;
+                                      _myPageController.currentReplyComment =
+                                          _myPageController
+                                              .maps['${event.commentId}']![0];
+                                      channel
+                                          .invokeMethod("addPage", {"id": -2});
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.only(
+                                            top: 15, left: 4),
+                                        child: Text(
+                                          "${_myPageController.maps['${event.commentId}']![0]}条回复>",
+                                          style: const TextStyle(
+                                              color: Colors.blueAccent,
+                                              fontSize: 10),
+                                        )),
+                                  ),
+                                );
+                              })
+                            ]))))
+          ],
+        ));
   }
 
-  getReplyItem(String headId,Comments event, bool showLine, int parentId) {
+  getReplyItem(String headId, Comments event, bool showLine, int parentId) {
     return Container(
       padding: const EdgeInsets.only(top: 15, left: 15),
       child: Row(
@@ -468,127 +490,146 @@ late TextEditingController _replyTextController ;
                           bottom:
                               BorderSide(color: Colors.black12, width: 0.8)))
                   : null,
-              child: headId=='0'? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(event.user.nickname),
-                  Text("${event.timeStr}  ${event.ipLocation.location}"),
-                  Container(
-                    padding: const EdgeInsets.only(top: 10, left: 4),
-                    child: Text(softWrap: true, event.content),
-                  ),
-                  event.beReplied.length > 0
-                      ? Visibility(
-                      visible:
-                      event.beReplied[0].beRepliedCommentId != parentId,
-                      child: Container(
-                        margin: EdgeInsets.only(top: 10) ,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                left: BorderSide(
-                                    color: Colors.black12, width: 2))),
-                        child:RichText(text: TextSpan(children: [
-                          TextSpan(text: "  ${event.beReplied[0].user.nickname}",
-                            style: const TextStyle(color: Colors.blueAccent)),
-                          TextSpan(text: " : ${event.beReplied[0].content}",style: const TextStyle(color: Colors.black) )
+              child: headId == '0'
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(event.user.nickname),
+                        Text("${event.timeStr}  ${event.ipLocation.location}"),
+                        Container(
+                          padding: const EdgeInsets.only(top: 10, left: 4),
+                          child: Text(softWrap: true, event.content),
+                        ),
+                        event.beReplied.length > 0
+                            ? Visibility(
+                                visible:
+                                    event.beReplied[0].beRepliedCommentId !=
+                                        parentId,
+                                child: Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            left: BorderSide(
+                                                color: Colors.black12,
+                                                width: 2))),
+                                    child: RichText(
+                                      text: TextSpan(children: [
+                                        TextSpan(
+                                            text:
+                                                "  ${event.beReplied[0].user.nickname}",
+                                            style: const TextStyle(
+                                                color: Colors.blueAccent)),
+                                        TextSpan(
+                                            text:
+                                                " : ${event.beReplied[0].content}",
+                                            style: const TextStyle(
+                                                color: Colors.black))
+                                      ]),
+                                    )))
+                            : Container()
+                      ],
+                    )
+                  : WPopupMenu(
+                      onValueChanged: (int value) {
+                        switch (value) {
+                          case 0:
+                            Utils.copyTextToClipboard(event.content, context);
+                            break;
+                          case 1:
+                            Comments commentsToRemove = _myPageController
+                                .traceCommentInfo!.comments
+                                .firstWhere((comment) =>
+                                    comment.commentId == event.commentId);
 
-                        ]),)
+                            if (commentsToRemove != null) {
+                              _myPageController.traceCommentInfo!.comments
+                                  .remove(commentsToRemove);
+                              _myPageController.itemCount -= 1;
+                              _myPageController.currentReplyComment -= 1;
+                              _myPageController.maps[headId]![0] -= 1;
 
+                              _myPageController
+                                  .relayInfo!
+                                  .events[widget.params['index'] as int]
+                                  .info
+                                  .commentCount -= 1;
+                              Utils.showTopSnackBar(context, "已删除");
 
-                      ))
-                      : Container()
-                ],
-              ):
-              WPopupMenu(
-                  onValueChanged: (int value) {
-                    switch(value){
-                      case 0:
-                        Utils.copyTextToClipboard(event.content, context);
-                        break;
-                      case 1:
-                        Comments commentsToRemove = _myPageController.traceCommentInfo!.comments.firstWhere((comment) => comment.commentId == event.commentId);
-
-                        if (commentsToRemove != null) {
-                          _myPageController.traceCommentInfo!.comments.remove(commentsToRemove);
-                          _myPageController.itemCount -= 1;
-                          _myPageController.currentReplyComment -=1;
-                          _myPageController.maps[headId]![0] -=1 ;
-
-                          _myPageController.relayInfo!.events[widget.params['index'] as int].info.commentCount -=1;
-                          Utils.showTopSnackBar(context, "已删除");
-
-
-                          sendOrRemoveComment(0,widget.params['id'],"",event.commentId);
-                          // 如果需要，可以在这里添加一些删除操作的反馈
-                        } else {
-                          // 或者如果没找到用户，可以打印一个消息
-                          print('User with ID 323230 not found.');
+                              sendOrRemoveComment(
+                                  0, widget.params['id'], "", event.commentId);
+                              // 如果需要，可以在这里添加一些删除操作的反馈
+                            } else {
+                              // 或者如果没找到用户，可以打印一个消息
+                              print('User with ID 323230 not found.');
+                            }
+                            break;
                         }
-                        break;
-                    }
-                  },
-                  pressType: PressType.longPress,
-                  actions: actions,
-                  key: null,
-                  child:
-                  InkWell(
-                      onTap: () {
-
-                        _myPageController.currentCommentId = event.commentId;
-                        _replyFocusNode.requestFocus();
-                        replyHintText =
-                        "回复: ${event.user.nickname}";
                       },
-                      child:
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(event.user.nickname),
-                      Text("${event.timeStr}  ${event.ipLocation.location}"),
-                      Container(
-                        padding: const EdgeInsets.only(top: 10, left: 4),
-                        child: Text(softWrap: true, event.content),
-                      ),
-                      event.beReplied.length > 0
-                          ? Visibility(
-                          visible:
-                          event.beReplied[0].beRepliedCommentId != parentId,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    left: BorderSide(
-                                        color: Colors.black12, width: 2))),
-                            child:
-                            RichText(text: TextSpan(children: [
-                              TextSpan(text: "  ${event.beReplied[0].user.nickname}",
-                                  style: const TextStyle(color: Colors.blueAccent)),
-                              TextSpan(text: " : ${event.beReplied[0].content}",style: const TextStyle(color: Colors.black) )
-
-                            ]),)
-
-                          ))
-                          : Container()
-                    ],
-                  )))
-             )
+                      pressType: PressType.longPress,
+                      actions: actions,
+                      key: null,
+                      child: InkWell(
+                          onTap: () {
+                            _myPageController.currentCommentId =
+                                event.commentId;
+                            _replyFocusNode.requestFocus();
+                            replyHintText = "回复: ${event.user.nickname}";
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(event.user.nickname),
+                              Text(
+                                  "${event.timeStr}  ${event.ipLocation.location}"),
+                              Container(
+                                padding:
+                                    const EdgeInsets.only(top: 10, left: 4),
+                                child: Text(softWrap: true, event.content),
+                              ),
+                              event.beReplied.length > 0
+                                  ? Visibility(
+                                      visible: event.beReplied[0]
+                                              .beRepliedCommentId !=
+                                          parentId,
+                                      child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border(
+                                                  left: BorderSide(
+                                                      color: Colors.black12,
+                                                      width: 2))),
+                                          child: RichText(
+                                            text: TextSpan(children: [
+                                              TextSpan(
+                                                  text:
+                                                      "  ${event.beReplied[0].user.nickname}",
+                                                  style: const TextStyle(
+                                                      color:
+                                                          Colors.blueAccent)),
+                                              TextSpan(
+                                                  text:
+                                                      " : ${event.beReplied[0].content}",
+                                                  style: const TextStyle(
+                                                      color: Colors.black))
+                                            ]),
+                                          )))
+                                  : Container()
+                            ],
+                          ))))
         ],
       ),
     );
   }
 
   getData(String id) async {
-    _myPageController.isTraceComment=false;
+    _myPageController.isTraceComment = false;
 
     var dioRequest = DioRequest();
 
-    dioRequest.executeGet(
-        url: "/comment/event",
-        params: {"threadId": id}).then((value) {
-
+    dioRequest.executeGet(url: "/comment/event", params: {"threadId": id}).then(
+        (value) {
       _myPageController.traceCommentInfo = CommentInfoBean.fromJson(value);
       getList();
-      _myPageController.isTraceComment=true;
-
+      _myPageController.isTraceComment = true;
     });
   }
 
@@ -598,7 +639,8 @@ late TextEditingController _replyTextController ;
     // var count = 0;
     Map<String, List> maps = {};
     Map<String, String> reply = {};
-    print("object------------------------${_myPageController.traceCommentInfo?.comments.length}");
+    print(
+        "object------------------------${_myPageController.traceCommentInfo?.comments.length}");
     _myPageController.traceCommentInfo?.comments.forEach((value) {
       if (value.parentCommentId == 0) {
         // count++;
@@ -615,56 +657,58 @@ late TextEditingController _replyTextController ;
         }
       }
     });
-    _myPageController.itemCount = _myPageController.traceCommentInfo!.totalCount>=20
-        ?20:_myPageController.traceCommentInfo!.totalCount;
+    _myPageController.itemCount =
+        _myPageController.traceCommentInfo!.totalCount >= 20
+            ? 20
+            : _myPageController.traceCommentInfo!.totalCount;
     //_myPageController.traceCommentInfo?.count = count;
     _myPageController.maps = maps;
 
     _myPageController.traceCommentInfo?.comments =
         _myPageController.traceCommentInfo!.comments.reversed.toList();
   }
-  sendOrRemoveComment(int type,String threadId,String? comment,int? commentId){
-   // type:1:发送，2:回复 ，0:删除
-    var params ;
-        switch(type){
-          case 0:
-          params={
-            "t":type,
-            "type":6,
-            "threadId":threadId,
-            "commentId":commentId
-          };
-            break;
-          case 1:
-            params={
-              "t":type,
-              "type":6,
-              "threadId":threadId,
-              "content":comment
-            };
-            break;
-          case 2:
-            params={
-              "t":type,
-              "type":6,
-              "threadId":threadId,
-              "commentId":commentId,
-              "content":comment
-            };
-            break;
+
+  sendOrRemoveComment(
+      int type, String threadId, String? comment, int? commentId) {
+    // type:1:发送，2:回复 ，0:删除
+    var params;
+    switch (type) {
+      case 0:
+        params = {
+          "t": type,
+          "type": 6,
+          "threadId": threadId,
+          "commentId": commentId
+        };
+        break;
+      case 1:
+        params = {
+          "t": type,
+          "type": 6,
+          "threadId": threadId,
+          "content": comment
+        };
+        break;
+      case 2:
+        params = {
+          "t": type,
+          "type": 6,
+          "threadId": threadId,
+          "commentId": commentId,
+          "content": comment
+        };
+        break;
+    }
+    dioRequest.executeGet(url: "/comment", params: params).then((value) {
+      if (value['code'] == 200) {
+        if (type == 0) {
+          _myPageController.isTraceComment = true;
+          return;
         }
-        dioRequest.executeGet(url: "/comment",params: params).then((value){
-          if(value['code']==200){
-          if (type==0) {
-
-
-            _myPageController.isTraceComment=true;
-            return;
-          };
-            getData(widget.params['id']);
-          }
-        });
-
+        ;
+        getData(widget.params['id']);
+      }
+    });
   }
 
   showSheet(Comments event) {
@@ -676,8 +720,6 @@ late TextEditingController _replyTextController ;
       context: context,
       builder: (context) => PopScope(
         onPopInvoked: (isPop) {
-
-
           _myPageController.isReplyComment = false;
           _focusNode.unfocus();
         },
@@ -692,58 +734,65 @@ late TextEditingController _replyTextController ;
                       scrolledUnderElevation: 0.0,
                       centerTitle: true,
                       backgroundColor: Colors.transparent,
-                      title:
-                      Obx((){
-                        return  Text(
-                            "回复(${ _myPageController.currentReplyComment})");
+                      title: Obx(() {
+                        return Text(
+                            "回复(${_myPageController.currentReplyComment})");
                       }),
-
                     ),
                     Flexible(
-                      child:
-                       CustomScrollView(
-                          slivers: [
-                            SliverToBoxAdapter(
-                              child: getReplyItem("0",event, false, 0),
+                        child: CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: getReplyItem("0", event, false, 0),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Container(
+                            width: double.infinity,
+                            height: 60,
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                    top: BorderSide(
+                                        color: Colors.black12, width: 15))),
+                            padding: const EdgeInsets.only(bottom: 15),
+                            child: const Padding(
+                              padding: EdgeInsets.only(top: 10, left: 14),
+                              child: Text("全部回复"),
                             ),
-                            SliverToBoxAdapter(
-                              child: Container(
-                                width: double.infinity,
-                                height: 60,
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        top: BorderSide(
-                                            color: Colors.black12, width: 15))),
-                                padding: const EdgeInsets.only(bottom: 15),
-                                child: const Padding(
-                                  padding: EdgeInsets.only(top: 10, left: 14),
-                                  child: Text("全部回复"),
-                                ),
-                              ),
-                            ),
-    Obx((){
-    return _myPageController.isTraceComment? SliverList.builder(
-        itemCount: _myPageController.itemCount,
-        itemBuilder: (BuildContext context, int i) {
-          var comment = _myPageController
-              .traceCommentInfo!.comments[i];
+                          ),
+                        ),
+                        Obx(() {
+                          return _myPageController.isTraceComment
+                              ? SliverList.builder(
+                                  itemCount: _myPageController.itemCount,
+                                  itemBuilder: (BuildContext context, int i) {
+                                    var comment = _myPageController
+                                        .traceCommentInfo!.comments[i];
 
-          return  _myPageController.maps['${event.commentId}']!
-                .contains(_myPageController
-                .traceCommentInfo!
-                .comments[i]
-                .commentId)
-                ?  _myPageController.maps['${event.commentId}']![0]!=0?getReplyItem("${event.commentId}",
-                      comment, true, event.commentId):Container()
-
-                : SizedBox()
-          ;
-        }):SliverToBoxAdapter(child: Utils.loadingView(Alignment.center),);}),
-                            const SliverToBoxAdapter(child: SizedBox(height: 50,),),
-                          ],
-                       )
-
-                    )
+                                    return _myPageController
+                                            .maps['${event.commentId}']!
+                                            .contains(_myPageController
+                                                .traceCommentInfo!
+                                                .comments[i]
+                                                .commentId)
+                                        ? _myPageController.maps[
+                                                    '${event.commentId}']![0] !=
+                                                0
+                                            ? getReplyItem("${event.commentId}",
+                                                comment, true, event.commentId)
+                                            : Container()
+                                        : SizedBox();
+                                  })
+                              : SliverToBoxAdapter(
+                                  child: Utils.loadingView(Alignment.center),
+                                );
+                        }),
+                        const SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: 50,
+                          ),
+                        ),
+                      ],
+                    ))
                   ],
                 ),
                 AnimatedPadding(
@@ -784,19 +833,27 @@ late TextEditingController _replyTextController ;
                                 flex: 2,
                                 child: GestureDetector(
                                     onTap: () async {
-                                      String text = _replyTextController.text.trim();
+                                      String text =
+                                          _replyTextController.text.trim();
                                       if (text.isEmpty) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
                                             content: Text('输入框不能为空！'),
-                                            duration: Duration(seconds: 1), // 设置显示时间
-                                            backgroundColor: Colors.black12, // 设置背景色
+                                            duration: Duration(seconds: 1),
+                                            // 设置显示时间
+                                            backgroundColor:
+                                                Colors.black12, // 设置背景色
                                           ),
                                         );
                                         return;
                                       }
                                       _myPageController.isTraceComment = false;
-                                      sendOrRemoveComment(2, widget.params['id'], _replyTextController.text, _myPageController.currentCommentId );
+                                      sendOrRemoveComment(
+                                          2,
+                                          widget.params['id'],
+                                          _replyTextController.text,
+                                          _myPageController.currentCommentId);
 
                                       _replyFocusNode.unfocus();
                                       _replyTextController.clear();
@@ -814,7 +871,6 @@ late TextEditingController _replyTextController ;
       ),
     );
   }
-
 }
 
 class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
@@ -847,5 +903,3 @@ class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
         oldDelegate.minExtent != minExtent;
   }
 }
-
-

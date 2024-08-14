@@ -21,20 +21,18 @@ Map<String, dynamic> _$RelayBeanToJson(RelayBean instance) => <String, dynamic>{
 Events _$EventsFromJson(Map<String, dynamic> json) {
   var type = (json['type'] as num).toInt();
   var data = jsonDecode(json['json'] as String);
-  Message message = Message.fromJson(data,type);
+  Message message = Message.fromJson(data, type);
 
   return Events(
-    Info.fromJson(json['info'] as Map<String, dynamic>),
-    (json['id'] as num).toInt(),
-    (json['showTime'] as num).toInt(),
+      Info.fromJson(json['info'] as Map<String, dynamic>),
+      (json['id'] as num).toInt(),
+      (json['showTime'] as num).toInt(),
       json['json'] as String,
-    IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
-    User.fromJson(json['user'] as Map<String, dynamic>),
-    json['threadId'] as String,
-    type,
-    message
-
-  );
+      IpLocation.fromJson(json['ipLocation'] as Map<String, dynamic>),
+      User.fromJson(json['user'] as Map<String, dynamic>),
+      json['threadId'] as String,
+      type,
+      message);
 }
 
 Map<String, dynamic> _$EventsToJson(Events instance) => <String, dynamic>{
@@ -64,29 +62,32 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
 
 CommentThread _$CommentThreadFromJson(Map<String, dynamic> json) =>
     CommentThread(
-      json['resourceTitle'] ==null?"":  json['resourceTitle'] as String,
-      json['latestLikedUsers'] ==null?[]: (json['latestLikedUsers']as List<dynamic>).map((e)=>LatestLikedUsers(e['s'])).toList()
-
-    );
+        json['resourceTitle'] == null ? "" : json['resourceTitle'] as String,
+        json['latestLikedUsers'] == null
+            ? []
+            : (json['latestLikedUsers'] as List<dynamic>)
+                .map((e) => LatestLikedUsers(e['s']))
+                .toList());
 
 Map<String, dynamic> _$CommentThreadToJson(CommentThread instance) =>
     <String, dynamic>{
       'resourceTitle': instance.resourceTitle,
     };
 
-Message _$MessageFromJson(Map<String, dynamic> json,int type){
+Message _$MessageFromJson(Map<String, dynamic> json, int type) {
   OtherInfo info = OtherInfo();
-  switch(type){
+  switch (type) {
     case 18:
-      info.song =  Song.fromJson(json['song'] as Map<String, dynamic>);
+      info.song = Song.fromJson(json['song'] as Map<String, dynamic>);
       break;
     case 19:
-      info.album =  Album.fromJson(json['album'] as Map<String, dynamic>);
+      info.album = Album.fromJson(json['album'] as Map<String, dynamic>);
       break;
     case 13:
     case 35:
-    info.playlist =  SongSheetList.fromJson(json['playlist'] as Map<String, dynamic>);
-    break;
+      info.playlist =
+          SongSheetList.fromJson(json['playlist'] as Map<String, dynamic>);
+      break;
   }
 
   return Message(

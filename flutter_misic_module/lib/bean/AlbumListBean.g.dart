@@ -21,19 +21,22 @@ Map<String, dynamic> _$AlbumListBeanToJson(AlbumListBean instance) =>
     };
 
 Album _$AlbumFromJson(Map<String, dynamic> json) => Album(
-    json['picUrl']==null?"":  json['picUrl'] as String,
-      json['blurPicUrl'] as String,
-      json['description'] as String,
-      json['name'] as String,
-      (json['id'] as num).toInt(),
-      (json['size'] as num).toInt(),
-    json['info']==null?Info(0, 0, 0, 0, false):Info.fromJson(json['info'] as Map<String, dynamic>),
-      (json['publishTime'] as num).toInt(),
-    json['artists'] ==null?[] : (json['artists'] as List<dynamic>)
-          .map((e) => Artists.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    json['alias'] ==null?[]:List<String>.from(json['alias'])
-    );
+    json['picUrl'] == null ? "" : json['picUrl'] as String,
+    json['blurPicUrl'] as String,
+    json['description'] as String,
+    json['name'] as String,
+    (json['id'] as num).toInt(),
+    (json['size'] as num).toInt(),
+    json['info'] == null
+        ? Info(0, 0, 0, 0, false)
+        : Info.fromJson(json['info'] as Map<String, dynamic>),
+    (json['publishTime'] as num).toInt(),
+    json['artists'] == null
+        ? []
+        : (json['artists'] as List<dynamic>)
+            .map((e) => Artists.fromJson(e as Map<String, dynamic>))
+            .toList(),
+    json['alias'] == null ? [] : List<String>.from(json['alias']));
 
 Map<String, dynamic> _$AlbumToJson(Album instance) => <String, dynamic>{
       'picUrl': instance.picUrl,
@@ -50,7 +53,7 @@ Map<String, dynamic> _$AlbumToJson(Album instance) => <String, dynamic>{
 Artists _$ArtistsFromJson(Map<String, dynamic> json) => Artists(
       (json['id'] as num).toInt(),
       json['name'] as String,
-  json['followed']==null?false: json['followed'] as bool,
+      json['followed'] == null ? false : json['followed'] as bool,
     );
 
 Map<String, dynamic> _$ArtistsToJson(Artists instance) => <String, dynamic>{
@@ -76,10 +79,14 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
     };
 
 Songs _$SongsFromJson(Map<String, dynamic> json) => Songs(
-  json['ar']==null?[]:   (json['ar'] as List<dynamic>)
-          .map((e) => AR.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    json['al']==null?Al("", ""):   Al.fromJson(json['al'] as Map<String, dynamic>),
+      json['ar'] == null
+          ? []
+          : (json['ar'] as List<dynamic>)
+              .map((e) => AR.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      json['al'] == null
+          ? Al("", "")
+          : Al.fromJson(json['al'] as Map<String, dynamic>),
       json['name'] as String,
       (json['id'] as num).toInt(),
     );

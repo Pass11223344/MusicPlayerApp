@@ -33,10 +33,10 @@ class SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context,
-      double shrinkOffset,
-      bool overlapsContent,
-      ) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     Widget child = builder(context, shrinkOffset, overlapsContent);
     //测试代码：如果在调试模式，且子组件设置了key，则打印日志
     assert(() {

@@ -1,7 +1,6 @@
 package com.rikkatheworld.wangyiyun.fragment;
 
 
-
 import static android.os.Build.VERSION_CODES.N;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.CURRENT_PLAY_MODE;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.SINGLE_PLAY_MODE_ONE;
@@ -103,9 +102,7 @@ import java.util.Set;
 public class HomeFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, ViewPager.OnPageChangeListener {
 
 
-
-
-    public  HomeHandler homeHandler;
+    public HomeHandler homeHandler;
     public static String moduleTitle;
     public static String radarTitle;
     public static String tvExclusiveSheetTitle;
@@ -123,12 +120,12 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
     public static final int URL_ID = 3;
     public static final int LRC_ID = 4;
 
-   // public static final int SONG_SHEET_ID = 5;
+    // public static final int SONG_SHEET_ID = 5;
     public static final int ADD_OR_REMOVE = 6;
     public static final int SONG_LIST = 7;
     public static final int SONGS = 8;
     private RecyclerView horizontalRecycler;
-   // private AsyncTimer asyncTimer_banner;
+    // private AsyncTimer asyncTimer_banner;
     private Runnable banner_runnable;
     private ViewPager singLessAlbum;
     private SinglesAndAlbumsAdapter singlesAndAlbumsAdapter;
@@ -197,19 +194,21 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-     //   homeHandler = new HomeHandler();
+        //   homeHandler = new HomeHandler();
         banner_runnable = () -> {
 
-            Vp_banner.setCurrentItem(countItem++,true);
-            homeHandler.postDelayed(banner_runnable,5000);
+            Vp_banner.setCurrentItem(countItem++, true);
+            homeHandler.postDelayed(banner_runnable, 5000);
         };
     }
-  public HomeHandler  getHomeHandler(){
-      if (homeHandler==null) {
-          homeHandler = new HomeHandler()  ;
-      }
+
+    public HomeHandler getHomeHandler() {
+        if (homeHandler == null) {
+            homeHandler = new HomeHandler();
+        }
         return homeHandler;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -229,21 +228,21 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
         new DataProcessingTask().execute(app.HomeData);
 
 
-
     }
 
 
-public void hideFragment(){
-    getActivity().getSupportFragmentManager()
-            .beginTransaction()
-            .setCustomAnimations(
-                    R.anim.fade_in,
-                    R.anim.fade_out,
-                    R.anim.fade_in,
-                    R.anim.fade_out)
-            .hide(songSheetFragment)
-            .commit();
-}
+    public void hideFragment() {
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out)
+                .hide(songSheetFragment)
+                .commit();
+    }
+
     private void initView() {
 
         EditText search_btn = getView().findViewById(R.id.search_btn);
@@ -253,7 +252,7 @@ public void hideFragment(){
         search_btn.setOnClickListener(this);
 
 
-        bannerAdapter = new BannerAdapter(getContext(),secondPage);
+        bannerAdapter = new BannerAdapter(getContext(), secondPage);
         banner_beanList = new ArrayList<>();
         re_home = getView().findViewById(R.id.re_home);
         load_page = getView().findViewById(R.id.load_page);
@@ -284,11 +283,11 @@ public void hideFragment(){
         btn_rankingList.setOnClickListener(this);
 
         LinearLayoutManager horizontalRecycler_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        LinearLayoutManager svDish_layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager rvRadar_layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager  rvExclusiveSheet_layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager rvSpeciallyProduced_layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager rvConcentration_layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager svDish_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager rvRadar_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager rvExclusiveSheet_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager rvSpeciallyProduced_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager rvConcentration_layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
         horizontalRecycler.setLayoutManager(horizontalRecycler_layoutManager);
         svDish.setLayoutManager(svDish_layoutManager);
@@ -298,20 +297,20 @@ public void hideFragment(){
         rv_specially_produced.setLayoutManager(rvSpeciallyProduced_layoutManager);
 
 
-        singlesAndAlbumsAdapter = new SinglesAndAlbumsAdapter(getContext(),secondPage);
-        digitalAlbumsAdapter = new DigitalAlbumsAdapter(getContext(),secondPage);
+        singlesAndAlbumsAdapter = new SinglesAndAlbumsAdapter(getContext(), secondPage);
+        digitalAlbumsAdapter = new DigitalAlbumsAdapter(getContext(), secondPage);
         recommendableMusicAdapter = new RecommendableMusicAdapter(getContext());
-        musicRadarAdapter = new MusicRadarAdapter(getContext(),secondPage);
+        musicRadarAdapter = new MusicRadarAdapter(getContext(), secondPage);
         concentrationAdapter = new ConcentrationAdapter(getContext());
         speciallyProducedAdapter = new SpeciallyProducedAdapter(getContext());
-        exclusiveSceneSongListAdapter = new ExclusiveSceneSongListAdapter(getContext(),secondPage);
+        exclusiveSceneSongListAdapter = new ExclusiveSceneSongListAdapter(getContext(), secondPage);
 
         Vp_banner = getView().findViewById(R.id.Vp_banner);
         Vp_banner.addOnPageChangeListener(this);
         Vp_banner.setOnTouchListener(this);
-       // singLessAlbum.setOffscreenPageLimit(1);
-       re_home.setPadding(0,px,0,0);
-       DrawerLayout drawerLayout = getActivity().findViewById(R.id.DL_main_drawer);
+        // singLessAlbum.setOffscreenPageLimit(1);
+        re_home.setPadding(0, px, 0, 0);
+        DrawerLayout drawerLayout = getActivity().findViewById(R.id.DL_main_drawer);
         img_menu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
 
@@ -319,7 +318,7 @@ public void hideFragment(){
 
 
     private void insertPoint() {
-        Log.d("TAG111111111111111111111", "insertPoint: "+banner_beanList.size());
+        Log.d("TAG111111111111111111111", "insertPoint: " + banner_beanList.size());
         for (int i = 0; i < banner_beanList.size(); i++) {
             point_view = new View(getContext());
             int currentItem = Vp_banner.getCurrentItem() % banner_beanList.size();
@@ -351,12 +350,12 @@ public void hideFragment(){
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-               // asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
-                if (banner_runnable==null) {
+                // asyncTimer_banner.startTimer(5000, 5000, banner_runnable);
+                if (banner_runnable == null) {
                     banner_runnable = () -> {
 
-                        Vp_banner.setCurrentItem(  countItem++);
-                        homeHandler.postDelayed(banner_runnable,5000);
+                        Vp_banner.setCurrentItem(countItem++);
+                        homeHandler.postDelayed(banner_runnable, 5000);
 
                     };
                 }
@@ -370,97 +369,96 @@ public void hideFragment(){
     @Override
     public void onClick(View v) {
         int id = v.getId();
-      if(id==R.id.lin_recommend){
-          app.page +=1;
-          app.touchType = TouchType.RECOMMENDABLE_SHEET;
-          ((MainActivity) getContext()).setRecommendSheetId("-1");
-          secondPage.toSecond(TO_RECOMMEND_SONG, "-1");
-      }else if(id==R.id.lin_radio){
-          if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE)
-          {
-              ((MainActivity) getContext()).OpenSheet();
-              return;
-          }
+        if (id == R.id.lin_recommend) {
+            app.page += 1;
+            app.touchType = TouchType.RECOMMENDABLE_SHEET;
+            ((MainActivity) getContext()).setRecommendSheetId("-1");
+            secondPage.toSecond(TO_RECOMMEND_SONG, "-1");
+        } else if (id == R.id.lin_radio) {
+            if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE || CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
+                ((MainActivity) getContext()).OpenSheet();
+                return;
+            }
 
-          //app.touchType = TouchType.EXCLUSIVE_MUSIC;
-          ((MainActivity)getActivity()).setCurrentMode("ExclusiveMusicMode");
-          //if (playerInfo!=null) {
-              if (playerInfo.getListBeans()!=null)  playerInfo.getListBeans().clear();
-         // }
+            //app.touchType = TouchType.EXCLUSIVE_MUSIC;
+            ((MainActivity) getActivity()).setCurrentMode("ExclusiveMusicMode");
+            //if (playerInfo!=null) {
+            if (playerInfo.getListBeans() != null) playerInfo.getListBeans().clear();
+            // }
 
 
-          activityMainBinding.setPlayerInfo(playerInfo);
-        loadMp3("radio");
-      }else if(id==R.id.lin_songSheet){
-         ( (MainActivity) getContext()).hideView();
-         ( (MainActivity)getContext()).setBackColor();
-          ((MainActivity) getContext()).setRecommendSheetId("10086");
-          // 获取FragmentManager
-          FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-          // 开始事务
-          transaction = fragmentManager.beginTransaction();
-          transaction.setCustomAnimations(
-                  R.anim.fade_in,
-                  R.anim.fade_out,
-                  R.anim.fade_in,
-                  R.anim.fade_out
-          );
-          // 检查MyFragment是否已添加，如果没有，则添加
-          songSheetFragment = (SongSheetFragment) fragmentManager.findFragmentByTag("SongShee_FRAGMENT");
-          if (songSheetFragment == null) {
-              songSheetFragment = new SongSheetFragment(secondPage);
-              // 使用addToBackStack允许用户通过返回按钮回到之前的状态
-              transaction.
-                      add(R.id.home_song_sheet, songSheetFragment, "SongShee_FRAGMENT")
-                      .addToBackStack(null)
-                      .commit();
-          } else {
+            activityMainBinding.setPlayerInfo(playerInfo);
+            loadMp3("radio");
+        } else if (id == R.id.lin_songSheet) {
+            ((MainActivity) getContext()).hideView();
+            ((MainActivity) getContext()).setBackColor();
+            ((MainActivity) getContext()).setRecommendSheetId("10086");
+            // 获取FragmentManager
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            // 开始事务
+            transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(
+                    R.anim.fade_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.fade_out
+            );
+            // 检查MyFragment是否已添加，如果没有，则添加
+            songSheetFragment = (SongSheetFragment) fragmentManager.findFragmentByTag("SongShee_FRAGMENT");
+            if (songSheetFragment == null) {
+                songSheetFragment = new SongSheetFragment(secondPage);
+                // 使用addToBackStack允许用户通过返回按钮回到之前的状态
+                transaction.
+                        add(R.id.home_song_sheet, songSheetFragment, "SongShee_FRAGMENT")
+                        .addToBackStack(null)
+                        .commit();
+            } else {
 
-              transaction.show(songSheetFragment).commit();
-          }
+                transaction.show(songSheetFragment).commit();
+            }
 
-      }else if(id==R.id.lin_rankingList){
-          app.page+=1;
-          app.touchType = TouchType.RANKING_PAGE;
-          secondPage.toSecond(TO_RANKING,"12138");
+        } else if (id == R.id.lin_rankingList) {
+            app.page += 1;
+            app.touchType = TouchType.RANKING_PAGE;
+            secondPage.toSecond(TO_RANKING, "12138");
 
-      }else if(id==R.id.search_btn){
-          app.page+=1;
-          app.touchType = TouchType.SEARCH_PAGE;
-          transaction = fragmentManager.beginTransaction();
-          transaction.setCustomAnimations(
-                  R.anim.fade_in,
-                  R.anim.fade_out,
-                  R.anim.fade_in,
-                  R.anim.fade_out
-          );
-          searchFragment = (SearchPage) fragmentManager.findFragmentByTag("SearchPage_FRAGMENT");
-          if (searchFragment == null) {
-              searchFragment = new SearchPage();
-              // 使用addToBackStack允许用户通过返回按钮回到之前的状态
-              transaction.add(R.id.fragment_container, searchFragment, "SearchPage_FRAGMENT")
-                      .addToBackStack(null)
-                      .commit();
-          } else {
+        } else if (id == R.id.search_btn) {
+            app.page += 1;
+            app.touchType = TouchType.SEARCH_PAGE;
+            transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(
+                    R.anim.fade_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.fade_out
+            );
+            searchFragment = (SearchPage) fragmentManager.findFragmentByTag("SearchPage_FRAGMENT");
+            if (searchFragment == null) {
+                searchFragment = new SearchPage();
+                // 使用addToBackStack允许用户通过返回按钮回到之前的状态
+                transaction.add(R.id.fragment_container, searchFragment, "SearchPage_FRAGMENT")
+                        .addToBackStack(null)
+                        .commit();
+            } else {
 
-              transaction.show(searchFragment).commit();
-          }
-          ((MainActivity)getActivity()).hideView();
-      }
+                transaction.show(searchFragment).commit();
+            }
+            ((MainActivity) getActivity()).hideView();
+        }
     }
 
-    public   void loadMp3(String type){
-        switch (type){
-            case  "radio":
-                    // 生成-180到180之间的随机数
-                    number = secureRandom.nextInt(363) - 181;
-                    if (number!=currentNumber) {
-                        currentNumber = number;
-                    }else number -=1;
-                    generated.add(number);
+    public void loadMp3(String type) {
+        switch (type) {
+            case "radio":
+                // 生成-180到180之间的随机数
+                number = secureRandom.nextInt(363) - 181;
+                if (number != currentNumber) {
+                    currentNumber = number;
+                } else number -= 1;
+                generated.add(number);
 
 
-                NetworkUtils.makeRequest(NetworkInfo.URL +"/aidj/content/rcmd?longitude="+number+"&latitude="+(number-1),homeHandler,SONGS,true,getContext());
+                NetworkUtils.makeRequest(NetworkInfo.URL + "/aidj/content/rcmd?longitude=" + number + "&latitude=" + (number - 1), homeHandler, SONGS, true, getContext());
                 break;
             //   case ""
         }
@@ -498,7 +496,7 @@ public void hideFragment(){
 
     }
 
-    public   class HomeHandler extends Handler {
+    public class HomeHandler extends Handler {
 
         private List<ExclusiveMusicBean> exclusiveMusic;
 
@@ -517,7 +515,7 @@ public void hideFragment(){
 
                     break;
                 case AUTO_PAGER:
-                    Log.d("TAG----------zzccc-----------", "onViewCreated: "+(msg.obj)+"00000s"+Vp_banner.getCurrentItem());
+                    Log.d("TAG----------zzccc-----------", "onViewCreated: " + (msg.obj) + "00000s" + Vp_banner.getCurrentItem());
 
                     Vp_banner.setCurrentItem((Integer) msg.obj);
 // 在数据变更后调用
@@ -526,17 +524,17 @@ public void hideFragment(){
                     break;
                 case URL_ID:
 
-                    if (msg.obj!=null) {
+                    if (msg.obj != null) {
                         String string = msg.obj.toString();
                         try {
                             //App app = (App)activity.getApplication();
-                           // Gson gson = app.gson;
+                            // Gson gson = app.gson;
                             JSONObject jsonObject = new JSONObject(string);
-                            String data = String.valueOf(jsonObject.get("data")) ;
+                            String data = String.valueOf(jsonObject.get("data"));
                             Gson gson = new Gson();
                             Type listType = new TypeToken<List<UrlBeans>>() {
                             }.getType();
-                           List<UrlBeans> urlBeans = gson.fromJson(data,listType);
+                            List<UrlBeans> urlBeans = gson.fromJson(data, listType);
 
 
                             mp3Info.getMp3Info(urlBeans);
@@ -548,15 +546,15 @@ public void hideFragment(){
                     }
                     break;
                 case LRC_ID:
-                    if (msg.obj!=null){
-                        String obj =  msg.obj.toString();
+                    if (msg.obj != null) {
+                        String obj = msg.obj.toString();
 
                         try {
-                            String translateLyric  = "";
+                            String translateLyric = "";
                             String lyricT = "";
                             JSONObject jsonObject = new JSONObject(obj);
                             if (!jsonObject.has("lrc")) {
-                                return ;
+                                return;
                             }
 
                             if (jsonObject.has("tlyric")) {
@@ -570,7 +568,7 @@ public void hideFragment(){
                             String lyric = String.valueOf(lrc.get("lyric"));
 
 
-                            getLrcString.setLrc(lyric,translateLyric);
+                            getLrcString.setLrc(lyric, translateLyric);
 
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -580,16 +578,16 @@ public void hideFragment(){
 
                 case ADD_OR_REMOVE:
 
-                    LoadNetWorkCall.DOCall("getSongList",sheetList.get(0).getSheetId());
+                    LoadNetWorkCall.DOCall("getSongList", sheetList.get(0).getSheetId());
 
                     break;
                 case SONG_LIST:
-                    if (msg.obj!=null){
-                        String obj =  msg.obj.toString();
+                    if (msg.obj != null) {
+                        String obj = msg.obj.toString();
                         try {
                             JSONObject object = new JSONObject(obj);
                             String o = String.valueOf(object.get("songs"));
-                            List<UserSongListBean> getSongList = (List<UserSongListBean>) MyGsonUtil.getInstance().press(o, "getSongList",app);
+                            List<UserSongListBean> getSongList = (List<UserSongListBean>) MyGsonUtil.getInstance().press(o, "getSongList", app);
                             songLists.setSongList(getSongList);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -597,49 +595,50 @@ public void hideFragment(){
                     }
                     break;
                 case SONGS:
-                    if (msg.obj!=null){
-                        String obj =  msg.obj.toString();
-                        String  result = "";
+                    if (msg.obj != null) {
+                        String obj = msg.obj.toString();
+                        String result = "";
                         try {
                             JSONObject jsonObject = new JSONObject(obj);
                             JSONObject data = (JSONObject) jsonObject.get("data");
-                              result = String.valueOf(data.get("aiDjResources"));
+                            result = String.valueOf(data.get("aiDjResources"));
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
-                        if (exclusiveMusic==null) {
+                        if (exclusiveMusic == null) {
                             exclusiveMusic = new ArrayList<>();
                         }
                         List<ListBean> list = new ArrayList<>();
 
                         for (ExclusiveMusicBean exclusiveMusicBean : app.gson.fromJson(result, ExclusiveMusicBean[].class)) {
                             if (exclusiveMusicBean.getType().equals("song")) {
-                             //exclusiveMusic.add(exclusiveMusicBean);
-                                ListBean listBean =  new ListBean();
-                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: "+exclusiveMusicBean.getValue().songData.artists.size());
+                                //exclusiveMusic.add(exclusiveMusicBean);
+                                ListBean listBean = new ListBean();
+                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: " + exclusiveMusicBean.getValue().songData.artists.size());
                                 String ar = app.gson.toJson(exclusiveMusicBean.getValue().songData.artists);
-                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: "+ar);
-                                Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
-                                List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(ar,token);
+                                Log.d("TAGjdjdjfjj", "dispatchMessaaaasddfge: " + ar);
+                                Type token = new TypeToken<List<UserSongListBean.Ar>>() {
+                                }.getType();
+                                List<UserSongListBean.Ar> SingerInfo = app.gson.fromJson(ar, token);
                                 listBean.setSingerInfo(SingerInfo);
                                 listBean.setSongName(exclusiveMusicBean.getValue().songData.name);
                                 listBean.setSongId(exclusiveMusicBean.getValue().songData.id);
                                 listBean.setSubTitle(exclusiveMusicBean.getValue().songData.album.subType);
                                 listBean.setImgUrl(exclusiveMusicBean.getValue().songData.album.picUrl);
-                               list.add(listBean);
+                                list.add(listBean);
 
                             }
                         }
-                        if (playerInfo.getListBeans()!=null) {
-                           playerInfo.addListBeans(list);
+                        if (playerInfo.getListBeans() != null) {
+                            playerInfo.addListBeans(list);
                             activityMainBinding.setPlayerInfo(playerInfo);
-                            isUpData =2;
-                            app.isUpViewpage =true;
+                            isUpData = 2;
+                            app.isUpViewpage = true;
                             ((MainActivity) getContext()).playerPageAdapter.setData(playerInfo.getListBeans());
                             ((MainActivity) getContext()).songListAdapter.upData(playerInfo.getListBeans());
 
 
-                        }else {
+                        } else {
                             playerInfo.setListBeans(list);
                             setImg.setImg(list.get(0).getImgUrl());
                             String name = Utils.getString(list.get(0));
@@ -653,14 +652,14 @@ public void hideFragment(){
                             activityMainBinding.setPlayerInfo(playerInfo);
                             ((MainActivity) getContext()).OpenSheet();
                             ((MainActivity) getContext())
-                                    .play(String.valueOf(playerInfo.getListBeans().get(0).getSongId()),null);
+                                    .play(String.valueOf(playerInfo.getListBeans().get(0).getSongId()), null);
 
                             setList.setListInfo(playerInfo.getListBeans());
 
                         }
 
 
-                      //  setCurrentPageItem.setCurrentItem(0);
+                        //  setCurrentPageItem.setCurrentItem(0);
                     }
                     break;
 
@@ -671,8 +670,9 @@ public void hideFragment(){
 
 
     }
-    public static void UpDateText(String text,String code) {
-        switch (code){
+
+    public static void UpDateText(String text, String code) {
+        switch (code) {
 
             case "module_title":
                 moduleTitle = text;
@@ -696,11 +696,11 @@ public void hideFragment(){
         }
 
 
-
     }
+
     @SuppressLint("ClickableViewAccessibility")
     private void Draw_recommended_sheet() {
-        recommendRecyclerAdapter = new recommendRecyclerAdapter(getContext(), recommended_playlists,secondPage,app);
+        recommendRecyclerAdapter = new recommendRecyclerAdapter(getContext(), recommended_playlists, secondPage, app);
         horizontalRecycler.setAdapter(recommendRecyclerAdapter);
 
 
@@ -722,16 +722,15 @@ public void hideFragment(){
     public void onResume() {
         super.onResume();
         Log.d("TAG----------qqqqqqq", "onResume: ");
-        if (banner_runnable==null) {
+        if (banner_runnable == null) {
             banner_runnable = () -> {
-               // countItem = Vp_banner.getCurrentItem();
-                Vp_banner.setCurrentItem(  countItem++);
-                homeHandler.postDelayed(banner_runnable,5000);
+                // countItem = Vp_banner.getCurrentItem();
+                Vp_banner.setCurrentItem(countItem++);
+                homeHandler.postDelayed(banner_runnable, 5000);
 
             };
         }
         homeHandler.post(banner_runnable);
-
 
 
 //        if (asyncTimer_banner!=null) {
@@ -749,55 +748,64 @@ public void hideFragment(){
         homeHandler.removeCallbacks(banner_runnable);
 
     }
-    public  void setDataFromAdapter(dataFromAdapter dataFromAdapter){
+
+    public void setDataFromAdapter(dataFromAdapter dataFromAdapter) {
         FromAdapter = dataFromAdapter;
 
         Bundle bundle = FromAdapter.fromAdapter();
         this.setArguments(bundle);
     }
-    public interface dataFromAdapter{
-        Bundle  fromAdapter();
+
+    public interface dataFromAdapter {
+        Bundle fromAdapter();
     }
 
-    public  void setLoadNetWorkCall(LoadNetWorkCall loadNetWorkCall){
-         LoadNetWorkCall = loadNetWorkCall;
+    public void setLoadNetWorkCall(LoadNetWorkCall loadNetWorkCall) {
+        LoadNetWorkCall = loadNetWorkCall;
     }
-    public interface LoadNetWorkCall{
-        void DOCall(String flag,long sheetId);
+
+    public interface LoadNetWorkCall {
+        void DOCall(String flag, long sheetId);
     }
-    public  void setSongLists(SongList songList){
+
+    public void setSongLists(SongList songList) {
         songLists = songList;
     }
-    public interface SongList{
+
+    public interface SongList {
         void setSongList(List<UserSongListBean> songList);
     }
 
 
-    public GHandler getHandler( ){
-       GHandler gHandler = () -> {
+    public GHandler getHandler() {
+        GHandler gHandler = () -> {
 
 
-
-       };
-   return gHandler;
+        };
+        return gHandler;
     }
-    public interface GHandler{
+
+    public interface GHandler {
         void initGHandler();
     }
-    public interface   NavigationToSecond{
-        void   toSecond(String type,String id);
+
+    public interface NavigationToSecond {
+        void toSecond(String type, String id);
     }
-    public void setNavigationToSecond(NavigationToSecond secondPage){
+
+    public void setNavigationToSecond(NavigationToSecond secondPage) {
         this.secondPage = secondPage;
     }
-    public interface GetMp3Info{
+
+    public interface GetMp3Info {
         void getMp3Info(List<UrlBeans> urlBeans);
     }
-    public void setMp3Info(GetMp3Info mp3Info){
+
+    public void setMp3Info(GetMp3Info mp3Info) {
         this.mp3Info = mp3Info;
     }
 
-    private class DataProcessingTask extends AsyncTask<String, Void, Boolean>{
+    private class DataProcessingTask extends AsyncTask<String, Void, Boolean> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -813,20 +821,19 @@ public void hideFragment(){
                 digitalAlbumsAdapter.setData(singLe_albumsList);
                 svDish.setAdapter(digitalAlbumsAdapter);
                 recommendableMusicAdapter.setData(recommendableMusics);
-                UpDateText(recommendableMusics.get(0).get(0).getModuleTitle(),"module_title");
+                UpDateText(recommendableMusics.get(0).get(0).getModuleTitle(), "module_title");
                 //recommendableMusicAdapter.setUrlData(urlBeans);
                 vp_recommend_music.setAdapter(recommendableMusicAdapter);
                 recommendableMusicAdapter.notifyDataSetChanged();
 
                 musicRadarAdapter.setData(musicRadar_beanList);
-                UpDateText(musicRadar_beanList.get(0).getRadarTitle(),"radar_title");
+                UpDateText(musicRadar_beanList.get(0).getRadarTitle(), "radar_title");
                 rvRadar.setAdapter(musicRadarAdapter);
 
 
                 exclusiveSceneSongListAdapter.setData(exclusiveSceneSongList_beanList);
-                UpDateText(exclusiveSceneSongList_beanList.get(0).getModuleTitle(),"exclusive_sheet");
+                UpDateText(exclusiveSceneSongList_beanList.get(0).getModuleTitle(), "exclusive_sheet");
                 rv_exclusive_sheet.setAdapter(exclusiveSceneSongListAdapter);
-
 
 
                 speciallyProducedAdapter.setData(speciallyProduced_beanList);
@@ -834,48 +841,47 @@ public void hideFragment(){
 
 
                 concentrationAdapter.setData(concentration_beanList);
-                UpDateText(concentration_beanList.get(0).getModuleTitle(),"concentration_title");
+                UpDateText(concentration_beanList.get(0).getModuleTitle(), "concentration_title");
                 rv_concentration.setAdapter(concentrationAdapter);
 
 
                 bannerAdapter.setData(banner_beanList);
                 Draw_recommended_sheet();
-                if (lin_point.getChildAt(0)==null) {
+                if (lin_point.getChildAt(0) == null) {
                     insertPoint();
                 }
                 Vp_banner.setAdapter(bannerAdapter);
-                Vp_banner.setCurrentItem(10000 / 2,false);
+                Vp_banner.setCurrentItem(10000 / 2, false);
                 countItem = Vp_banner.getCurrentItem();
 
 
             }
 
-            if (load_page.getVisibility()!= View.GONE) {
+            if (load_page.getVisibility() != View.GONE) {
                 load_page.setVisibility(View.GONE);
                 home_root.setVisibility(View.VISIBLE);
             }
 
 
-            
         }
 
         @Override
         protected Boolean doInBackground(String... strings) {
             String s = strings[0];
-            banner_beanList = Home_GsonUtil.getInstance().press(s, BannerBean.class, "HOMEPAGE_BANNER",getContext());
-            recommended_playlists = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_PLAYLIST_RCMD",getContext());
-            singLe_albumsList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG",getContext());
-            recommendableMusics = Home_GsonUtil.getInstance().press(s,null,"HOMEPAGE_BLOCK_STYLE_RCMD",getContext());
-            musicRadar_beanList = Home_GsonUtil.getInstance().press(s,null,"HOMEPAGE_BLOCK_MGC_PLAYLIST",getContext());
-            concentration_beanList = Home_GsonUtil.getInstance().press(s,null,"HOMEPAGE_BLOCK_NEW_HOT_COMMENT",getContext());
-            exclusiveSceneSongList_beanList = Home_GsonUtil.getInstance().press(s,null,"HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST",getContext());
-            speciallyProduced_beanList = Home_GsonUtil.getInstance().press(s,null,"HOMEPAGE_BLOCK_YUNCUN_PRODUCED",getContext());
+            banner_beanList = Home_GsonUtil.getInstance().press(s, BannerBean.class, "HOMEPAGE_BANNER", getContext());
+            recommended_playlists = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_PLAYLIST_RCMD", getContext());
+            singLe_albumsList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG", getContext());
+            recommendableMusics = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_STYLE_RCMD", getContext());
+            musicRadar_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_MGC_PLAYLIST", getContext());
+            concentration_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_NEW_HOT_COMMENT", getContext());
+            exclusiveSceneSongList_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST", getContext());
+            speciallyProduced_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_YUNCUN_PRODUCED", getContext());
             return banner_beanList != null
                     && recommended_playlists != null
-                    &&singLe_albumsList!=null&&
-                    recommendableMusics != null&&musicRadar_beanList!=null
-                    &&concentration_beanList!=null&&
-                    exclusiveSceneSongList_beanList!=null&&speciallyProduced_beanList!=null;
+                    && singLe_albumsList != null &&
+                    recommendableMusics != null && musicRadar_beanList != null
+                    && concentration_beanList != null &&
+                    exclusiveSceneSongList_beanList != null && speciallyProduced_beanList != null;
         }
 
     }

@@ -23,7 +23,7 @@ NotificationListBean _$NotificationListBeanFromJson(
     );
 
 Map<String, dynamic> _$NotificationListBeanToJson(
-    NotificationListBean instance) =>
+        NotificationListBean instance) =>
     <String, dynamic>{
       'msgCount': instance.msgCount,
       'newMsgCount': instance.newMsgCount,

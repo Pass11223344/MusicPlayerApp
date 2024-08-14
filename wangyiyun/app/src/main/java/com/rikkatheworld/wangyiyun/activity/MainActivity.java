@@ -1,9 +1,6 @@
 package com.rikkatheworld.wangyiyun.activity;
 
 
-
-
-
 import static com.rikkatheworld.wangyiyun.adapter.PlayerPageAdapter.playerPageAdapterAnimation;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.ADD_OR_REMOVE;
 import static com.rikkatheworld.wangyiyun.fragment.HomeFragment.LRC_ID;
@@ -54,6 +51,7 @@ import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -137,7 +135,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener, ViewPager.OnPageChangeListener, DataModel.DataModelObserver, EngineBindings.EngineBindingsDelegate {
 
 
-   private final int  MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE  =1;
+    private final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     public static final String MY_ENGINE_ID = "my_engine_id";
     public static final String MSG_ENGINE_ID = "msg_engine_id";
     private static final String CHANNEL = "from_flutter";
@@ -164,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static Boolean StateFlag = false;
     private LinearLayout lin_player;
-    public  BottomSheetBehavior<FrameLayout> behavior;
+    public BottomSheetBehavior<FrameLayout> behavior;
     private ImageView player_btn_to_back;
     private int statusBarHeight;
 
@@ -188,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private DrawerLayout dlMainDrawer;
     private RelativeLayout reMainContent;
     private FrameLayout song_list_back;
-   private static PlayerAlbumPager player_viewPage;
+    private static PlayerAlbumPager player_viewPage;
     public static PlayerInfo playerInfo;
     private RecyclerView player_song_list;
     public static beginPlay.CurrentItem setCurrentPageItem;
@@ -239,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public static boolean switchSong = false;
 
     int p = 0;
-    int p1 =0;
+    int p1 = 0;
     private ImageView layout_player_list;
     private AnimationUtil animationUtil;
     private boolean isAnimationToShow;
@@ -260,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private boolean likeOrNot;
     private boolean likeOrNot1;
     private boolean heart_isOnClick = false;
-    private final List<Long> newLikeList =new ArrayList<>();
+    private final List<Long> newLikeList = new ArrayList<>();
     private ImageView player_comment;
 
     private float y;
@@ -285,21 +283,22 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     public static int isUpData = 0;//单更：1/全更：2
     public static List<UrlBeans> songList = new ArrayList<>();
-    private List<ListBean> temporaryList   = new ArrayList<>();
-     private  List<ListBean>   orderList = new ArrayList<>();
-    private static   ImageView main_player_img;
+    private List<ListBean> temporaryList = new ArrayList<>();
+    private List<ListBean> orderList = new ArrayList<>();
+    private static ImageView main_player_img;
     private ListBean nextPager;
     //private Check check;
     private float offset;
     private Map<?, ?> newData;
     private App app;
-    private String sheetId="";
-    public static String oldSheetId="";
-    List<ListBean> Sheetlist = new ArrayList<>();;
+    private String sheetId = "";
+    public static String oldSheetId = "";
+    List<ListBean> Sheetlist = new ArrayList<>();
+    ;
     private long currentId = 0;
     float startX = 0;
     float startY = 0;
-    int diffOffset ;
+    int diffOffset;
     boolean inTO = false;
     private TextView list_title;
     private MyFragment myFragment;
@@ -311,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private float deltaX;
     private float deltaY;
     private boolean isScroll = false;
-   private Map<?, ?> info ;
+    private Map<?, ?> info;
     private String filePath;
     private String fileName = "songdata.ser";
     private HomeFragment.HomeHandler homeHandler;
@@ -324,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        myFragment.onActivityResult(requestCode,resultCode,data);
+        myFragment.onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -334,37 +333,35 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS,true,this);
+        NetworkUtils.makeRequest(NetworkInfo.URL + "/login/status", handler, STATUS, true, this);
 
         DataModel.getInstance().addObserver(this);
         activity = this;
         animationUtils = new AnimationUtil();
         app = (App) this.getApplication();
 
-        if (savedInstanceState!=null) {
+        if (savedInstanceState != null) {
             String fileName = savedInstanceState.getString("data");
-            app.HomeData = FileUtils.readStringFromFile(this,fileName);
+            app.HomeData = FileUtils.readStringFromFile(this, fileName);
         }
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         playerInfo = new PlayerInfo();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-  //      notifyBuilderManager = new NotifyBuilderManager();
+        //      notifyBuilderManager = new NotifyBuilderManager();
 
 
         initView();
 
         homeFragment.setNavigationToSecond(new HomeFragment.NavigationToSecond() {
             @Override
-            public void toSecond(String type,String id) {
+            public void toSecond(String type, String id) {
 
-                showMyFragment(type,id);
+                showMyFragment(type, id);
             }
         });
 
     }
-
-
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -372,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         Log.d("TAGddddddddddddllllllllsss", "initView: sssssssssssss");
 
         app.touchType = TouchType.HOME_PAGE;
-         bottom_view = findViewById(R.id.bottom_navigation);
+        bottom_view = findViewById(R.id.bottom_navigation);
         dlMainDrawer = findViewById(R.id.DL_main_drawer);
         dlMainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         fl_sidebar = findViewById(R.id.Fl_sidebar);
@@ -387,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(2);
         homeFragment = (HomeFragment) viewPager.getAdapter().instantiateItem(viewPager, 0);
-         homeHandler =   homeFragment.getHomeHandler();
+        homeHandler = homeFragment.getHomeHandler();
         myFragment = (MyFragment) viewPager.getAdapter().instantiateItem(viewPager, 1);
         msgFragment = (MsgFragment) viewPager.getAdapter().instantiateItem(viewPager, 2);
 
@@ -402,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         dlMainDrawer = findViewById(R.id.DL_main_drawer);
         fl_sidebar = findViewById(R.id.Fl_sidebar);
 
-        reMainContent =findViewById(R.id.RE_main_content);
+        reMainContent = findViewById(R.id.RE_main_content);
         bottomSheet = findViewById(R.id.bottom_sheet);
         lin_player = player_control.findViewById(R.id.lin_player);
 
@@ -411,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         playerFl = include_player.findViewById(R.id.player_FL);
         player_seekBar = include_player.findViewById(R.id.player_seekBar);
         player_viewPage = include_player.findViewById(R.id.player_viewPage);
-        playerPageAdapter = new PlayerPageAdapter(this,app);
+        playerPageAdapter = new PlayerPageAdapter(this, app);
 
         play_module = include_player.findViewById(R.id.player_play_module);
         player_heart = include_player.findViewById(R.id.player_heart_off);
@@ -439,8 +436,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         player_song_list = include_song_list.findViewById(R.id.re_player_song_list);
 
         scroll_btn = include_song_list.findViewById(R.id.scroll_btn);
-        scroll_btn.setOnTouchListener((v, event) -> closeList(null, event,scroll_btn));
-        player_song_list.setOnTouchListener((v, event) -> closeList((RecyclerView) v, event,scroll_btn));
+        scroll_btn.setOnTouchListener((v, event) -> closeList(null, event, scroll_btn));
+        player_song_list.setOnTouchListener((v, event) -> closeList((RecyclerView) v, event, scroll_btn));
 //
 
         LinearLayoutManager song_list_LayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -452,11 +449,10 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         player_seekBar.setOnSeekBarChangeListener(this);
         song_list_back.setOnClickListener(this);
-       player_viewPage.addOnPageChangeListener(this);
+        player_viewPage.addOnPageChangeListener(this);
         player_heart.setOnClickListener(this);
         player_comment.setOnClickListener(this);
         bottomSheet.setOnClickListener(this);
-
 
 
         player_viewPage.setOnTouchListener((v, event) -> {
@@ -494,13 +490,13 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 case MotionEvent.ACTION_UP:
 
                     nowDate = new Date().getTime();
-                    Log.d("TAG111111111111222", "initView: "+isScroll+"sssss"+getCurrentPagerIdx());
+                    Log.d("TAG111111111111222", "initView: " + isScroll + "sssss" + getCurrentPagerIdx());
 
                     new Handler(Looper.getMainLooper()).postDelayed(
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    if ((nowDate-lodDate)<300&&!isScroll) {
+                                    if ((nowDate - lodDate) < 300 && !isScroll) {
 
                                         player_stylus.setVisibility(View.INVISIBLE);
                                         mLrcView.setVisibility(View.VISIBLE);
@@ -508,14 +504,14 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                                     }
                                     isScroll = false;
                                 }
-                            },100
+                            }, 100
                     );
                     if (Math.abs(deltaX) > Math.abs(deltaY)) {
                         return false;
                     }
 
 
-                        break;
+                    break;
             }
 
 //            if (instance.serviceBinder!=null) {
@@ -542,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             public void onStateChanged(@NonNull View view, int i) {
                 if (i == BottomSheetBehavior.STATE_COLLAPSED || i == BottomSheetBehavior.STATE_HIDDEN) {
                     include_player.setVisibility(View.VISIBLE);
-                   behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 }
                 if (mLrcView.getVisibility() == View.VISIBLE || include_song_list.getVisibility() == View.VISIBLE) {
                     if (i == BottomSheetBehavior.STATE_DRAGGING) {
@@ -561,26 +557,26 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         main_player_img = player_control.findViewById(R.id.main_player_img);
 
         setImg = url -> {
-          Glide.with(this.getApplicationContext())
+            Glide.with(this.getApplicationContext())
                     .asBitmap()
                     .load(url)
                     .error(R.drawable.img_background)
                     .placeholder(R.drawable.img_background)
                     .apply(RequestOptions.bitmapTransform(new RoundedCorners(100)))
-                  .addListener(new RequestListener<Bitmap>() {
-                      @Override
-                      public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                          // 加载失败时的处理
-                          return false;
-                      }
+                    .addListener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                            // 加载失败时的处理
+                            return false;
+                        }
 
-                      @Override
-                      public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                          // 加载成功时的处理
-                          Utils.setColor(resource,player_rootView,"Muted");
-                          return false;
-                      }
-                  })
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                            // 加载成功时的处理
+                            Utils.setColor(resource, player_rootView, "Muted");
+                            return false;
+                        }
+                    })
                     .into(main_player_img);
             if (lin_player.getVisibility() == View.INVISIBLE) {
                 lin_player.setVisibility(View.VISIBLE);
@@ -602,11 +598,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 playerPageAdapter.setData(PlayerList);
                 PagerAdapter pagerAdapter = player_viewPage.getAdapter();
                 RecyclerView.Adapter listAdapter = player_song_list.getAdapter();
-                if (pagerAdapter==null||listAdapter==null) {
+                if (pagerAdapter == null || listAdapter == null) {
                     player_viewPage.setAdapter(playerPageAdapter);
                     songListAdapter = new SongListAdapter(this);
                     player_song_list.setAdapter(songListAdapter);
-                }else {
+                } else {
                     songListAdapter.upData(listBean);
                 }
 
@@ -617,10 +613,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         setCurrentPageItem = current -> {
             Log.d("TAG111111111111111", "initView: 我被调用");
 
-            if (isUpData==1) {
+            if (isUpData == 1) {
                 isUpData = 2;
-                playerPageAdapter.setData(playerInfo.getListBeans());}
-          player_viewPage.setCurrentItem(current);
+                playerPageAdapter.setData(playerInfo.getListBeans());
+            }
+            player_viewPage.setCurrentItem(current);
             if (animationUtils != null) {
                 animationUtils.stopRotate("cancel");
             }
@@ -628,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         lin_player.setVisibility(View.INVISIBLE);
 
         homeFragment.setLoadNetWorkCall((flag, sheetId) -> {
-            loadNetWork(flag,null,sheetId);
+            loadNetWork(flag, null, sheetId);
         });
         homeFragment.setSongLists(songList -> {
 
@@ -655,17 +652,17 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 switchSong = true;
                 next_song.setClickable(false);
 
-                if (isUpData==1) {
+                if (isUpData == 1) {
                     isUpData = 2;
                     playerPageAdapter.setData(playerInfo.getListBeans());
-                    if (pIndex ==0) {
-                        player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()+1 ,false);
+                    if (pIndex == 0) {
+                        player_viewPage.setCurrentItem(position1 + playerInfo.getListBeans().size() + 1, false);
                         pIndex = 1;
-                    }else {
-                        player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()+1 ,false);
+                    } else {
+                        player_viewPage.setCurrentItem(position1 - playerInfo.getListBeans().size() + 1, false);
                         pIndex = 0;
                     }
-                }else {
+                } else {
                     player_viewPage.setCurrentItem(position1 + 1);
 
                 }
@@ -678,18 +675,18 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 previous_song.setClickable(false);
 
 
-                if (isUpData==1) {
+                if (isUpData == 1) {
                     isUpData = 2;
                     playerPageAdapter.setData(playerInfo.getListBeans());
-                    if (pIndex ==0) {
-                        player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()-1 ,false);
+                    if (pIndex == 0) {
+                        player_viewPage.setCurrentItem(position1 + playerInfo.getListBeans().size() - 1, false);
                         pIndex = 1;
-                    }else {
-                        player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()-1 ,false);
+                    } else {
+                        player_viewPage.setCurrentItem(position1 - playerInfo.getListBeans().size() - 1, false);
                         pIndex = 0;
                     }
 
-                }else {
+                } else {
                     player_viewPage.setCurrentItem(position1 - 1);
 
                 }
@@ -705,13 +702,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             @Override
             public void onSeekTo(long pos) {
                 instance.serviceBinder.seek2((int) pos);
-                Log.d("MediaSessionManager", "onSeekTo: "+pos);
+                Log.d("MediaSessionManager", "onSeekTo: " + pos);
             }
         };
 
         lin_player.setOnClickListener(this);
-
-
 
 
         player_rootView = include_player.findViewById(R.id.player_rootView);
@@ -719,16 +714,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         ViewGroup.LayoutParams layoutParams = player_rootView.getLayoutParams();
         layoutParams.height = screenPoint.y + statusBarHeight;
         player_rootView.setLayoutParams(layoutParams);
-        if (userInfo!=null) {
-            loadNetWork("playlist",null,0);
+        if (userInfo != null) {
+            loadNetWork("playlist", null, 0);
         }
-      restoreData();
+        restoreData();
     }
 
     public void loadNetWork(String requestFlag, long[] SongId, long sheetId) {
         long songId = playerInfo.getSongId();
-        if (homeHandler==null) return;
-        switch (requestFlag){
+        if (homeHandler == null) return;
+        switch (requestFlag) {
             case "lyric":
                 NetworkUtils.makeRequest(NetworkInfo.URL + "/lyric/new?id=" + songId, homeHandler, LRC_ID, true, this);
                 break;
@@ -739,30 +734,30 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             case "addToPlaylist":
                 String str = "";
                 for (int i = 0; i < SongId.length; i++) {
-                    if (i<SongId.length-1){
-                        str = str+ SongId[i]+",";
-                    }else {
-                        str = str+ SongId[i];
+                    if (i < SongId.length - 1) {
+                        str = str + SongId[i] + ",";
+                    } else {
+                        str = str + SongId[i];
                     }
                 }
 
-                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/tracks?op=add&pid="+sheetId+"&tracks="+str, homeHandler, ADD_OR_REMOVE,true,this);
+                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/tracks?op=add&pid=" + sheetId + "&tracks=" + str, homeHandler, ADD_OR_REMOVE, true, this);
                 break;
             case "removePlaylist":
                 String str1 = "";
                 for (int i = 0; i < SongId.length; i++) {
-                    if (i<SongId.length-1){
-                        str1 = str1+ SongId[i]+",";
-                    }else {
-                        str1 = str1+ SongId[i];
+                    if (i < SongId.length - 1) {
+                        str1 = str1 + SongId[i] + ",";
+                    } else {
+                        str1 = str1 + SongId[i];
                     }
                 }
-                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/tracks?op=del&pid="+sheetId+"&tracks="+str1,  homeHandler, ADD_OR_REMOVE,true,this);
+                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/tracks?op=del&pid=" + sheetId + "&tracks=" + str1, homeHandler, ADD_OR_REMOVE, true, this);
 
                 break;
             case "getSongList":
 
-                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/track/all?id="+sheetId,  homeHandler, SONG_LIST,true,this);
+                NetworkUtils.makeRequest(NetworkInfo.URL + "/playlist/track/all?id=" + sheetId, homeHandler, SONG_LIST, true, this);
 
                 break;
 
@@ -770,7 +765,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         }
 
     }
-
 
 
     @Override
@@ -811,31 +805,31 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         super.onResume();
         SharedPreferences userInfoData = getSharedPreferences("UserInfoData", Context.MODE_PRIVATE);
-        String string = userInfoData.getString("UserInfo","");
-        if ((!string.equals("")|| !TextUtils.isEmpty(string))&&playerInfo.getUserInfoBean()==null) {
+        String string = userInfoData.getString("UserInfo", "");
+        if ((!string.equals("") || !TextUtils.isEmpty(string)) && playerInfo.getUserInfoBean() == null) {
             try {
                 JSONObject info = new JSONObject(string);
                 String profile = String.valueOf(info.get("profile"));
                 userInfo = (UserInfoBean) MyGsonUtil.getInstance().press(profile, "userInfo", app).get(0);
                 ContentValues values = new ContentValues();
                 Cursor query = getContentResolver().query(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser/" + userInfo.getUserId()), null, null, null, null);
-                values.put("userId",userInfo.getUserId());
-                values.put("avatarUrl",userInfo.getAvatarUrl());
-                values.put("backgroundUrl",userInfo.getBackgroundUrl());
-                values.put("nickname",userInfo.getNickname());
-                values.put("birthday",userInfo.getBirthday());
-                values.put("province",userInfo.getProvince());
-                values.put("gender",userInfo.getGender());
-                values.put("city",userInfo.getCity());
-                values.put("followeds",userInfo.getFolloweds());
-                values.put("follows",userInfo.getFollows());
-                values.put("eventCount",userInfo.getEventCount());
-                values.put("level",userInfo.getLevel());
+                values.put("userId", userInfo.getUserId());
+                values.put("avatarUrl", userInfo.getAvatarUrl());
+                values.put("backgroundUrl", userInfo.getBackgroundUrl());
+                values.put("nickname", userInfo.getNickname());
+                values.put("birthday", userInfo.getBirthday());
+                values.put("province", userInfo.getProvince());
+                values.put("gender", userInfo.getGender());
+                values.put("city", userInfo.getCity());
+                values.put("followeds", userInfo.getFolloweds());
+                values.put("follows", userInfo.getFollows());
+                values.put("eventCount", userInfo.getEventCount());
+                values.put("level", userInfo.getLevel());
 
-                if (query.getCount()==0) {
-                    getContentResolver().insert(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser"),values);
-                }else {
-                    getContentResolver().update(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser/" + userInfo.getUserId()),values,null,null);
+                if (query.getCount() == 0) {
+                    getContentResolver().insert(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser"), values);
+                } else {
+                    getContentResolver().update(Uri.parse("content://com.rikkatheworld.wangyiyun/saveUser/" + userInfo.getUserId()), values, null, null);
                 }
 
                 playerInfo.setUserInfoBean(userInfo);
@@ -846,17 +840,17 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             }
         }
 
-        getLrcString = (Lrc,tLrc) -> {
+        getLrcString = (Lrc, tLrc) -> {
             if (Lrc.equals("") || TextUtils.isEmpty(Lrc)) {
                 return;
             }
 
             LrcString = Lrc;
 
-            List<LrcBean> lrcBeanList = LrcUtil.parseStr2List(Lrc,tLrc);
+            List<LrcBean> lrcBeanList = LrcUtil.parseStr2List(Lrc, tLrc);
 
             mLrcView.setLrc(lrcBeanList);
-           mLrcView.init();
+            mLrcView.init();
         };
         showLrcInfoView = showOrHide -> {
             if (showOrHide) {
@@ -868,35 +862,34 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         };
 
 
-
     }
 
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d("TAG--------ahaha", "onSaveInstanceState: ");
-        FileUtils.writeStringToFile(this,"homeData.text",app.HomeData);
+        FileUtils.writeStringToFile(this, "homeData.text", app.HomeData);
 
-        outState.putString("data","homeData.text");
+        outState.putString("data", "homeData.text");
         super.onSaveInstanceState(outState);
 
     }
 
     @Override
     protected void onDestroy() {
+        Log.d("TAGpapapapapapa", "onDestroy: ");
 
-
-       filePath = getApplicationContext().getFilesDir() + "/"+fileName;
-        if (playerInfo.getListBeans()!=null) {
-           MusicCacheBean bean = new MusicCacheBean(position1%playerInfo.getListBeans().size(),
-                   instance.serviceBinder.getCurrentPosition(),playerInfo.getCurrentPosition(),
-           playerInfo.getDurationNum(),playerInfo.getDuration(),CURRENT_PLAY_MODE,playerInfo.getListBeans());
-            MusicPlayerUtils.serializeList(bean,filePath);
+        filePath = getApplicationContext().getFilesDir() + "/" + fileName;
+        if (playerInfo.getListBeans() != null) {
+            MusicCacheBean bean = new MusicCacheBean(position1 % playerInfo.getListBeans().size(),
+                    instance.serviceBinder.getCurrentPosition(), playerInfo.getCurrentPosition(),
+                    playerInfo.getDurationNum(), playerInfo.getDuration(), CURRENT_PLAY_MODE, playerInfo.getListBeans());
+            MusicPlayerUtils.serializeList(bean, filePath);
         }
 
         DataModel.getInstance().removeObserver(this);
-        if (instance != null&&instance.serviceConnection!=null) {
-          unbindService(instance.serviceConnection);
+        if (instance != null && instance.serviceConnection != null) {
+            unbindService(instance.serviceConnection);
             stopService(instance.intent);
             instance.serviceBinder.stopPlay();
         }
@@ -906,20 +899,18 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     }
 
 
-
-
-
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         private JSONObject data;
         private String account;
+
         @Override
         public void handleMessage(Message msg) {
-            // 处理从子线程发送过来的消息
+
             super.handleMessage(msg);
             if (msg.what == STATUS) {
                 String string = msg.obj.toString();
-                if (string!=null) {
+                if (string != null) {
 
                     JSONObject jsonObject = null;
                     try {
@@ -927,7 +918,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                         if (jsonObject.has("data")) {
                             data = (JSONObject) jsonObject.get("data");
                             account = String.valueOf(data.get("account"));
-                        }else {
+                        } else {
                             account = String.valueOf(jsonObject.get("account"));
                         }
 
@@ -950,20 +941,23 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 }
 
             }
-        };
+        }
+
+        ;
     };
 
- public void   OpenSheet(){
-     mLrcView.setVisibility(View.INVISIBLE);
-     behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    public void OpenSheet() {
+        mLrcView.setVisibility(View.INVISIBLE);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
+
     @Override
     public void onClick(View v) {
 
         int id = v.getId();
         if (id == R.id.lin_player) {
 
-           // animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            // animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
             fl_sidebar.setVisibility(View.GONE);
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             player_viewPage.setVisibility(View.VISIBLE);
@@ -988,19 +982,19 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             int drawable_hashCode = drawable.getConstantState().hashCode();
 
 
-            if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
+            if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE || CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
 
 
-                if (CURRENT_PLAY_MODE ==   UNLIMITED_PLAYBACK_MODE) {
-                    CURRENT_PLAY_MODE =   SINGLE_PLAY_MODE_ONE;
+                if (CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
+                    CURRENT_PLAY_MODE = SINGLE_PLAY_MODE_ONE;
                     play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
-                }else {
-                    CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
+                } else {
+                    CURRENT_PLAY_MODE = UNLIMITED_PLAYBACK_MODE;
                     play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
                 }
 
-               // ExclusiveMusicMode
-            }else  for (int i = 0; i < playMode.length; i++) {
+                // ExclusiveMusicMode
+            } else for (int i = 0; i < playMode.length; i++) {
                 if (drawable_hashCode == getDrawable(playMode[i]).getConstantState().hashCode()) {
                     if (i == playMode.length - 1) {
                         upDataList(0);
@@ -1011,45 +1005,43 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             }
 
 
-
         } else if (id == R.id.player_previous_song) {
-        //上一曲
-            AUTO_PLAY =true;
+            //上一曲
+            AUTO_PLAY = true;
             switchSong = true;
             previous_song.setClickable(false);
             //instance.serviceBinder.playOrPause(STATE_PLAY);
-          //  animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            //  animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
 
-            if (isUpData==1) {
+            if (isUpData == 1) {
                 isUpData = 2;
                 playerPageAdapter.setData(playerInfo.getListBeans());
-                if (pIndex ==0) {
-                    player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()-1 ,false);
+                if (pIndex == 0) {
+                    player_viewPage.setCurrentItem(position1 + playerInfo.getListBeans().size() - 1, false);
                     pIndex = 1;
-                }else {
-                    player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()-1 ,false);
+                } else {
+                    player_viewPage.setCurrentItem(position1 - playerInfo.getListBeans().size() - 1, false);
                     pIndex = 0;
                 }
 
-            }else {
-               player_viewPage.setCurrentItem(position1 - 1);
+            } else {
+                player_viewPage.setCurrentItem(position1 - 1);
 
             }
-
 
 
         } else if (id == R.id.player_play || id == R.id.IV_play_btn) {
 
             if (!AUTO_PLAY) {
                 notifyBuilderManager.createDateNotification(playerInfo.getImgUrl(),
-                        playerInfo.getSongName(),playerInfo.getSingerName(),playerInfo.getDurationNum());
+                        playerInfo.getSongName(), playerInfo.getSingerName(), playerInfo.getDurationNum());
                 instance.serviceBinder.seekTo((int) currentPosition);
             }
-            AUTO_PLAY =true;
+            AUTO_PLAY = true;
             playerOrStop();
         } else if (id == R.id.player_next_song) {//下一曲
 
-            AUTO_PLAY =true;
+            AUTO_PLAY = true;
 
 //            if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){isUpData = 2;
 //                playerPageAdapter.setData(playerInfo.getListBeans());
@@ -1059,31 +1051,27 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             switchSong = true;
             next_song.setClickable(false);
 
-                if (isUpData==1) {
-                    isUpData = 2;
-                    playerPageAdapter.setData(playerInfo.getListBeans());
-                    if (pIndex ==0) {
-                        player_viewPage.setCurrentItem(position1+playerInfo.getListBeans().size()+1 ,false);
-                        pIndex = 1;
-                    }else {
-                        player_viewPage.setCurrentItem(position1-playerInfo.getListBeans().size()+1 ,false);
-                        pIndex = 0;
-                    }
-                }else {
-                    player_viewPage.setCurrentItem(position1 + 1);
-
+            if (isUpData == 1) {
+                isUpData = 2;
+                playerPageAdapter.setData(playerInfo.getListBeans());
+                if (pIndex == 0) {
+                    player_viewPage.setCurrentItem(position1 + playerInfo.getListBeans().size() + 1, false);
+                    pIndex = 1;
+                } else {
+                    player_viewPage.setCurrentItem(position1 - playerInfo.getListBeans().size() + 1, false);
+                    pIndex = 0;
                 }
+            } else {
+                player_viewPage.setCurrentItem(position1 + 1);
 
-          //  instance.serviceBinder.playOrPause(STATE_PLAY);
-           // animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
-            Log.d("TAGpppppppppppppppppppppppp", "onClick: "+(position1+1)+"---------"+(getCurrentPagerIdx()));
+            }
+
+            //  instance.serviceBinder.playOrPause(STATE_PLAY);
+            // animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+            Log.d("TAGpppppppppppppppppppppppp", "onClick: " + (position1 + 1) + "---------" + (getCurrentPagerIdx()));
 
 
-
-
-
-        }
-        else if (id == R.id.player_position) {//滑动到歌词处点击跳到选定处播放
+        } else if (id == R.id.player_position) {//滑动到歌词处点击跳到选定处播放
             jumpTo jumpTo = mLrcView.setJump();
             if (jumpTo != null) jumpTo.toPosition();
         } else if (id == R.id.player_LrcView) {//隐藏滚动歌词显示唱片
@@ -1092,32 +1080,31 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
             mLrcView.setVisibility(View.INVISIBLE);
             player_viewPage.setVisibility(View.VISIBLE);
             showLrcInfoView.ShowLrcInfoView(false);
-        }
-        else if(id== R.id.player_heart_off){
+        } else if (id == R.id.player_heart_off) {
             heart_isOnClick = true;
 
-            likeOrNot1 =!likeOrNot1;
+            likeOrNot1 = !likeOrNot1;
             if (likeOrNot1) {
-                if (!newLikeList.contains(playerInfo.getSongId())){
+                if (!newLikeList.contains(playerInfo.getSongId())) {
                     newLikeList.add(playerInfo.getSongId());
 
                 }
-            }else {
+            } else {
 
                 newLikeList.remove(playerInfo.getSongId());
 
             }
-            player_heart.setImageDrawable((likeOrNot1 ?getDrawable(R.drawable.baseline_favorite):getDrawable(R.drawable.baseline_not_favorite)));
+            player_heart.setImageDrawable((likeOrNot1 ? getDrawable(R.drawable.baseline_favorite) : getDrawable(R.drawable.baseline_not_favorite)));
 
-        }else if(id==R.id.player_comment){
+        } else if (id == R.id.player_comment) {
             Intent intent = new Intent(this, CommentActivity.class);
 
-            intent.putExtra("songName",playerInfo.getSongName());
+            intent.putExtra("songName", playerInfo.getSongName());
             intent.putExtra("Id", playerInfo.getSongId());
-            intent.putExtra("singerName",playerInfo.getSingerName());
-            intent.putExtra("imgUrl",playerInfo.getImgUrl());
-           // Log.d("TAG000011122233344455678", "onClick: "+playerInfo.getUserInfoBean().getUserId());
-            intent.putExtra("userId",playerInfo.getUserInfoBean().getUserId());
+            intent.putExtra("singerName", playerInfo.getSingerName());
+            intent.putExtra("imgUrl", playerInfo.getImgUrl());
+            // Log.d("TAG000011122233344455678", "onClick: "+playerInfo.getUserInfoBean().getUserId());
+            intent.putExtra("userId", playerInfo.getUserInfoBean().getUserId());
             intent.putExtras(intent);
             startActivity(intent);
 
@@ -1127,7 +1114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     }
 
-    public  void playerOrStop() {
+    public void playerOrStop() {
         int state;
         if (playerInfo.isPlayOrPause()) {
             state = STATE_PLAY;
@@ -1145,8 +1132,9 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
         activityMainBinding.setPlayerInfo(playerInfo);
     }
-    public  void setStop(){
-        int state ;
+
+    public void setStop() {
+        int state;
         if (playerInfo.isPlayOrPause()) {
             state = STATE_PLAY;
 
@@ -1160,10 +1148,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
 
     }
-    public  void setPlay(){
+
+    public void setPlay() {
         int state;
 
-        if (!playerInfo.isPlayOrPause()&& instance.serviceBinder!=null) {
+        if (!playerInfo.isPlayOrPause() && instance.serviceBinder != null) {
             state = STATE_PAUSE;
             animationUtils.proceedRotate();
             playerPageAdapterAnimation.proceedRotate();
@@ -1174,21 +1163,20 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         }
 
 
+    }
 
+    public void setCurrentMode(String type) {
+        if (type.equals("ExclusiveMusicMode")) {
+            CURRENT_PLAY_MODE = UNLIMITED_PLAYBACK_MODE;
+            play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
+        } else {
+
+            CURRENT_PLAY_MODE = SEQUENTIAL_MODE;
+            play_module.setImageDrawable(getDrawable(playMode[1]));
+        }
 
     }
 
-    public void   setCurrentMode(String type){
-          if (type.equals("ExclusiveMusicMode")) {
-              CURRENT_PLAY_MODE =   UNLIMITED_PLAYBACK_MODE;
-              play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
-          }else{
-
-              CURRENT_PLAY_MODE = SEQUENTIAL_MODE  ;
-              play_module.setImageDrawable(getDrawable(playMode[1]));
-          }
-
-        }
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
@@ -1208,12 +1196,12 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
             if (instance.serviceBinder != null) {
                 currentPosition = progress;
-                Log.d("TAGpppppcurrentPositionpppp", "onStopTrackingTouch: "+currentPosition);
+                Log.d("TAGpppppcurrentPositionpppp", "onStopTrackingTouch: " + currentPosition);
                 instance.serviceBinder.seekTo(progress);
 
             }
         }
-     mLrcView.UpdateMusicProcess();
+        mLrcView.UpdateMusicProcess();
     }
 
     public static void beginService(Context context) {
@@ -1221,9 +1209,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         mLrcView.setStartS(instance);
     }
-
-
-
 
 
     public static final IPlayerViewChange mIPlayerViewChange = new IPlayerViewChange() {
@@ -1238,7 +1223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         @Override
         public void RotateView() {
-           beginRotate();
+            beginRotate();
         }
 
         @Override
@@ -1248,7 +1233,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         @Override
         public int currentIndex() {
-            return  player_viewPage.getCurrentItem();
+            return player_viewPage.getCurrentItem();
         }
     };
 
@@ -1258,102 +1243,100 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         offset = positionOffset;
 
-        Log.d("TAG----------------ll", "onPageScrolled: "+Math.abs(1 - offset)+"--"+ Math.abs(0 - offset));
+        Log.d("TAG----------------ll", "onPageScrolled: " + Math.abs(1 - offset) + "--" + Math.abs(0 - offset));
 
 
     }
+
     @Override
     public void onPageScrollStateChanged(int state) {
 
     }
 
 
-
     @Override
     public void onPageSelected(int position) {
-        Log.d("TAG11111111111122333", "onPageSelected: "+switchSong+isOnClick+CURRENT_PLAY_MODE+position);
+        Log.d("TAG11111111111122333", "onPageSelected: " + switchSong + isOnClick + CURRENT_PLAY_MODE + position);
         isScroll = true;
-        if (instance.serviceBinder!=null) {
+        if (instance.serviceBinder != null) {
             instance.serviceBinder.playOrPause(STATE_PLAY);
             animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
             animationUtils.stopRotate("pause");
             playerPageAdapterAnimation.stopRotate("pause");
         }
-        if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE||CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
-            if (playerInfo.getListBeans().size()-1==position) {
+        if (CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE || CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE) {
+            if (playerInfo.getListBeans().size() - 1 == position) {
                 homeFragment.loadOk = false;
-             //   isUpData = 1;
+                //   isUpData = 1;
                 homeFragment.loadMp3("radio");
 
-               // return;
+                // return;
             }
-           // player_viewPage.setCurrentItem(position1+1);
+            // player_viewPage.setCurrentItem(position1+1);
         }
-            if(!isOnClick&&!switchSong){
-                if(isFirstScroll){
-                    isFirstScroll=   false;
-                }else AUTO_PLAY = true;
+        if (!isOnClick && !switchSong) {
+            if (isFirstScroll) {
+                isFirstScroll = false;
+            } else AUTO_PLAY = true;
 
-                if(CURRENT_PLAY_MODE==UNLIMITED_PLAYBACK_MODE&&isUpData==1){
-                    isUpData = 2;
-                    playerPageAdapter.setData(playerInfo.getListBeans());
+            if (CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE && isUpData == 1) {
+                isUpData = 2;
+                playerPageAdapter.setData(playerInfo.getListBeans());
                 return;
-                }
-                if (CURRENT_PLAY_MODE!=RANDOM_PLAY_MODE) {
-                    if (inTO){
-                        inTO = false;
-                        isUpData =2;
-                        playerPageAdapter.setData(playerInfo.getListBeans());
-                        playerPageAdapter.notifyDataSetChanged();
-                        if(diffOffset==1){
-                            player_viewPage.setCurrentItem(position1 + 1,false);
-                        }else player_viewPage.setCurrentItem(position1 - 1,false);
-                        return;
-                    }
-                    play(String.valueOf(playerInfo.getListBeans().get((position)%playerInfo.getListBeans().size()).getSongId()),null);
-                    currentPlay(position);
-                    return;
-                }
-
-                if (isUpData==1) {
+            }
+            if (CURRENT_PLAY_MODE != RANDOM_PLAY_MODE) {
+                if (inTO) {
+                    inTO = false;
                     isUpData = 2;
-                    inTO = true;
                     playerPageAdapter.setData(playerInfo.getListBeans());
                     playerPageAdapter.notifyDataSetChanged();
-
-                    if(diffOffset==1){
-                        player_viewPage.setCurrentItem(position1 + 1,false);
-                    }else player_viewPage.setCurrentItem(position1 - 1,false);
-
+                    if (diffOffset == 1) {
+                        player_viewPage.setCurrentItem(position1 + 1, false);
+                    } else player_viewPage.setCurrentItem(position1 - 1, false);
                     return;
                 }
-                play(String.valueOf(playerInfo.getListBeans().get((position)%playerInfo.getListBeans().size()).getSongId()),null);
+                play(String.valueOf(playerInfo.getListBeans().get((position) % playerInfo.getListBeans().size()).getSongId()), null);
                 currentPlay(position);
                 return;
-                }
+            }
 
-        if (switchSong){
-        //    CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE
-            play(String.valueOf(playerInfo.getListBeans().get((position)%playerInfo.getListBeans().size()).getSongId()),null);
+            if (isUpData == 1) {
+                isUpData = 2;
+                inTO = true;
+                playerPageAdapter.setData(playerInfo.getListBeans());
+                playerPageAdapter.notifyDataSetChanged();
+
+                if (diffOffset == 1) {
+                    player_viewPage.setCurrentItem(position1 + 1, false);
+                } else player_viewPage.setCurrentItem(position1 - 1, false);
+
+                return;
+            }
+            play(String.valueOf(playerInfo.getListBeans().get((position) % playerInfo.getListBeans().size()).getSongId()), null);
+            currentPlay(position);
+            return;
+        }
+
+        if (switchSong) {
+            //    CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE
+            play(String.valueOf(playerInfo.getListBeans().get((position) % playerInfo.getListBeans().size()).getSongId()), null);
         }
         currentPlay(position);
-
-
 
 
     }
 
     private void currentPlay(int position) {
         ListBean listBeans;
-        Log.d("TAG111111111111", "currentPlay: "+((position1 > position || position1 < position)&&playerInfo.getSongId()!=currentId));
-   //     long songId = playerInfo.getListBeans().get(position % playerInfo.getListBeans().size()).getSongId();
-        if ((position1 > position || position1 < position)&&playerInfo.getSongId()!=currentId) {
+        Log.d("TAG111111111111", "currentPlay: " + ((position1 > position || position1 < position) && playerInfo.getSongId() != currentId));
+        //     long songId = playerInfo.getListBeans().get(position % playerInfo.getListBeans().size()).getSongId();
+        if ((position1 > position || position1 < position) && playerInfo.getSongId() != currentId) {
 
 
             position1 = position;
-            listBeans = playerInfo.getListBeans().get(position%playerInfo.getListBeans().size());
+            listBeans = playerInfo.getListBeans().get(position % playerInfo.getListBeans().size());
 
-            Log.d("TAG111111111111", "currentPlay: "+listBeans.getImgUrl()+(AUTO_PLAY&&instance!=null)+"-----"+AUTO_PLAY);
+            Log.d("TAG111111111111", "currentPlay: " + listBeans.getImgUrl() + (AUTO_PLAY && instance != null) + "-----" + AUTO_PLAY);
             songListAdapter.setIndex(position);
             setImg.setImg(listBeans.getImgUrl());
             String name = Utils.getString(listBeans);
@@ -1374,15 +1357,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 //            switchSong = false;
             mLrcView.setTips(true);
             likeOrNot = likeOrNot(playerInfo.getSongId());
-            boolean isIn = newLikeList.stream().anyMatch(num-> {
-                if (newLikeList.size()==0) return false;
+            boolean isIn = newLikeList.stream().anyMatch(num -> {
+                if (newLikeList.size() == 0) return false;
 
-                return playerInfo.getSongId()==num;});
+                return playerInfo.getSongId() == num;
+            });
 
-            player_heart.setImageDrawable((likeOrNot||isIn?getDrawable(R.drawable.baseline_favorite):getDrawable(R.drawable.baseline_not_favorite)));
+            player_heart.setImageDrawable((likeOrNot || isIn ? getDrawable(R.drawable.baseline_favorite) : getDrawable(R.drawable.baseline_not_favorite)));
             likeOrNot1 = likeOrNot || isIn;
-            if (instance.serviceBinder!=null){
-                loadNetWork("lyric",null,0);
+            if (instance.serviceBinder != null) {
+                loadNetWork("lyric", null, 0);
             }
 
 
@@ -1390,24 +1374,24 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
     }
 
-public void setCurrentIdToFlutter(long id){
+    public void setCurrentIdToFlutter(long id) {
 
-    if (msgFragment!=null&&msgFragment.msgBindings!=null) {
-        msgFragment.msgBindings.channel.invokeMethod("currentId",id);
+        if (msgFragment != null && msgFragment.msgBindings != null) {
+            msgFragment.msgBindings.channel.invokeMethod("currentId", id);
+        }
+        if (myFragment != null && myFragment.myBindings != null) {
+            myFragment.myBindings.channel.invokeMethod("currentId", id);
+        }
+        if (homeFragment.searchFragment != null) {
+            homeFragment.searchFragment.searchBindings.channel.invokeMethod("currentId", id);
+        }
+
+        if (secondFragment != null) {
+            secondFragment.otherBindings.channel.invokeMethod("currentId", id);
+        }
+
+
     }
-    if (myFragment!=null&&myFragment.myBindings!=null) {
-        myFragment.myBindings.channel.invokeMethod("currentId",id);
-    }
-   if ( homeFragment.searchFragment!=null){
-       homeFragment.searchFragment.searchBindings.channel.invokeMethod("currentId",id);
-   }
-
-    if ( secondFragment!=null){
-        secondFragment.otherBindings.channel.invokeMethod("currentId",id);
-    }
-
-
-}
 
     public void upDataList(int mode) {
 
@@ -1421,25 +1405,25 @@ public void setCurrentIdToFlutter(long id){
                 playerInfo.setListBeans(list);
                 activityMainBinding.setPlayerInfo(playerInfo);
 
-                if (orderList!=null) {
+                if (orderList != null) {
                     orderList.clear();
                     orderList.addAll(list);
                 }
 
-                int nextIndex = (getCurrentPagerIdx()%list.size())+1>=list.size()?
-                        0:(getCurrentPagerIdx()%list.size())+1;
+                int nextIndex = (getCurrentPagerIdx() % list.size()) + 1 >= list.size() ?
+                        0 : (getCurrentPagerIdx() % list.size()) + 1;
                 ListBean nextPager = null;
                 ListBean previousPager = null;
-                int previousIndex = (getCurrentPagerIdx()%list.size())-1<0?
-                        list.size()-1:(getCurrentPagerIdx()%list.size())-1;
+                int previousIndex = (getCurrentPagerIdx() % list.size()) - 1 < 0 ?
+                        list.size() - 1 : (getCurrentPagerIdx() % list.size()) - 1;
                 for (int i = 0; i < list.size(); i++) {
-                    if (playerInfo.getSongId()==list.get(i).getSongId()) {
-                         nextPager = i + 1 >= list.size() ? list.get(0) : list.get(i + 1);
-                         previousPager = i - 1 < 0 ? list.get(list.size()-1) : list.get(i - 1);
+                    if (playerInfo.getSongId() == list.get(i).getSongId()) {
+                        nextPager = i + 1 >= list.size() ? list.get(0) : list.get(i + 1);
+                        previousPager = i - 1 < 0 ? list.get(list.size() - 1) : list.get(i - 1);
                     }
                 }
-               orderList.set(nextIndex,nextPager);
-               orderList.set(previousIndex,previousPager);
+                orderList.set(nextIndex, nextPager);
+                orderList.set(previousIndex, previousPager);
                 playerPageAdapter.setData(orderList);
                 playerPageAdapter.notifyDataSetChanged();
 
@@ -1451,7 +1435,7 @@ public void setCurrentIdToFlutter(long id){
                     }
                 }
 
-            break;
+                break;
             case 1://顺序播放
                 CURRENT_PLAY_MODE = SEQUENTIAL_MODE;
 
@@ -1462,7 +1446,7 @@ public void setCurrentIdToFlutter(long id){
                 CURRENT_PLAY_MODE = RANDOM_PLAY_MODE;
 
                 if (listBean != null) listBean.clear();
-                    listBean.addAll(playerInfo.getListBeans());
+                listBean.addAll(playerInfo.getListBeans());
                 play_module.setImageDrawable(getDrawable(playMode[2]));
                 ListBean listBean1 = listBean.get(position1 % listBean.size());
                 listBean.remove(listBean1);
@@ -1473,74 +1457,77 @@ public void setCurrentIdToFlutter(long id){
                 songListAdapter.upData(listBean);
                 playerInfo.setListBeans(listBean);
                 activityMainBinding.setPlayerInfo(playerInfo);
-                if (temporaryList !=null) {
+                if (temporaryList != null) {
                     temporaryList.clear();
                     temporaryList.addAll(listBean);
                 }
 
-                int nextPagerIdx = (getCurrentPagerIdx()%listBean.size())+1>=listBean.size()?0:(getCurrentPagerIdx()%listBean.size())+1;
-                int previousPagerIdx = (getCurrentPagerIdx()%listBean.size())-1<0?listBean.size()-1:(getCurrentPagerIdx()%listBean.size())-1;
-                temporaryList.set(nextPagerIdx,listBean.get(1));
-                temporaryList.set(previousPagerIdx,listBean.get(listBean.size()-1));
+                int nextPagerIdx = (getCurrentPagerIdx() % listBean.size()) + 1 >= listBean.size() ? 0 : (getCurrentPagerIdx() % listBean.size()) + 1;
+                int previousPagerIdx = (getCurrentPagerIdx() % listBean.size()) - 1 < 0 ? listBean.size() - 1 : (getCurrentPagerIdx() % listBean.size()) - 1;
+                temporaryList.set(nextPagerIdx, listBean.get(1));
+                temporaryList.set(previousPagerIdx, listBean.get(listBean.size() - 1));
                 playerPageAdapter.setData(temporaryList);
-               for (int i = 0; i < listBean.size(); i++) {
-                   if (position1 % listBean.size() == 0) {
-                       songListAdapter.setIndex(position1);
-                       break;
-                   } else position1 -= 1;
+                for (int i = 0; i < listBean.size(); i++) {
+                    if (position1 % listBean.size() == 0) {
+                        songListAdapter.setIndex(position1);
+                        break;
+                    } else position1 -= 1;
                 }
 
                 break;
         }
     }
-public void upData(long id){
-    if (listBean.size()!=0) {
-        listBean.clear();
-    }
-    listBean.addAll(PlayerList);
-    switchSong=false;
-    isOnClick = true;
-    for (int i = 0; i < listBean.size(); i++) {
 
-        if (listBean.get(i).getSongId()==id) {
-            ListBean listBean1 = listBean.get(i);
-            listBean.remove(listBean1);
-            Collections.shuffle(listBean);
-            listBean.add(0, listBean1);
-            playerInfo.setListBeans(listBean);
-            activityMainBinding.setPlayerInfo(playerInfo);
-            songListAdapter.upData(listBean);
-            playerPageAdapter.setData(listBean);
-            Log.d("TAG11111111111111111111111111", "upData:aaaaa ");
+    public void upData(long id) {
+        if (listBean.size() != 0) {
+            listBean.clear();
+        }
+        listBean.addAll(PlayerList);
+        switchSong = false;
+        isOnClick = true;
+        for (int i = 0; i < listBean.size(); i++) {
 
-            for (int j = 0; j < listBean.size(); j++) {
-        if (position1 % listBean.size() == 0) {
-            songListAdapter.setIndex(position1);
-            if (pIndex ==0) {
-                player_viewPage.setCurrentItem(position1+listBean.size());
-                pIndex = 1;
-            }else {
-                player_viewPage.setCurrentItem(position1-listBean.size());
-                pIndex = 0;
+            if (listBean.get(i).getSongId() == id) {
+                ListBean listBean1 = listBean.get(i);
+                listBean.remove(listBean1);
+                Collections.shuffle(listBean);
+                listBean.add(0, listBean1);
+                playerInfo.setListBeans(listBean);
+                activityMainBinding.setPlayerInfo(playerInfo);
+                songListAdapter.upData(listBean);
+                playerPageAdapter.setData(listBean);
+                Log.d("TAG11111111111111111111111111", "upData:aaaaa ");
+
+                for (int j = 0; j < listBean.size(); j++) {
+                    if (position1 % listBean.size() == 0) {
+                        songListAdapter.setIndex(position1);
+                        if (pIndex == 0) {
+                            player_viewPage.setCurrentItem(position1 + listBean.size());
+                            pIndex = 1;
+                        } else {
+                            player_viewPage.setCurrentItem(position1 - listBean.size());
+                            pIndex = 0;
+                        }
+                        Log.d("TAG11111111111111hh", "upData: 11111sss" + getCurrentPagerIdx());
+                        break;
+                    } else position1 -= 1;
+                }
+                break;
             }
-            Log.d("TAG11111111111111hh", "upData: 11111sss"+getCurrentPagerIdx());
-            break;
-        } else position1 -= 1;
-    }
-            break;
         }
     }
-}
+
     public static void scrollPage() {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
             public void run() {
                 if (position1 <= 100000 && position1 >= 0) {
-                    if (isUpData==1) {
+                    if (isUpData == 1) {
                         isUpData = 2;
-                        playerPageAdapter.setData(playerInfo.getListBeans());}
-                   // player_viewPage.getAdapter().notifyDataSetChanged();
+                        playerPageAdapter.setData(playerInfo.getListBeans());
+                    }
+                    // player_viewPage.getAdapter().notifyDataSetChanged();
                     player_viewPage.setCurrentItem(position1 + 1);
                 }
             }
@@ -1550,25 +1537,23 @@ public void upData(long id){
     }
 
 
+    public boolean likeOrNot(long id) {
 
-    public boolean likeOrNot(long id){
+        if (songLists == null) return false;
 
-        if (songLists==null)return false;
-
-        return   songLists.stream().anyMatch((Predicate<UserSongListBean>) userSongListBean ->
-                userSongListBean.getSongId()==id);
+        return songLists.stream().anyMatch((Predicate<UserSongListBean>) userSongListBean ->
+                userSongListBean.getSongId() == id);
 
     }
 
 
-
-    public boolean closeList(RecyclerView view, MotionEvent event,View parent) {
+    public boolean closeList(RecyclerView view, MotionEvent event, View parent) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (downY-event.getY()==0) {
+                if (downY - event.getY() == 0) {
                     return false;
                 }
 
@@ -1576,17 +1561,16 @@ public void upData(long id){
                 scroll = 0;
 
                 if (event.getY() < downY) {
-                    if (parent.getScrollY()==0) {
+                    if (parent.getScrollY() == 0) {
                         downY = event.getY();
                     }
-                    if (parent.getScrollY()!=0) {
+                    if (parent.getScrollY() != 0) {
                         if (view == null) {
-                            if (parent.getScrollY()==0) {
+                            if (parent.getScrollY() == 0) {
                                 return false;
                             }
                             parent.scrollTo(0, 0);
-                        }
-                        else  {
+                        } else {
 
                             scroll = Math.min(parent.getScrollY() + scrollH, 0);
                             parent.scrollTo(0, scroll);
@@ -1595,23 +1579,22 @@ public void upData(long id){
                     }
 
 
-                }
-                else {
-                    if (parent.getScrollY()==0) {
+                } else {
+                    if (parent.getScrollY() == 0) {
                         downY = event.getY();
 
                     }
                     scroll = (int) Math.min(parent.getScrollY() - scrollH, 0);
 
                     if (view == null) {
-                       // scroll = Math.min(parent.getScrollY() - scrollH, 0);
+                        // scroll = Math.min(parent.getScrollY() - scrollH, 0);
                         parent.scrollTo(0, scroll / 2);
-                    } else  {
+                    } else {
                         if (!view.canScrollVertically(-1)) {
 
                             parent.scrollTo(0, (int) (scroll));
-                           return  parent.getScrollY() != 0;
-                        }else {
+                            return parent.getScrollY() != 0;
+                        } else {
 
                         }
                         return false;
@@ -1619,7 +1602,7 @@ public void upData(long id){
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (downY-event.getY()==0) {
+                if (downY - event.getY() == 0) {
                     return true;
                 }
 
@@ -1640,7 +1623,7 @@ public void upData(long id){
     }
 
 
-    private void showMyFragment(String type,String id) {
+    private void showMyFragment(String type, String id) {
         hideView();
         // 获取FragmentManager
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -1651,9 +1634,9 @@ public void upData(long id){
                 R.anim.fade_out,
                 R.anim.fade_in,
                 R.anim.fade_out
-            );
+        );
         // 检查MyFragment是否已添加，如果没有，则添加
-        secondFragment =   (SecondPage) fragmentManager.findFragmentByTag("SecondPage_FRAGMENT");
+        secondFragment = (SecondPage) fragmentManager.findFragmentByTag("SecondPage_FRAGMENT");
         if (secondFragment == null) {
             secondFragment = new SecondPage();
             // 使用addToBackStack允许用户通过返回按钮回到之前的状态
@@ -1666,11 +1649,11 @@ public void upData(long id){
         }
         secondFragment.setParams(new SecondPage.GetParams() {
             @Override
-            public Map<String,Object> getParam() {
-               Map<String, Object> map = new HashMap<>();
-                map.put("type",type);
-                map.put("id",id);
-                return  map;
+            public Map<String, Object> getParam() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", type);
+                map.put("id", id);
+                return map;
             }
         });
 
@@ -1682,246 +1665,260 @@ public void upData(long id){
     }
 
 
-
-
-
-    public int getCurrentPagerIdx(){
+    public int getCurrentPagerIdx() {
 
         return player_viewPage.getCurrentItem();
     }
-public void  play(String id,SetCurrentMp3 setCurrentMp3){
-    currentId = Long.parseLong(id);
+
+    public void play(String id, SetCurrentMp3 setCurrentMp3) {
+        currentId = Long.parseLong(id);
 
 
-    boolean isHave = false;
-    if (songList!=null&&songList.size()>0) {
-        for (int i = 0; i < songList.size(); i++) {
-            if (String.valueOf(songList.get(i).getId()).equals(id)) {
-                Log.d("TAG----", "play:有 ");
-                instance.serviceBinder.setMusicSource(songList.get(i).getUrl());
+        boolean isHave = false;
+        if (songList != null && songList.size() > 0) {
+            for (int i = 0; i < songList.size(); i++) {
+                if (String.valueOf(songList.get(i).getId()).equals(id)) {
+                    Log.d("TAG----", "play:有 ");
+                    instance.serviceBinder.setMusicSource(songList.get(i).getUrl());
                     previous_song.setClickable(true);
                     next_song.setClickable(true);
 
-                if (setCurrentMp3!=null) {
+                    if (setCurrentMp3 != null) {
+                        setCurrentMp3.setCurrentMp3(songList);
+                    }
+                    isHave = true;
+                    break;
+                }
+            }
+        }
+
+
+        if (!isHave) {
+            Log.d("TAG----", "play:没有 ");
+            try {
+                NetworkUtils.makeRequest(NetworkInfo.URL + "/song/url/v1?id=" + id + "&level=standard", homeHandler, URL_ID, true, this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        Context context = this;
+        homeFragment.setMp3Info(new HomeFragment.GetMp3Info() {
+            @Override
+            public void getMp3Info(List<UrlBeans> urlBeans) {
+
+                if (songList.size() == 0) {
+                    songList.add(urlBeans.get(0));
+                } else {
+                    for (int i = 0; i < songList.size(); i++) {
+                        if (songList.get(i).getId() != urlBeans.get(0).getId()) {
+                            songList.add(urlBeans.get(0));
+                        }
+
+                    }
+                }
+
+                if (TOUCH_COUNT != 0) {
+                    Log.d("TAGaaaaaa", "getMp3Info: 入口1");
+                    instance.serviceBinder.setMusicSource(urlBeans.get(0).getUrl());
+                    previous_song.setClickable(true);
+                    next_song.setClickable(true);
+                    animationUtils.stopRotate("cancel");
+                    //   animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+
+                } else {
+                    Log.d("TAGaaaaaa", "getMp3Info: 入口2");
+                    beginPlay.play(context, () -> {
+                                instance.serviceBinder.setMusicSource(urlBeans.get(0).getUrl());
+                                previous_song.setClickable(true);
+                                next_song.setClickable(true);
+                                if (!AUTO_PLAY) {
+                                    setStop();
+                                }
+
+
+                                //    animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
+                                loadNetWork("lyric", null, 0);
+                            }
+                    );
+
+                }
+
+                if (setCurrentMp3 != null) {
                     setCurrentMp3.setCurrentMp3(songList);
                 }
-                isHave = true;
-                break;
             }
-        }
-    }
-
-
-    if (!isHave) {
-        Log.d("TAG----", "play:没有 ");
-        try {
-            NetworkUtils.makeRequest(NetworkInfo.URL + "/song/url/v1?id="+id+"&level=standard", homeHandler, URL_ID,true,this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
 
     }
 
-
-    Context context = this;
-    homeFragment.setMp3Info(new HomeFragment.GetMp3Info() {
-        @Override
-        public void getMp3Info(List<UrlBeans> urlBeans) {
-
-            if (songList.size()==0) {
-                songList.add(urlBeans.get(0));
-            }else {
-                for (int i = 0; i < songList.size(); i++) {
-                    if (songList.get(i).getId()!=urlBeans.get(0).getId()) {
-                        songList.add(urlBeans.get(0));
-                    }
-
-                }
-            }
-
-            if (TOUCH_COUNT!=0) {
-                Log.d("TAGaaaaaa", "getMp3Info: 入口1");
-                instance.serviceBinder.setMusicSource(urlBeans.get(0).getUrl());
-                    previous_song.setClickable(true);
-                    next_song.setClickable(true);
-                animationUtils.stopRotate("cancel");
-             //   animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
-
-            }else {
-                Log.d("TAGaaaaaa", "getMp3Info: 入口2");
-                beginPlay.play(context, () -> {
-                            instance.serviceBinder.setMusicSource(urlBeans.get(0).getUrl());
-                        previous_song.setClickable(true);
-                        next_song.setClickable(true);
-                            if(!AUTO_PLAY){
-                                setStop();
-                            }
-
-
-                //    animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
-                    loadNetWork("lyric",null,0);
-                        }
-                );
-
-            }
-
-            if (setCurrentMp3!=null) {
-                setCurrentMp3.setCurrentMp3(songList);
-            }
-        }
-    });
-
-}
-public interface SetCurrentMp3{
+    public interface SetCurrentMp3 {
         void setCurrentMp3(List<UrlBeans> urlBeans);
-}
+    }
 
-    public static void beginRotate(){
+    public static void beginRotate() {
         Log.d("TAGpppppaaa", "beginRotate: ");
         animationUtils.Rotate(main_player_img);
         animationUtils.getObjectAnimator(stylusY, player_stylus, screenPoint);
         playerPageAdapterAnimation.proceedRotate();
+    }
+
+
+    @Override
+    public void onCountUpdate(Map<?, ?> newData) {
+
+        this.newData = newData;
+        formatDate(newData);
+    }
+
+    public void formatDate(Map<?, ?> data) {
+        if (CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE || CURRENT_PLAY_MODE == SINGLE_PLAY_MODE_ONE) {
+            setCurrentMode("");
         }
 
+        switchSong = false;
+        if (data != null) {
+            String str = String.valueOf(data.get("SongList"));
+            int index = Integer.parseInt(String.valueOf(data.get("SongIndex")));
 
-@Override
-public void onCountUpdate(Map<?, ?> newData) {
+            String upOrAdd = String.valueOf(data.get("upOrAdd"));
+            int currentP = 0;
 
-       this.newData = newData;
-         formatDate(newData);
-            }
- public void formatDate(Map<?, ?> data){
-     if(CURRENT_PLAY_MODE == UNLIMITED_PLAYBACK_MODE||CURRENT_PLAY_MODE==SINGLE_PLAY_MODE_ONE){
-          setCurrentMode("");
-     }
+            String songId;
+            Log.d("TAG--------fff----", "formatDatess: " + (!sheetId.equals(oldSheetId) || isOnClick));
 
-switchSong = false;
-     if (data!=null) {
-         String str = String.valueOf(data.get("SongList"));
-         int index = Integer.parseInt(String.valueOf(data.get("SongIndex"))) ;
+            if (!sheetId.equals(oldSheetId) || isOnClick) {
+                try {
+                    JSONArray array = new JSONArray(str);
+                    if (Sheetlist != null) {
+                        if (!upOrAdd.equals("add")) {
+                            Sheetlist.clear();
+                        }
+                    }
 
-         String upOrAdd = String.valueOf(data.get("upOrAdd"));
-         int currentP = 0;
+                    for (int i = 0; i < array.length(); i++) {
+                        ListBean listBean = new ListBean();
+                        JSONObject jsonObject = array.getJSONObject(i);
+                        String ar = String.valueOf(jsonObject.get("ar"));
+                        Type token = new TypeToken<List<UserSongListBean.Ar>>() {
+                        }.getType();
+                        List<UserSongListBean.Ar> SingerInfo = app.gson.fromJson(ar, token);
+                        listBean.setSingerInfo(SingerInfo);
 
-         String songId;
-         Log.d("TAG--------fff----", "formatDatess: "+(!sheetId.equals(oldSheetId)||isOnClick));
+                        listBean.setSongName(String.valueOf(jsonObject.get("name")));
+                        listBean.setSongId(Long.parseLong(String.valueOf(jsonObject.get("id"))));
+                        listBean.setSubTitle(String.valueOf(((JSONObject) jsonObject.get("al")).get("name")));
+                        if (((JSONObject) jsonObject.get("al")).has("picUrl")) {
+                            listBean.setImgUrl(String.valueOf(((JSONObject) jsonObject.get("al")).get("picUrl")));
+                        } else {
+                            String pic_str = String.valueOf(((JSONObject) jsonObject.get("al")).get("pic_str"));
 
-         if (!sheetId.equals(oldSheetId)||isOnClick) {
-             try {
-                 JSONArray array = new JSONArray(str);
-                 if (Sheetlist!=null) {
-                     if (!upOrAdd.equals("add")){
-                         Sheetlist.clear();
-                     }
-                 }
+                            listBean.setImgUrl(pic_str);
+                        }
 
-                 for (int i = 0; i < array.length(); i++) {
-                     ListBean listBean = new ListBean();
-                     JSONObject jsonObject = array.getJSONObject(i);
-                     String ar = String.valueOf(jsonObject.get("ar"));
-                     Type token = new TypeToken<List<UserSongListBean.Ar>>(){}.getType();
-                     List<UserSongListBean.Ar> SingerInfo =  app.gson.fromJson(ar,token);
-                     listBean.setSingerInfo(SingerInfo);
-
-                     listBean.setSongName(String.valueOf(jsonObject.get("name")));
-                     listBean.setSongId(Long.parseLong(String.valueOf(jsonObject.get("id"))) );
-                     listBean.setSubTitle(String.valueOf(((JSONObject)jsonObject.get("al")).get("name")));
-                     if(((JSONObject)jsonObject.get("al")).has("picUrl")){
-                         listBean.setImgUrl(String.valueOf(((JSONObject)jsonObject.get("al")).get("picUrl")));
-                     }else {
-                         String pic_str = String.valueOf(((JSONObject) jsonObject.get("al")).get("pic_str"));
-
-                         listBean.setImgUrl(pic_str);
-                     }
-
-                     Sheetlist.add(listBean);
+                        Sheetlist.add(listBean);
 
 
-                 }
-                 assert Sheetlist != null;
-                 if (!upOrAdd.equals("add")){
-                     songId = String.valueOf(Sheetlist.get(index).getSongId());
-                 }else {
-                     songId = String.valueOf(Sheetlist.get(Sheetlist.size()-1).getSongId());
-                 }
+                    }
+                    assert Sheetlist != null;
+                    if (!upOrAdd.equals("add")) {
+                        songId = String.valueOf(Sheetlist.get(index).getSongId());
+                    } else {
+                        songId = String.valueOf(Sheetlist.get(Sheetlist.size() - 1).getSongId());
+                    }
 
-                 play(songId,null);
-                setList.setListInfo(Sheetlist);
-
-
-                 if ( Sheetlist.size()<=10) {
-                     currentP =  Sheetlist.size()* 500+index;
-                 }else if( Sheetlist.size()<=100){
-                     currentP = Sheetlist.size()* 50+index;
-                 }else if( Sheetlist.size()<=1000){
-                     currentP =  Sheetlist.size()* 5+index;
-                 }else {
-                     currentP = index;
-                 }
-                 oldSheetId = sheetId;
-             } catch (JSONException e) {
-                 throw new RuntimeException(e);
-             }
-             if(CURRENT_PLAY_MODE==RANDOM_PLAY_MODE){
-                 isUpData = 2;
-                 Log.d("TAG--------11111", "formatDate: "+Long.parseLong(songId));
-
-                 upData(Long.parseLong(songId));
-             }else if (pIndex ==0) {
-                 player_viewPage.setCurrentItem(currentP+Sheetlist.size());
-                 pIndex = 1;
-             }else {
-                 player_viewPage.setCurrentItem(currentP-Sheetlist.size());
-                 pIndex = 0;
-             }
-
-             //player_viewPage.setCurrentItem(currentP);
-             if (animationUtils != null) {
-                 animationUtils.stopRotate("cancel");
-             }
+                    play(songId, null);
+                    setList.setListInfo(Sheetlist);
 
 
-         }else if(playerInfo.getSongId() != Sheetlist.get(index).getSongId()){
-             if (animationUtils != null) {
-                 animationUtils.stopRotate("cancel");
-             }
+                    if (Sheetlist.size() <= 10) {
+                        currentP = Sheetlist.size() * 500 + index;
+                    } else if (Sheetlist.size() <= 100) {
+                        currentP = Sheetlist.size() * 50 + index;
+                    } else if (Sheetlist.size() <= 1000) {
+                        currentP = Sheetlist.size() * 5 + index;
+                    } else {
+                        currentP = index;
+                    }
+                    oldSheetId = sheetId;
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                if (CURRENT_PLAY_MODE == RANDOM_PLAY_MODE) {
+                    isUpData = 2;
+                    Log.d("TAG--------11111", "formatDate: " + Long.parseLong(songId));
 
-             songId = String.valueOf(Sheetlist.get(index).getSongId());
+                    upData(Long.parseLong(songId));
+                } else if (pIndex == 0) {
+                    player_viewPage.setCurrentItem(currentP + Sheetlist.size());
+                    pIndex = 1;
+                } else {
+                    player_viewPage.setCurrentItem(currentP - Sheetlist.size());
+                    pIndex = 0;
+                }
+
+                //player_viewPage.setCurrentItem(currentP);
+                if (animationUtils != null) {
+                    animationUtils.stopRotate("cancel");
+                }
+
+
+            } else if (playerInfo.getSongId() != Sheetlist.get(index).getSongId()) {
+                if (animationUtils != null) {
+                    animationUtils.stopRotate("cancel");
+                }
+
+                songId = String.valueOf(Sheetlist.get(index).getSongId());
 
 //
 
 
-           //  play(songId,null);
-             int i = currentP % Sheetlist.size();
-             if (index>i) {
-                 currentP = currentP+index;
-             }else {
-                 currentP = currentP-index;
-             }
+                //  play(songId,null);
+                int i = currentP % Sheetlist.size();
+                if (index > i) {
+                    currentP = currentP + index;
+                } else {
+                    currentP = currentP - index;
+                }
 
-             if (pIndex ==0) {
-                 player_viewPage.setCurrentItem(currentP+Sheetlist.size());
-                 pIndex = 1;
-             }else {
-                 player_viewPage.setCurrentItem(currentP-Sheetlist.size());
-                 pIndex = 0;
-             }
-
-
-         }
+                if (pIndex == 0) {
+                    player_viewPage.setCurrentItem(currentP + Sheetlist.size());
+                    pIndex = 1;
+                } else {
+                    player_viewPage.setCurrentItem(currentP - Sheetlist.size());
+                    pIndex = 0;
+                }
 
 
-     }
+            }
+
+
+        }
     }
-    public void setRecommendSheetId(String sheetId ){
+
+    public void setRecommendSheetId(String sheetId) {
         this.sheetId = sheetId;
 
     }
+
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode==KeyEvent.KEYCODE_BACK){
+//            moveTaskToBack(true);
+//            return false;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
+
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed() {
-        Log.d("TAG11111111111111111111111", "onBackPressed: "+app.page);
-        if(homeFragment.songSheetFragment!=null&&homeFragment.songSheetFragment.isVisible()){
-            if (secondFragment!=null&&secondFragment.isVisible()) {
+
+        Log.d("TAG11111111111111111111111", "onBackPressed: " + app.page);
+        if (homeFragment.songSheetFragment != null && homeFragment.songSheetFragment.isVisible()) {
+            if (secondFragment != null && secondFragment.isVisible()) {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(
@@ -1932,43 +1929,43 @@ switchSong = false;
                         .hide(secondFragment)
                         .commit();
                 Log.d("TAGwotmzoulzhe", "attach: 2");
-                app.page-=1;
+                app.page -= 1;
                 return;
             }
 
 
             homeFragment.hideFragment();
-            Log.d("TAG111111111111222333", "onBackPressed: "+app.page);
+            Log.d("TAG111111111111222333", "onBackPressed: " + app.page);
             showView();
             viewPager.setBackground(getDrawable(R.drawable.home_background));
 
             return;
         }
-        if(behavior.getState()==BottomSheetBehavior.STATE_EXPANDED){
+        if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             return;
         }
-        if(app.touchType == TouchType.MY_PAGE&&!app.isOpenFence ){
-            myFragment.myBindings.channel.invokeMethod("back","");
+        if (app.touchType == TouchType.MY_PAGE && !app.isOpenFence) {
+            myFragment.myBindings.channel.invokeMethod("back", "");
             return;
         }
-        if( app.touchType ==TouchType.SEARCH_PAGE){
+        if (app.touchType == TouchType.SEARCH_PAGE) {
             Log.d("TAG----------aaaaaa", "onBackPressed: ");
             homeFragment.searchFragment.getBack().back();
             return;
         }
-        if(secondFragment!=null){
-            if(app.touchType==TouchType.RECOMMENDABLE_SHEET||app.touchType==TouchType.RANKING_PAGE||app.touchType==TouchType.EXCLUSIVE_SCENE
-                    ||app.touchType==TouchType.MUSIC_RADAR||app.touchType==TouchType.SING_AND_ALBUMS){
+        if (secondFragment != null) {
+            if (app.touchType == TouchType.RECOMMENDABLE_SHEET || app.touchType == TouchType.RANKING_PAGE || app.touchType == TouchType.EXCLUSIVE_SCENE
+                    || app.touchType == TouchType.MUSIC_RADAR || app.touchType == TouchType.SING_AND_ALBUMS) {
                 secondFragment.getBack().back();
                 return;
             }
         }
-        if (app.page>0){
+        if (app.page > 0) {
             Log.d("TAGwotmzoulzhe", "attach: 3");
-            app.page-=1;
-            if (homeFragment.searchFragment!=null&&homeFragment.searchFragment.isVisible()){
+            app.page -= 1;
+            if (homeFragment.searchFragment != null && homeFragment.searchFragment.isVisible()) {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(
@@ -1981,7 +1978,7 @@ switchSong = false;
                 showView();
                 return;
             }
-            if (secondFragment!=null&&secondFragment.isVisible()) {
+            if (secondFragment != null && secondFragment.isVisible()) {
 
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -1992,16 +1989,16 @@ switchSong = false;
                                 R.anim.fade_out)
                         .hide(secondFragment)
                         .commit();
-            }else {
-                Log.d("TAG---------", "onBackPressed: "+(myFragment.isVisible()&&viewPager.getCurrentItem()==1));
+            } else {
+                Log.d("TAG---------", "onBackPressed: " + (myFragment.isVisible() && viewPager.getCurrentItem() == 1));
 //                if (myFragment.isVisible()&&viewPager.getCurrentItem()==1) {
 //                   // myFragment.myBindings.channel.invokeMethod("back","");
 //                    app.touchType = TouchType.MY_PAGE;
 //                    showView();
 //                    return;
 //                }
-                if (msgFragment.isVisible()&&viewPager.getCurrentItem()==2) {
-                    msgFragment.msgBindings.channel.invokeMethod("back","");
+                if (msgFragment.isVisible() && viewPager.getCurrentItem() == 2) {
+                    msgFragment.msgBindings.channel.invokeMethod("back", "");
                     showView();
                     return;
                 }
@@ -2014,33 +2011,36 @@ switchSong = false;
         }
 
 
-            if (doubleBackToExitPressedOnce) {
-                super.onBackPressed();// 如果已经点击过一次返回按钮，则直接调用父类的方法，执行默认的退出操作
-                finish();
-                return;
-            }
-            this.doubleBackToExitPressedOnce = true;
-            CustomToast.showToast(this, "再按一次退出");
-
-            // 设置延时2秒，如果2秒内再次点击返回按钮，则将 doubleBackToExitPressedOnce 重置为 false
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    doubleBackToExitPressedOnce = false;
-                    app.isOpenFence = false;
-                }
-            }, 2000);
+        if (doubleBackToExitPressedOnce) {
+            this.doubleBackToExitPressedOnce = false;
+            app.isOpenFence = false;
+            moveTaskToBack(true);
+            return;
         }
+        this.doubleBackToExitPressedOnce = true;
+        CustomToast.showToast(this, "再按一次退出");
 
-   public void setBackColor(){
+        // 设置延时2秒，如果2秒内再次点击返回按钮，则将 doubleBackToExitPressedOnce 重置为 false
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+                app.isOpenFence = false;
+            }
+        }, 2000);
+
+    }
+
+    public void setBackColor() {
         viewPager.setBackground(getDrawable(R.color.white));
     }
+
     public void showView() {
-        if (app.page==0) {
+        if (app.page == 0) {
             animationUtil.showView(bottom_view);
         }
 
-        if (playerLayoutParams!=null){
+        if (playerLayoutParams != null) {
             player_control.setVisibility(View.INVISIBLE);
             new Handler(Looper.getMainLooper()).postDelayed(
                     new Runnable() {
@@ -2051,69 +2051,73 @@ switchSong = false;
                             animationUtil.showView(player_control);
                         }
                     }
-                    ,500);
+                    , 500);
         }
     }
+
     public void hideView() {
         //隐藏Bottom_view
-        if(bottom_view.getVisibility()==View.GONE||bottom_view.getVisibility()==View.INVISIBLE)return;
+        if (bottom_view.getVisibility() == View.GONE || bottom_view.getVisibility() == View.INVISIBLE)
+            return;
         animationUtil.hideView(bottom_view);
         bottom_view.setVisibility(View.GONE);
-        if (player_control.getVisibility()== View.VISIBLE) {
+        if (player_control.getVisibility() == View.VISIBLE) {
             player_control.setVisibility(View.GONE);
         }
 
         playerLayoutParams = (RelativeLayout.LayoutParams) player_control.getLayoutParams();
-        playerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+        playerLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
         player_control.setLayoutParams(playerLayoutParams);
 
-        if (player_control.getVisibility()== View.INVISIBLE||
-                player_control.getVisibility()== View.GONE)
-        {
+        if (player_control.getVisibility() == View.INVISIBLE ||
+                player_control.getVisibility() == View.GONE) {
             animationUtil.showView(player_control);
         }
     }
 
-public void hide(){
-    animationUtil.hideView(player_control);
-}
-    public void show(){
+    public void hide() {
+        animationUtil.hideView(player_control);
+    }
+
+    public void show() {
         animationUtil.showView(player_control);
     }
-public void requestPermission(Map<?, ?> info){
+
+    public void requestPermission(Map<?, ?> info) {
         this.info = info;
-    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
-        String[] strings = {Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO};
-        for (String string : strings) {
-            if (ContextCompat.checkSelfPermission(this, string)!= PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            String[] strings = {Manifest.permission.READ_MEDIA_AUDIO,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO};
+            for (String string : strings) {
+                if (ContextCompat.checkSelfPermission(this, string) != PackageManager.PERMISSION_GRANTED) {
 
                     ActivityCompat.requestPermissions(this,
                             strings,
                             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
 
-                            return;
-               // }
+                    return;
+                    // }
+                }
+            }
+
+        } else {
+            int checked = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (checked == PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                showPermissionRationaleDialog();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             }
         }
 
-    }else {
-        int checked = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if(checked==PackageManager.PERMISSION_GRANTED){
-            return;
-        }
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-            showPermissionRationaleDialog();
-        }else {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-        }
     }
 
-}
     private void showPermissionRationaleDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("权限请求")
@@ -2123,6 +2127,7 @@ public void requestPermission(Map<?, ?> info){
                 .create()
                 .show();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -2131,33 +2136,33 @@ public void requestPermission(Map<?, ?> info){
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++) {
                         if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                            if(i==grantResults.length-1){
+                            if (i == grantResults.length - 1) {
                                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
                                 String downloadsPath = downloadsDir.getAbsolutePath();
-                                Map<String,Object> result = new HashMap<>();
-                                result.put("isSuccess",true);
-                                result.put("action", String.valueOf(info.get("info")).equals("") ?"chooseImg":"saveImg");
-                                result.put("info",String.valueOf(info.get("info")));
-                                result.put("path",downloadsPath);
+                                Map<String, Object> result = new HashMap<>();
+                                result.put("isSuccess", true);
+                                result.put("action", String.valueOf(info.get("info")).equals("") ? "chooseImg" : "saveImg");
+                                result.put("info", String.valueOf(info.get("info")));
+                                result.put("path", downloadsPath);
 
 
                                 if (String.valueOf(info.get("origin")).equals("myFragment")) {
                                     myFragment.myBindings.channel.invokeMethod("RequestResults", result);
 
-                                }else secondFragment.otherBindings.channel.invokeMethod("RequestResults",result);
-
+                                } else
+                                    secondFragment.otherBindings.channel.invokeMethod("RequestResults", result);
 
 
                             }
-                        }else {
-                            CustomToast.showToast(this,"未授予权限或权限不完整！");
+                        } else {
+                            CustomToast.showToast(this, "未授予权限或权限不完整！");
                             return;
                         }
                     }
 
                     // 权限被用户授予，可以继续操作
                 }
-                    // 权限被用户拒绝，处理这种情况
+                // 权限被用户拒绝，处理这种情况
 
 
                 break;
@@ -2166,11 +2171,13 @@ public void requestPermission(Map<?, ?> info){
             // ...
         }
     }
-   public void upImage(String path){
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://"+path)));
+
+    public void upImage(String path) {
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + path)));
     }
-    public void restoreData(){
-        filePath = getApplicationContext().getFilesDir() + "/"+fileName;
+
+    public void restoreData() {
+        filePath = getApplicationContext().getFilesDir() + "/" + fileName;
 
         File file = new File(filePath);
         if (file.exists()) {
@@ -2183,20 +2190,20 @@ public void requestPermission(Map<?, ?> info){
             CURRENT_PLAY_MODE = musicCacheBean.getPlayMode();
             int index = musicCacheBean.getIndex();
             int num = musicCacheBean.getPlayList().size();
-            if ( num<=10) {
-                index =  num* 500+index;
-            }else if( num<=1000){
-                index =  num* 50+index;
-            }else if( num<=4000) {
+            if (num <= 10) {
+                index = num * 500 + index;
+            } else if (num <= 1000) {
+                index = num * 50 + index;
+            } else if (num <= 4000) {
                 index = num * 5 + index;
             }
 
             currentPosition = (musicCacheBean.getProgress() * 1.0f / musicCacheBean.getDurationNum() * 100);
-            Log.d("TAGjdjdjfjfjgjg", "restoreData: "+ currentPosition +"----"+musicCacheBean.getProgress());
+            Log.d("TAGjdjdjfjfjgjg", "restoreData: " + currentPosition + "----" + musicCacheBean.getProgress());
             player_seekBar.setProgress((int) currentPosition);
             setList.setListInfo(musicCacheBean.getPlayList());
             player_viewPage.setCurrentItem(index);
-            switch (CURRENT_PLAY_MODE){
+            switch (CURRENT_PLAY_MODE) {
 
                 case SINGLE_PLAY_MODE:
                     play_module.setImageDrawable(getDrawable(playMode[0]));
@@ -2217,9 +2224,11 @@ public void requestPermission(Map<?, ?> info){
         }
 
     }
-    public  interface GetLrcString {
+
+    public interface GetLrcString {
         void setLrc(String Lrc, String tLrc);
     }
+
     public interface ShowLrcInfoView {
         void ShowLrcInfoView(boolean showOrHide);
     }
@@ -2228,7 +2237,7 @@ public void requestPermission(Map<?, ?> info){
         void toPosition();
     }
 
-    public  interface setCallback{
-        MediaSessionCompat.Callback callback( );
+    public interface setCallback {
+        MediaSessionCompat.Callback callback();
     }
 }

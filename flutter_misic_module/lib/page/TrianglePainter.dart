@@ -13,11 +13,11 @@ class TrianglePainter extends CustomPainter {
 
   TrianglePainter(
       {required this.color,
-        required this.position,
-        required this.size,
-        this.radius = 20,
-        this.isInverted = false,
-        required this.screenWidth}) {
+      required this.position,
+      required this.size,
+      this.radius = 20,
+      this.isInverted = false,
+      required this.screenWidth}) {
     _paint = Paint()
       ..style = PaintingStyle.fill
       ..color = color
@@ -33,11 +33,14 @@ class TrianglePainter extends CustomPainter {
     if (size.width > this.size.width) {
       // 靠右
       if (position.left + this.size.width / 2 > position.right) {
-        if (screenWidth - (position.left + this.size.width) > size.width / 2 + _kMenuScreenPadding) {
+        if (screenWidth - (position.left + this.size.width) >
+            size.width / 2 + _kMenuScreenPadding) {
           path.moveTo(size.width / 2, isInverted ? 0 : size.height);
-          path.lineTo(size.width / 2 - radius / 2, isInverted ? size.height : 0);
-          path.lineTo(size.width / 2 + radius / 2, isInverted ? size.height : 0);
-        }else {
+          path.lineTo(
+              size.width / 2 - radius / 2, isInverted ? size.height : 0);
+          path.lineTo(
+              size.width / 2 + radius / 2, isInverted ? size.height : 0);
+        } else {
           path.moveTo(size.width - this.size.width + this.size.width / 2,
               isInverted ? 0 : size.height);
           path.lineTo(
@@ -47,13 +50,15 @@ class TrianglePainter extends CustomPainter {
               size.width - this.size.width + this.size.width / 2 + radius / 2,
               isInverted ? size.height : 0);
         }
-      }else{
+      } else {
         // 靠左
-        if(position.left > size.width / 2 + _kMenuScreenPadding){
+        if (position.left > size.width / 2 + _kMenuScreenPadding) {
           path.moveTo(size.width / 2, isInverted ? 0 : size.height);
-          path.lineTo(size.width / 2 - radius / 2, isInverted ? size.height : 0);
-          path.lineTo(size.width / 2 + radius / 2, isInverted ? size.height : 0);
-        }else {
+          path.lineTo(
+              size.width / 2 - radius / 2, isInverted ? size.height : 0);
+          path.lineTo(
+              size.width / 2 + radius / 2, isInverted ? size.height : 0);
+        } else {
           path.moveTo(this.size.width / 2, isInverted ? 0 : size.height);
           path.lineTo(
               this.size.width / 2 - radius / 2, isInverted ? size.height : 0);
@@ -63,10 +68,8 @@ class TrianglePainter extends CustomPainter {
       }
     } else {
       path.moveTo(size.width / 2, isInverted ? 0 : size.height);
-      path.lineTo(
-          size.width / 2 - radius / 2, isInverted ? size.height : 0);
-      path.lineTo(
-          size.width / 2 + radius / 2, isInverted ? size.height : 0);
+      path.lineTo(size.width / 2 - radius / 2, isInverted ? size.height : 0);
+      path.lineTo(size.width / 2 + radius / 2, isInverted ? size.height : 0);
     }
 
     path.close();

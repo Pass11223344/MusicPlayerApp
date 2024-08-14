@@ -27,6 +27,7 @@ import com.rikkatheworld.wangyiyun.fragment.HomeFragment;
 import com.rikkatheworld.wangyiyun.view.CustomToast;
 
 import java.util.List;
+
 //轮播图
 public class BannerAdapter extends PagerAdapter {
 
@@ -35,6 +36,7 @@ public class BannerAdapter extends PagerAdapter {
     private List<BannerBean> list;
     private App app;
     private final HomeFragment.NavigationToSecond secondPage;
+
     public BannerAdapter(Context context, HomeFragment.NavigationToSecond secondPage) {
         this.context = context;
         this.secondPage = secondPage;
@@ -62,53 +64,53 @@ public class BannerAdapter extends PagerAdapter {
                         .transform(new MarginTransformation(40, 25)))
                 .into(imageView);
 
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switch (bean.getTypeTitle()){
-                        case "演出":
-                        case "独家策划":
-                            app.page+=1;
-                            app.touchType = TouchType.ALBUMS;
-                            secondPage.toSecond(TO_ALBUMS,bean.getUrl());
-                            break;
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (bean.getTypeTitle()) {
+                    case "演出":
+                    case "独家策划":
+                        app.page += 1;
+                        app.touchType = TouchType.ALBUMS;
+                        secondPage.toSecond(TO_ALBUMS, bean.getUrl());
+                        break;
 
-                        case "歌单":
-                            app.page +=1;
-                            app.touchType = TouchType.RECOMMENDABLE_SHEET;
-                            ((MainActivity) context).setRecommendSheetId(String.valueOf(bean.getTargetId()));
-                            secondPage.toSecond(TO_RECOMMEND_SHEET, String.valueOf(bean.getTargetId()));
-                            break;
-                        case "广告":
-                            CustomToast.showToast(context,"这是个广告");
-                            break;
+                    case "歌单":
+                        app.page += 1;
+                        app.touchType = TouchType.RECOMMENDABLE_SHEET;
+                        ((MainActivity) context).setRecommendSheetId(String.valueOf(bean.getTargetId()));
+                        secondPage.toSecond(TO_RECOMMEND_SHEET, String.valueOf(bean.getTargetId()));
+                        break;
+                    case "广告":
+                        CustomToast.showToast(context, "这是个广告");
+                        break;
 //                        case "":
 //                            break;
-                    }
                 }
-            });
+            }
+        });
         container.addView(imageView);
         return imageView;
     }
 
     @Override
     public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view==object;
+        return view == object;
     }
 
     public void setData(List<BannerBean> list) {
 
         this.list = list;
-        Log.d("TAG1qqqqqqqqqqqqqqqqqqqq", "instantiateItem: "+list.size());
+        Log.d("TAG1qqqqqqqqqqqqqqqqqqqq", "instantiateItem: " + list.size());
 
         notifyDataSetChanged();
     }
+
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
 
         container.removeView((View) object);
     }
-
 
 
 }

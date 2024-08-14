@@ -8,8 +8,6 @@ class DatabaseHelper {
 
   static final table = 'user_table';
 
-
-
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
@@ -45,8 +43,7 @@ class DatabaseHelper {
     ''');
   }
 
-
-  Future<int> insert(Map<String,dynamic> data) async {
+  Future<int> insert(Map<String, dynamic> data) async {
     Database db = await database;
     return await db.insert(table, data);
   }
@@ -56,9 +53,10 @@ class DatabaseHelper {
     return await db.query(table);
   }
 
-  Future<int> updateItem(int id, String key,String value) async {
+  Future<int> updateItem(int id, String key, String value) async {
     Database db = await database;
-    return await db.update(table, {key: value}, where: 'userId = ?', whereArgs: [id]);
+    return await db.update(table, {key: value},
+        where: 'userId = ?', whereArgs: [id]);
   }
 
   Future<int> deleteItem(int id) async {

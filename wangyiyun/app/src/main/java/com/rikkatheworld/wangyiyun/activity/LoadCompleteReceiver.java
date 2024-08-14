@@ -25,7 +25,7 @@ public class LoadCompleteReceiver extends BroadcastReceiver {
             App applicationContext = (App) activity.getApplicationContext();
             applicationContext.HomeData = intent.getStringExtra("result");
 
-            activity.startActivity(new Intent(activity,MainActivity.class));
+            activity.startActivity(new Intent(activity, MainActivity.class));
             activity.finish();
         }
     }

@@ -1,16 +1,16 @@
-
 import 'package:flutter/material.dart';
 
-class loadingAnimation extends StatefulWidget{
+class loadingAnimation extends StatefulWidget {
   @override
-    // TODO: implement createState
-    State<loadingAnimation> createState() => _loadingAnimationState();
-
-
+  // TODO: implement createState
+  State<loadingAnimation> createState() => _loadingAnimationState();
 }
-class _loadingAnimationState extends State<loadingAnimation> with SingleTickerProviderStateMixin{
+
+class _loadingAnimationState extends State<loadingAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<int> _frameAnimation;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -26,6 +26,7 @@ class _loadingAnimationState extends State<loadingAnimation> with SingleTickerPr
 
     _controller.repeat();
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -36,5 +37,4 @@ class _loadingAnimationState extends State<loadingAnimation> with SingleTickerPr
       },
     );
   }
-
 }

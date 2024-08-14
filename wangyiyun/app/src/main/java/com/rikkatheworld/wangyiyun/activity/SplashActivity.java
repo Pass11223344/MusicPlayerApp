@@ -54,17 +54,16 @@ public class SplashActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(ACTION_LOAD_COMPLETE);
         loadCompleteReceiver = new LoadCompleteReceiver(this);
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        localBroadcastManager.registerReceiver(loadCompleteReceiver,filter);
+        localBroadcastManager.registerReceiver(loadCompleteReceiver, filter);
 
         loadData();
-
 
 
     }
 
     private void loadData() {
         try {
-            OkHttpClient httpClient = new  OkHttpClient.Builder()
+            OkHttpClient httpClient = new OkHttpClient.Builder()
                     .build();
 
             Request request = new Request.Builder()
@@ -79,10 +78,10 @@ public class SplashActivity extends AppCompatActivity {
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (response.body()!=null) {
+                    if (response.body() != null) {
                         String result = response.body().string();
                         Intent intent = new Intent(ACTION_LOAD_COMPLETE);
-                        intent.putExtra("result",result);
+                        intent.putExtra("result", result);
                         LocalBroadcastManager.getInstance(SplashActivity.this).sendBroadcast(intent);
 
                     }

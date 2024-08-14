@@ -1,7 +1,6 @@
 package com.rikkatheworld.wangyiyun.fragment;
 
 
-
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.MSG_ENGINE_ID;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.activityMainBinding;
 import static com.rikkatheworld.wangyiyun.activity.MainActivity.playerInfo;
@@ -52,12 +51,10 @@ import io.flutter.embedding.android.RenderMode;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.FlutterEngineCache;
 
-public class MsgFragment extends Fragment implements EngineBindings.EngineBindingsDelegate{
-private final int RES_ID = 1;
+public class MsgFragment extends Fragment implements EngineBindings.EngineBindingsDelegate {
+    private final int RES_ID = 1;
 
-private final int LOGIN = 2;
-
-
+    private final int LOGIN = 2;
 
 
     public static MsgHandler handler;
@@ -65,7 +62,7 @@ private final int LOGIN = 2;
     private String json;
     public EngineBindings msgBindings;
     private boolean isPrepare;
-    private boolean isFirstLoad   = true;
+    private boolean isFirstLoad = true;
     private App app;
     private SharedPreferences userInfoData;
     private FragmentActivity activity;
@@ -73,7 +70,7 @@ private final int LOGIN = 2;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.msg_fragment,container,false);
+        return inflater.inflate(R.layout.msg_fragment, container, false);
 
     }
 
@@ -90,9 +87,6 @@ private final int LOGIN = 2;
     }
 
 
-
-
-
     public void onRefresh() {
 
         if (isFirstLoad) {
@@ -103,7 +97,7 @@ private final int LOGIN = 2;
     }
 
     private void initView() {
-        if (handler==null) {
+        if (handler == null) {
             handler = new MsgHandler();
         }
 
@@ -133,7 +127,7 @@ private final int LOGIN = 2;
 
     public void LoadData() {
         try {
-            NetworkUtils.makeRequest(NetworkInfo.URL + "/msg/private",MsgFragment.handler,RES_ID,true,getContext());
+            NetworkUtils.makeRequest(NetworkInfo.URL + "/msg/private", MsgFragment.handler, RES_ID, true, getContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,7 +139,7 @@ private final int LOGIN = 2;
 
     }
 
-    public    class  MsgHandler extends Handler{
+    public class MsgHandler extends Handler {
 
         private JSONObject data;
         private String account;
@@ -155,21 +149,21 @@ private final int LOGIN = 2;
         public void dispatchMessage(@NonNull Message msg) {
             super.dispatchMessage(msg);
 
-            switch (msg.what){
+            switch (msg.what) {
 
 
                 case RES_ID:
-                   String str = msg.obj.toString();
-                    if (str!=null) {
+                    String str = msg.obj.toString();
+                    if (str != null) {
 
-                        List<NotificationListBean> notificationInfo = MsgGsonUtil.getInstance().press(str, "NotificationInfo",app);
+                        List<NotificationListBean> notificationInfo = MsgGsonUtil.getInstance().press(str, "NotificationInfo", app);
 
                         Gson gson = new Gson();
                         json = gson.toJson(notificationInfo);
 
-                        String string1 = userInfoData.getString("token","");
-                        String string = userInfoData.getString("UserInfo","");
-                        if (!string.equals("")|| !TextUtils.isEmpty(string)&&  playerInfo.getUserInfoBean()==null) {
+                        String string1 = userInfoData.getString("token", "");
+                        String string = userInfoData.getString("UserInfo", "");
+                        if (!string.equals("") || !TextUtils.isEmpty(string) && playerInfo.getUserInfoBean() == null) {
                             try {
                                 JSONObject info = new JSONObject(string);
                                 String profile = String.valueOf(info.get("profile"));
@@ -183,20 +177,20 @@ private final int LOGIN = 2;
                         }
 
                         app.Cookie = string1;
-                        if (json!=null){
-                            FlutterEngineCache.getInstance().put(MSG_ENGINE_ID,msgBindings.engine);
+                        if (json != null) {
+                            FlutterEngineCache.getInstance().put(MSG_ENGINE_ID, msgBindings.engine);
                             msgBindings.attach();
                             FlutterFragment msgflutterFragment = FlutterFragment.withCachedEngine(MSG_ENGINE_ID)
-                                   .renderMode(RenderMode.texture)
+                                    .renderMode(RenderMode.texture)
                                     .build();
-                            Map<String,Object> map = new HashMap<>();
-                            map.put("json" ,json);
-                            map.put("token" ,string1);
-                            map.put("userId",playerInfo.getUserInfoBean().getUserId());
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("json", json);
+                            map.put("token", string1);
+                            map.put("userId", playerInfo.getUserInfoBean().getUserId());
                             msgBindings.channel.invokeMethod("to_msgPage", map);
                             activity.getSupportFragmentManager()
                                     .beginTransaction()
-                                    .add(R.id.FV_msg_list,msgflutterFragment)
+                                    .add(R.id.FV_msg_list, msgflutterFragment)
                                     .commit();
                         }
 
@@ -207,6 +201,7 @@ private final int LOGIN = 2;
             }
         }
     }
+
     private EngineBindings getMsgBindings() {
         if (msgBindings == null) {
             msgBindings = new EngineBindings(getActivity(), this, "msgMain");

@@ -43,33 +43,32 @@ public class CommentActivity extends AppCompatActivity implements EngineBindings
         initView();
 
 
-
     }
 
     private void initView() {
 
         Bundle extras = getIntent().getExtras();
-        Map<String ,Object> map = new HashMap<>();
-        map.put("songName",extras.getString("songName"));
-        map.put("commentType",0);
-       // map.put("commentUrl","/comment/new");
-        map.put("Id",extras.getLong("Id"));
-        map.put("singerName",extras.getString("singerName"));
-        map.put("imgUrl",extras.getString("imgUrl"));
-            map.put("userId",extras.getString("userId"));
-        FlutterEngineCache.getInstance().put(COMMENT_ENGINE_ID,commentBindings.engine);
+        Map<String, Object> map = new HashMap<>();
+        map.put("songName", extras.getString("songName"));
+        map.put("commentType", 0);
+        // map.put("commentUrl","/comment/new");
+        map.put("Id", extras.getLong("Id"));
+        map.put("singerName", extras.getString("singerName"));
+        map.put("imgUrl", extras.getString("imgUrl"));
+        map.put("userId", extras.getString("userId"));
+        FlutterEngineCache.getInstance().put(COMMENT_ENGINE_ID, commentBindings.engine);
         FlutterFragment commentFragment = FlutterFragment.withCachedEngine(COMMENT_ENGINE_ID)
                 .build();
-        commentBindings.channel.invokeMethod("commentChannel",map);
+        commentBindings.channel.invokeMethod("commentChannel", map);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.comment_view,commentFragment)
+                .add(R.id.comment_view, commentFragment)
                 .commit();
     }
 
-    public EngineBindings getCommentBindings(){
-        if (commentBindings==null) {
-            commentBindings = new EngineBindings(this,this,"CommentPage");
+    public EngineBindings getCommentBindings() {
+        if (commentBindings == null) {
+            commentBindings = new EngineBindings(this, this, "CommentPage");
 
         }
         return commentBindings;
@@ -83,12 +82,13 @@ public class CommentActivity extends AppCompatActivity implements EngineBindings
     @Override
     public void onBackPressed() {
 
+
         commentBindings.channel.invokeMethod("canPop", "", new MethodChannel.Result() {
             @Override
             public void success(@Nullable Object result) {
                 boolean canPop = (boolean) result;
-                if(canPop){
-                    Log.d("TAG-------", "successdddddd: "+canPop);
+                if (canPop) {
+                    Log.d("TAG-------", "successdddddd: " + canPop);
                     CommentActivity.super.onBackPressed();
                 }
             }
@@ -103,7 +103,7 @@ public class CommentActivity extends AppCompatActivity implements EngineBindings
 
             }
         });
-
+        super.onBackPressed();
         return;
     }
 
