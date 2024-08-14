@@ -301,9 +301,13 @@ class songListPageState extends State<songListPage> {
                                                           child:
                                                               GestureDetector(
                                                             onTap: () {
-                                                              ListController
-                                                                      .isShow =
-                                                                  true;
+                                                              channel.invokeMethod(
+                                                                  "hideOrShowView",
+                                                                  true)
+                                                                  .then((_) {
+                                                                ListController.isShow = true;
+                                                              });
+
                                                             },
                                                             child: Stack(
                                                               alignment:
@@ -322,8 +326,7 @@ class songListPageState extends State<songListPage> {
                                                                 ),
                                                                 Container(
                                                                   alignment:
-                                                                      Alignment
-                                                                          .bottomCenter,
+                                                                      Alignment.bottomCenter,
                                                                   child: ClipRRect(
                                                                       borderRadius: BorderRadius.circular(8.0),
                                                                       child: getSquareImg(

@@ -300,8 +300,7 @@ class mySongListPageState extends State<mySongListPage> {
                                                     height: 110,
                                                     child: GestureDetector(
                                                       onTap: () {
-                                                        channel
-                                                            .invokeMethod(
+                                                        channel.invokeMethod(
                                                                 "hideOrShowView",
                                                                 true)
                                                             .then((_) {
