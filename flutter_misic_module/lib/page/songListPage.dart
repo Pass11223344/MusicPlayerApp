@@ -98,15 +98,15 @@ class songListPageState extends State<songListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      mediaQuery = MediaQuery.of(context);
-
-      width = mediaQuery.size.width;
-      height = mediaQuery.size.height;
-      eHeight = height / 2 - 120;
-      statusHeight = mediaQuery.padding.top + kToolbarHeight;
-      setState(() {});
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   mediaQuery = MediaQuery.of(context);
+    //
+    //   width = mediaQuery.size.width;
+    //   height = mediaQuery.size.height;
+    //   eHeight = height / 2 - 120;
+    //   statusHeight = mediaQuery.padding.top + kToolbarHeight;
+    //   setState(() {});
+    // });
     getData(widget.data['id']);
     type = widget.data['type'];
     _textEditingController = TextEditingController();
@@ -266,14 +266,12 @@ class songListPageState extends State<songListPage> {
                                   flexibleSpace: FlexibleSpaceBar(
                                     // collapseMode: CollapseMode.pin,
                                     background: type == "to_recommend_song"
-                                        ? Container(
-                                            child: getSquareImg(
-                                              Url: ListController
-                                                  .songList[0].al.picUrl,
-                                              height: height / 2 - 100,
-                                              width: double.infinity,
-                                            ),
-                                          )
+                                        ? getSquareImg(
+                                      Url: ListController
+                                          .songList[0].al.picUrl,
+                                      height: height / 2 - 100,
+                                      width: double.infinity,
+                                    )
                                         : Stack(
                                             children: <Widget>[
                                               Positioned.fill(
@@ -1622,7 +1620,7 @@ class songListPageState extends State<songListPage> {
             url: "/playlist/track/all", params: {"id": id, "limit": 20});
 
         Future.microtask(() async {
-          print("object----------${SongSheet}");
+
 
           if (SongSheet != "error" && SList != "error") {
             if (ListController.albumInfo != null)
@@ -1634,6 +1632,7 @@ class songListPageState extends State<songListPage> {
             ListController.songList = (SList['songs'] as List<dynamic>)
                 .map((json) => SongListBean.fromJson(json))
                 .toList();
+
             pageController.pageIsOk = true;
           }
         });
@@ -1672,6 +1671,12 @@ class songListPageState extends State<songListPage> {
 
         break;
     }
+    mediaQuery = MediaQuery.of(context);
+
+    width = mediaQuery.size.width;
+    height = mediaQuery.size.height;
+    eHeight = height / 2 - 120;
+    statusHeight = mediaQuery.padding.top + kToolbarHeight;
   }
 
   Future<Color> _getPaletteGenerator(String image) async {

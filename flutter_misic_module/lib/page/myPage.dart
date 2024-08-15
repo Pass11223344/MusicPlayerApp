@@ -145,18 +145,18 @@ class myPageState extends State<myPage> with TickerProviderStateMixin {
                                               {"info": ""})) {
                                             var path =
                                                 await Utils.chooseImage();
+                                            print("pppppppp--${_myPageController
+                                                .users!.backgroundUrl}");
                                           }
                                         },
-                                        child: Positioned.fill(
-                                          child: getSquareImg(
-                                              Url: _myPageController
-                                                  .users!.backgroundUrl,
-                                              width: double.infinity,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height /
-                                                  2),
-                                        ),
+                                        child: getSquareImg(
+                                            Url: _myPageController
+                                                .users!.backgroundUrl,
+                                            width: double.infinity,
+                                            height: MediaQuery.of(context)
+                                                .size
+                                                .height /
+                                                2+50)
                                       ),
                                       Container(
                                         alignment: Alignment.center,
@@ -1122,7 +1122,7 @@ class getSquareImgState extends State<getSquareImg> {
     return ClipRRect(
         borderRadius: BorderRadius.circular(widget.isRadius ? 8.0 : 0),
         child: CachedNetworkImage(
-          httpHeaders: {
+          httpHeaders: const {
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 SLBrowser/9.0.3.5211 SLBChan/103',
           },
