@@ -219,11 +219,11 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Log.d("TAGpppppaaaaaa", "onViewCreated: ");
         super.onViewCreated(view, savedInstanceState);
 
         initView();
         app = (App) getContext().getApplicationContext();
+        Log.d("TAGpppppaaaaaa", "onViewCreated: "+app.HomeData);
 
         new DataProcessingTask().execute(app.HomeData);
 
@@ -814,6 +814,7 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             //super.onPostExecute(aBoolean);
+
             if (aBoolean) {
                 singlesAndAlbumsAdapter.setData(singLe_albumsList);
                 singLessAlbum.setAdapter(singlesAndAlbumsAdapter);
@@ -876,10 +877,14 @@ public class HomeFragment extends Fragment implements View.OnTouchListener, View
             concentration_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_NEW_HOT_COMMENT", getContext());
             exclusiveSceneSongList_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST", getContext());
             speciallyProduced_beanList = Home_GsonUtil.getInstance().press(s, null, "HOMEPAGE_BLOCK_YUNCUN_PRODUCED", getContext());
+            Log.d("TAG-----sssfffff", "onPostExecute: "+(banner_beanList != null)+"-----" +
+                    ""+(recommended_playlists != null)+"-----"+(singLe_albumsList != null)+"----"+
+                    (recommendableMusics != null)+"-----"+(musicRadar_beanList != null)+"----"+(concentration_beanList != null)
+            +(exclusiveSceneSongList_beanList != null)+"-----"+(speciallyProduced_beanList != null));
+
             return banner_beanList != null
                     && recommended_playlists != null
-                    && singLe_albumsList != null &&
-                    recommendableMusics != null && musicRadar_beanList != null
+                    && singLe_albumsList != null  && musicRadar_beanList != null
                     && concentration_beanList != null &&
                     exclusiveSceneSongList_beanList != null && speciallyProduced_beanList != null;
         }

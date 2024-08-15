@@ -170,10 +170,11 @@ public class Home_GsonUtil {
                         }
                     case "HOMEPAGE_BLOCK_STYLE_RCMD":
                         if (blockCode.equals(code)) {
+
                             JSONObject uiElement = (JSONObject) jsonObject.get("uiElement");
                             JSONObject subTitle = (JSONObject) uiElement.get("subTitle");
                             String ModuleTitle = (String) subTitle.get("title");
-
+                            Log.d("TAG------------aaaas", "press: "+ModuleTitle);
                             String SongTitle, SubTitle, imageUrl, name = "";
                             long SongId = 0;
                           //  HomeFragment.UpDateText(ModuleTitle, "module_title");

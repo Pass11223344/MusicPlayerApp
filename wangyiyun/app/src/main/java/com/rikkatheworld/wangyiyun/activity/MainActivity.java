@@ -1932,8 +1932,6 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                 app.page -= 1;
                 return;
             }
-
-
             homeFragment.hideFragment();
             Log.d("TAG111111111111222333", "onBackPressed: " + app.page);
             showView();
@@ -1991,12 +1989,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                         .commit();
             } else {
                 Log.d("TAG---------", "onBackPressed: " + (myFragment.isVisible() && viewPager.getCurrentItem() == 1));
-//                if (myFragment.isVisible()&&viewPager.getCurrentItem()==1) {
-//                   // myFragment.myBindings.channel.invokeMethod("back","");
-//                    app.touchType = TouchType.MY_PAGE;
-//                    showView();
-//                    return;
-//                }
+
                 if (msgFragment.isVisible() && viewPager.getCurrentItem() == 2) {
                     msgFragment.msgBindings.channel.invokeMethod("back", "");
                     showView();
@@ -2183,44 +2176,46 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         if (file.exists()) {
             AUTO_PLAY = false;
             musicCacheBean = MusicPlayerUtils.deserializeList(filePath);
-            playerInfo.setDuration(musicCacheBean.getDuration());
-            playerInfo.setCurrentPosition(musicCacheBean.getStrProgress());
-            playerInfo.setListBeans(musicCacheBean.getPlayList());
-            activityMainBinding.setPlayerInfo(playerInfo);
-            CURRENT_PLAY_MODE = musicCacheBean.getPlayMode();
-            int index = musicCacheBean.getIndex();
-            int num = musicCacheBean.getPlayList().size();
-            if (num <= 10) {
-                index = num * 500 + index;
-            } else if (num <= 1000) {
-                index = num * 50 + index;
-            } else if (num <= 4000) {
-                index = num * 5 + index;
+            if(musicCacheBean!=null){
+                playerInfo.setDuration(musicCacheBean.getDuration());
+                playerInfo.setCurrentPosition(musicCacheBean.getStrProgress());
+                playerInfo.setListBeans(musicCacheBean.getPlayList());
+                activityMainBinding.setPlayerInfo(playerInfo);
+                CURRENT_PLAY_MODE = musicCacheBean.getPlayMode();
+                int index = musicCacheBean.getIndex();
+                int num = musicCacheBean.getPlayList().size();
+                if (num <= 10) {
+                    index = num * 500 + index;
+                } else if (num <= 1000) {
+                    index = num * 50 + index;
+                } else if (num <= 4000) {
+                    index = num * 5 + index;
+                }
+
+                currentPosition = (musicCacheBean.getProgress() * 1.0f / musicCacheBean.getDurationNum() * 100);
+                player_seekBar.setProgress((int) currentPosition);
+                setList.setListInfo(musicCacheBean.getPlayList());
+                player_viewPage.setCurrentItem(index);
+                switch (CURRENT_PLAY_MODE) {
+
+                    case SINGLE_PLAY_MODE:
+                        play_module.setImageDrawable(getDrawable(playMode[0]));
+                        break;
+                    case SEQUENTIAL_MODE:
+                        play_module.setImageDrawable(getDrawable(playMode[1]));
+                        break;
+                    case RANDOM_PLAY_MODE:
+                        play_module.setImageDrawable(getDrawable(playMode[2]));
+                        break;
+                    case UNLIMITED_PLAYBACK_MODE:
+                        play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
+                        break;
+                    case SINGLE_PLAY_MODE_ONE:
+                        play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
+                        break;
+                }
             }
 
-            currentPosition = (musicCacheBean.getProgress() * 1.0f / musicCacheBean.getDurationNum() * 100);
-            Log.d("TAGjdjdjfjfjgjg", "restoreData: " + currentPosition + "----" + musicCacheBean.getProgress());
-            player_seekBar.setProgress((int) currentPosition);
-            setList.setListInfo(musicCacheBean.getPlayList());
-            player_viewPage.setCurrentItem(index);
-            switch (CURRENT_PLAY_MODE) {
-
-                case SINGLE_PLAY_MODE:
-                    play_module.setImageDrawable(getDrawable(playMode[0]));
-                    break;
-                case SEQUENTIAL_MODE:
-                    play_module.setImageDrawable(getDrawable(playMode[1]));
-                    break;
-                case RANDOM_PLAY_MODE:
-                    play_module.setImageDrawable(getDrawable(playMode[2]));
-                    break;
-                case UNLIMITED_PLAYBACK_MODE:
-                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[1]));
-                    break;
-                case SINGLE_PLAY_MODE_ONE:
-                    play_module.setImageDrawable(getDrawable(ExclusiveMusicMode[0]));
-                    break;
-            }
         }
 
     }

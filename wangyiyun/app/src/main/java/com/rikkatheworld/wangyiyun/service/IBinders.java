@@ -250,8 +250,7 @@ public class IBinders extends Binder implements IPlayerControl, MediaPlayer.OnPr
                 isOnClick = false;
                 switchSong = false;
                 scrollPage();
-            }else
-            if (isOnClick) {
+            }else if (isOnClick) {
                 isOnClick = false;
                 switchSong = false;
             }else {

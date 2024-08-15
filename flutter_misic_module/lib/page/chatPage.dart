@@ -88,104 +88,113 @@ class chatPageState extends State<chatPage> with WidgetsBindingObserver {
           ? Scaffold(
               backgroundColor: Color(0xFFFCFCFC),
               appBar: AppBar(
+                automaticallyImplyLeading: false,
                 scrolledUnderElevation: 0.0,
                 toolbarHeight: 38,
-                centerTitle: true,
-                title: Text("${widget.data["name"]}"),
-                backgroundColor: Colors.white,
-              ),
-              body: PopScope(
-                onPopInvoked: (sisPop) {
-                  channel.invokeMethod("back", "");
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          child: Obx(() {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              scrollToBottom();
-                            });
 
-                            return ListView.builder(
-                                padding: EdgeInsets.only(bottom: 80),
-                                controller: _scrollController,
-                                itemCount: controller.msgList.length,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: EdgeInsets.all(8),
-                                    child: _listItem(index),
-                                  );
-                                });
-                          })),
-                    ),
-                    Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          height: 50,
-                          alignment: Alignment.center,
-                          width: mediaQuery.size.width - 20,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                  flex: 8,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 14, bottom: 2),
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        color: Colors.black45,
-                                        borderRadius:
-                                            BorderRadius.circular(25)),
-                                    child: TextField(
-                                      maxLines: 6,
-                                      controller: _textController,
-                                      decoration: const InputDecoration(
-                                          hintText: "发送消息",
-                                          isCollapsed: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 6),
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: InputBorder.none),
-                                    ),
-                                  )),
-                              Expanded(
-                                  flex: 2,
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      Map<String, dynamic> params = {
-                                        "user_ids": widget.data["id"],
-                                        "msg": _textController.text
-                                      };
-                                      await dioRequest.executeGet(
-                                          url: "/send/text", params: params);
-                                      var dateTime = DateTime.now();
-                                      var now = dateTime.millisecondsSinceEpoch;
-                                      controller.addMsgList([
-                                        MsgBean(
-                                            fromUser,
-                                            ToUser("", "", "", 0),
-                                            '{"msg":"${_textController.text}"}',
-                                            0,
-                                            now)
-                                      ]);
-                                      _textController.clear();
-                                    },
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text("发送"),
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        )),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                        channel.invokeMethod("back", "");
+                      },
+                      child: const Icon(Icons.arrow_back,
+                        color: Colors.black),),
+                   Flexible(child:  Text("${widget.data["name"]}")),
+                    Container(width: 10,)
                   ],
                 ),
+                backgroundColor: Colors.white,
+              ),
+              body: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: Obx(() {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            scrollToBottom();
+                          });
+
+                          return ListView.builder(
+                              padding: EdgeInsets.only(bottom: 80),
+                              controller: _scrollController,
+                              itemCount: controller.msgList.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: EdgeInsets.all(8),
+                                  child: _listItem(index),
+                                );
+                              });
+                        })),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        height: 50,
+                        alignment: Alignment.center,
+                        width: mediaQuery.size.width - 20,
+                        child: Row(
+                          children: [
+                            Expanded(
+                                flex: 8,
+                                child: Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 14, bottom: 2),
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                      color: Colors.black45,
+                                      borderRadius:
+                                      BorderRadius.circular(25)),
+                                  child: TextField(
+                                    maxLines: 6,
+                                    controller: _textController,
+                                    decoration: const InputDecoration(
+                                        hintText: "发送消息",
+                                        isCollapsed: true,
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 6),
+                                        hintStyle:
+                                        TextStyle(color: Colors.grey),
+                                        border: InputBorder.none),
+                                  ),
+                                )),
+                            Expanded(
+                                flex: 2,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    Map<String, dynamic> params = {
+                                      "user_ids": widget.data["id"],
+                                      "msg": _textController.text
+                                    };
+                                    await dioRequest.executeGet(
+                                        url: "/send/text", params: params);
+                                    var dateTime = DateTime.now();
+                                    var now = dateTime.millisecondsSinceEpoch;
+                                    controller.addMsgList([
+                                      MsgBean(
+                                          fromUser,
+                                          ToUser("", "", "", 0),
+                                          '{"msg":"${_textController.text}"}',
+                                          0,
+                                          now)
+                                    ]);
+                                    _textController.clear();
+                                  },
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Text("发送"),
+                                  ),
+                                ))
+                          ],
+                        ),
+                      )),
+                ],
               ))
           : Container(
               color: Colors.white,

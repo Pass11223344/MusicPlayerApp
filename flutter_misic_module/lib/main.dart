@@ -219,12 +219,14 @@ class MyAppState extends State<MyApp> {
 
   void receiveDataFromAndroid() {
     channel.setMethodCallHandler((call) async {
-      print(
-          "object1111111111111111111122222222222222${childKey.currentState == null}");
+
       switch (call.method) {
         case "pressPage":
           bool isBack = true;
-
+          isBack = await childKey.currentState?.isPop() ?? false;
+          if (isBack) {
+            return;
+          }
           if (childKey.currentState == null) {
             var p = {"origin": "other_page"};
             await channel.invokeMethod("back", p);
@@ -237,7 +239,7 @@ class MyAppState extends State<MyApp> {
             songListPageState.cancelRequest();
           }
 
-          isBack = await childKey.currentState?.isPop() ?? false;
+
 
           break;
         case "to_other_page":
