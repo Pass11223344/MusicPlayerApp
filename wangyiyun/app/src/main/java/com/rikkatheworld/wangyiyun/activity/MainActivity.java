@@ -2133,12 +2133,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
                                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
                                 String downloadsPath = downloadsDir.getAbsolutePath();
                                 Map<String, Object> result = new HashMap<>();
-                                result.put("isSuccess", true);
-                                result.put("action", String.valueOf(info.get("info")).equals("") ? "chooseImg" : "saveImg");
+                                String action = String.valueOf(info.get("info")).equals("") ? "chooseImg" : "saveImg";                               result.put("isSuccess", true);
+                                result.put("action", action);
                                 result.put("info", String.valueOf(info.get("info")));
                                 result.put("path", downloadsPath);
 
 
+                                if (action.equals("chooseImg")) {
+                                    myFragment.myBindings.channel.invokeMethod("RequestResults", result);
+                                    return;
+                                }
                                 if (String.valueOf(info.get("origin")).equals("myFragment")) {
                                     myFragment.myBindings.channel.invokeMethod("RequestResults", result);
 

@@ -45,7 +45,7 @@
             android:id="@+id/ViewPager_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/lin_player"
+
             android:background="@drawable/home_background" />
 
         <FrameLayout

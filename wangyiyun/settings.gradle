@@ -19,7 +19,7 @@ dependencyResolutionManagement {
 include ':app'
 
 rootProject.name = "musicAPP"
-setBinding(new Binding([gradle: this]))
+setBinding(new Binding([gradle: this,mainModuleName:"flutter_misic_module"]))
 evaluate(new File(
         settingsDir.parentFile,
         'flutter_misic_module/.android/include_flutter.groovy'
