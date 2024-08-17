@@ -457,42 +457,54 @@ class mySongListPageState extends State<mySongListPage> {
                                                                   ListController
                                                                           .albumInfo !=
                                                                       null,
-                                                              child: Text(
-                                                                  "发行时间:${ListController.albumInfo != null ? Utils.formatDate(ListController.albumInfo!.album.publishTime) : ""}",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color: Colors
-                                                                          .grey)),
-                                                            ),
-                                                            Visibility(
-                                                                visible:
-                                                                    ListController
-                                                                            .albumInfo !=
-                                                                        null,
-                                                                child:
-                                                                    GestureDetector(
-                                                                  child: Text(
-                                                                    "${ListController.albumInfo != null ? ListController.albumInfo?.album.description : ""}>",
+                                                              child:GestureDetector(
+                                                                onTap:
+                                                                    () {
+                                                                  channel
+                                                                      .invokeMethod("hideOrShowView", true)
+                                                                      .then((_) {
+                                                                    ListController.isShow =
+                                                                    true;
+                                                                  });
+                                                                },
+                                                                child: Text(
+                                                                    "发行时间:${ListController.albumInfo != null ? Utils.formatDate(ListController.albumInfo!.album.publishTime) : ""}",
                                                                     style: TextStyle(
                                                                         fontSize:
-                                                                            12,
+                                                                        12,
                                                                         color: Colors
-                                                                            .grey),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                )),
-                                                            Obx(() {
+                                                                            .grey)),
+
+                                                              )
+                                                              ,
+                                                            ),
+                                                            ListController.albumInfo != null?GestureDetector(
+                                                              onTap:
+                                                                  () {
+                                                                channel
+                                                                    .invokeMethod("hideOrShowView", true)
+                                                                    .then((_) {
+                                                                  ListController.isShow =
+                                                                  true;
+                                                                });
+                                                              },
+                                                              child:Text(
+                                                                "${ListController.albumInfo?.album.description }>",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                    12,
+                                                                    color: Colors
+                                                                        .grey),
+                                                                overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ):const SizedBox(),
+                                                            ListController.albumInfo != null?const SizedBox(): Obx(() {
                                                               List<Widget>
                                                                   list = [];
-                                                              if (ListController
-                                                                      .songSheet!
-                                                                      .sharedUsers
-                                                                      .length !=
-                                                                  0) {
+                                                              if (ListController.songSheet!.sharedUsers.length != 0) {
                                                                 list = ListController
                                                                     .songSheet!
                                                                     .sharedUsers
@@ -506,10 +518,8 @@ class mySongListPageState extends State<mySongListPage> {
                                                                       user =
                                                                       entry
                                                                           .value;
-                                                                  print(
-                                                                      "-------------------$index");
-                                                                  if (index >=
-                                                                      2)
+                                                                  
+                                                                  if (index >= 2)
                                                                     return SizedBox();
                                                                   return Positioned(
                                                                       right: ListController.songSheet!.sharedUsers.length >=
@@ -619,7 +629,9 @@ class mySongListPageState extends State<mySongListPage> {
                                                                           )
                                                                         ],
                                                                       ));
-                                                            })
+                                                            }
+
+                                                            )
                                                           ],
                                                         ),
                                                       ],
@@ -627,6 +639,9 @@ class mySongListPageState extends State<mySongListPage> {
                                                   ),
                                                 ],
                                               ),
+
+
+
                                               Visibility(
                                                   visible: ListController
                                                           .albumInfo ==
@@ -661,14 +676,7 @@ class mySongListPageState extends State<mySongListPage> {
                                                           )),
                                                     ),
                                                   )),
-                                              // Container(
-                                              //   margin: const EdgeInsets.only(top: 10),
-                                              //   width: double.infinity,
-                                              //   alignment: Alignment.centerLeft,
-                                              //   child:Visibility(
-                                              //       visible:  ListController.songSheet?.description!=null||ListController.songSheet?.userId==ListController.songSheet?.creator.userId,
-                                              //       child: Text(" ${ListController.songSheet?.userId==ListController.songSheet?.creator.userId&&ListController.songSheet?.description=="" ?"编辑信息":ListController.songSheet?.description }>",style: TextStyle(fontSize:12,color: Colors.black ),overflow: TextOverflow.ellipsis,maxLines: 1,)),
-                                              // )
+
 
                                               Padding(
                                                 padding:

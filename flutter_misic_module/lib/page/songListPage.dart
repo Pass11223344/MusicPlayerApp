@@ -467,36 +467,30 @@ class songListPageState extends State<songListPage> {
                                                                             style:
                                                                                 TextStyle(fontSize: 12, color: Colors.white)),
                                                                       )),
-                                                                  Visibility(
-                                                                      visible:
-                                                                          ListController.albumInfo !=
-                                                                              null,
-                                                                      child:
-                                                                          GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          channel
-                                                                              .invokeMethod("hideOrShowView", true)
-                                                                              .then((_) {
-                                                                            ListController.isShow =
-                                                                                true;
-                                                                          });
-                                                                        },
-                                                                        child:
-                                                                            Text(
-                                                                          "${ListController.albumInfo != null ? ListController.albumInfo?.album.description : ""}>",
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: Colors.white70),
-                                                                          overflow:
-                                                                              TextOverflow.ellipsis,
-                                                                          maxLines:
-                                                                              1,
-                                                                        ),
-                                                                      )),
-                                                                  ListController
-                                                                              .albumInfo !=
-                                                                          null
+                                                            ListController.albumInfo != null?GestureDetector(
+                                                              onTap:
+                                                                  () {
+                                                                channel
+                                                                    .invokeMethod("hideOrShowView", true)
+                                                                    .then((_) {
+                                                                  ListController.isShow =
+                                                                  true;
+                                                                });
+                                                              },
+                                                              child:Text(
+                                                                "${ListController.albumInfo?.album.description }>",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                    12,
+                                                                    color: Colors
+                                                                        .grey),
+                                                                overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ):const SizedBox(),
+                                                                  ListController.albumInfo != null
                                                                       ? const SizedBox()
                                                                       : Obx(() {
                                                                           List<Widget>
@@ -585,6 +579,8 @@ class songListPageState extends State<songListPage> {
                                                         ),
                                                       ],
                                                     ),
+
+
                                                     Visibility(
                                                         visible: ListController
                                                                 .albumInfo ==
@@ -1773,7 +1769,7 @@ class songListPageState extends State<songListPage> {
         );
       },
     );
-
+    ListController.isOpenSheet = false;
     channel.invokeMethod("hideOrShowView", false);
   }
 }

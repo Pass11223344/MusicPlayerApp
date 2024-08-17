@@ -1140,7 +1140,6 @@ class searchPageState extends State<searchPage> with TickerProviderStateMixin {
                 child: Text("是", style: TextStyle(color: Colors.red)),
                 onPressed: () {
                   Navigator.of(context).pop();
-
                   FocusScope.of(context).unfocus();
                   history_list.clear();
                 },
@@ -1158,6 +1157,7 @@ class searchPageState extends State<searchPage> with TickerProviderStateMixin {
             ],
           );
         });
+    isOpenSheet = false;
   }
 
   _SongListItem(int index) {
